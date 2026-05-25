@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { gerarFluxoDiario, brl } from '../utils/gerarFluxo'
+import { gerarFluxoDiario, brl, FERIADOS_BR } from '../utils/gerarFluxo'
 
 const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
@@ -96,7 +96,13 @@ export default function StepResultado({ data, back, restart, className }) {
   }, [dias, diasNoMes])
 
   const dayNums = Array.from({ length: diasNoMes }, (_, i) => i + 1)
-  const isWeekend = (day) => { const dow = new Date(ano, mes, day).getDay(); return dow === 0 || dow === 6 }
+  const isNonWorking = (day) => {
+    const d = new Date(ano, mes, day)
+    const dow = d.getDay()
+    if (dow === 0 || dow === 6) return true
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+    return FERIADOS_BR.has(key)
+  }
 
   const rows = [
     { kind: 'saldo-top', label: 'SALDO INICIAL DO CAIXA',
@@ -218,8 +224,10 @@ export default function StepResultado({ data, back, restart, className }) {
                     Categoria
                   </th>
                   {dayNums.map(d => (
-                    <th key={d} className={`px-0 py-3 text-[11px] font-semibold min-w-[42px] text-center border-r border-white/10
-                      ${isWeekend(d) ? 'text-white/30' : 'text-slate-300'}`}>
+                    <th key={d}
+                      style={{ backgroundColor: isNonWorking(d) ? '#2e4f8a' : NAVY }}
+                      className={`px-0 py-3 text-[11px] font-semibold min-w-[42px] text-center border-r border-white/10
+                        ${isNonWorking(d) ? 'text-white/35' : 'text-slate-300'}`}>
                       {d}
                     </th>
                   ))}
@@ -274,7 +282,8 @@ export default function StepResultado({ data, back, restart, className }) {
                         {dayNums.map(d => {
                           const val = row.values[d - 1] || 0
                           return (
-                            <td key={d} className="px-0.5 py-2 text-center border-r border-white/10">
+                            <td key={d} className="px-0.5 py-2 text-center border-r border-white/10"
+                              style={{ backgroundColor: isNonWorking(d) ? '#2e4f8a' : subBg }}>
                               <NumCell value={val} bold onDark />
                             </td>
                           )
@@ -301,8 +310,9 @@ export default function StepResultado({ data, back, restart, className }) {
                       {dayNums.map(d => {
                         const val = (row.values || [])[d - 1] || 0
                         return (
-                          <td key={d} className={`px-0.5 py-2 text-center border-r border-slate-100/60
-                            ${!cfg.dark && isWeekend(d) ? 'bg-slate-50' : ''}`}>
+                          <td key={d}
+                            className="px-0.5 py-2 text-center border-r border-slate-100/60"
+                            style={{ backgroundColor: isNonWorking(d) ? (cfg.dark ? '#2e4f8a' : '#dbeafe') : undefined }}>
                             <NumCell value={val} bold={cfg.bold} saldo={row.isSaldo} onDark={cfg.dark} numColor={row.numColor} />
                           </td>
                         )
