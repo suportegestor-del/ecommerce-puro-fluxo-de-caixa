@@ -100,18 +100,24 @@ export default function App() {
             </svg>
           </button>
           {showQR && (
-            <div className="absolute right-0 top-12 z-50 bg-[#1a1a1a] border border-white/10 rounded-2xl p-4 shadow-2xl flex flex-col items-center gap-3 min-w-[220px]">
-              <p className="text-xs text-white/60 font-medium uppercase tracking-widest">Escaneie para acessar</p>
-              <div className="bg-white rounded-xl p-2">
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(SITE_URL)}&bgcolor=ffffff&color=000000&margin=4`}
-                  alt="QR Code"
-                  width={180}
-                  height={180}
-                  className="rounded-lg"
-                />
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm" onClick={() => setShowQR(false)}>
+              <div className="flex flex-col items-center gap-6 p-10 rounded-3xl bg-[#0f0f0f] border border-white/10 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <p className="text-2xl font-bold text-white tracking-wide">Acesse o Fluxo de Caixa</p>
+                <p className="text-slate-400 text-base -mt-3">Aponte a câmera do celular para o QR Code</p>
+                <div className="bg-white rounded-2xl p-4 shadow-xl">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(SITE_URL)}&bgcolor=ffffff&color=000000&margin=8`}
+                    alt="QR Code"
+                    width={400}
+                    height={400}
+                    className="rounded-xl"
+                  />
+                </div>
+                <p className="text-slate-500 text-sm">{SITE_URL}</p>
+                <button onClick={() => setShowQR(false)} className="mt-2 px-8 py-2.5 rounded-xl border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition text-sm">
+                  Fechar
+                </button>
               </div>
-              <p className="text-[10px] text-white/30 text-center break-all">{SITE_URL}</p>
             </div>
           )}
         </div>
