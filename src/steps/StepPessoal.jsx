@@ -15,6 +15,14 @@ export default function StepPessoal({ data, updateData, next, back, className })
           Total consolidado da folha — salários, pró-labore, freelancers
         </p>
 
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 mb-5 flex items-start gap-2">
+          <span className="text-amber-400 text-base mt-0.5">⚠️</span>
+          <p className="text-amber-300 text-xs leading-relaxed">
+            Inclua <strong>salários + encargos</strong> (FGTS, INSS patronal, férias, 13º, etc.)
+            no valor total da folha.
+          </p>
+        </div>
+
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
