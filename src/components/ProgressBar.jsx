@@ -30,7 +30,7 @@ export default function ProgressBar({ current, total, labels }) {
       </div>
       <div className="relative h-1.5 bg-zinc-800 rounded-full overflow-hidden">
         <div
-          className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-blue-400 rounded-full transition-all duration-500"
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-700 to-blue-400 rounded-full transition-all duration-500"
           style={{ width: `${((current - 1) / (total - 1)) * 100}%` }}
         />
       </div>
