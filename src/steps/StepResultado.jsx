@@ -134,7 +134,7 @@ export default function StepResultado({ data, back, restart, className }) {
     'subheader': { bg: 'bg-[#2e5597]',  sticky: 'bg-[#2e5597]',  dark: true,  indent: false, bold: true  },
     'item':      { bg: 'bg-white',       sticky: 'bg-white',       dark: false, indent: true,  bold: false },
 
-    'saldo-dia': { bg: 'bg-[#1a3a2e]',  sticky: 'bg-[#1a3a2e]',  dark: true,  indent: false, bold: true  },
+    'saldo-dia': { bg: 'bg-[#1e3a5f]',  sticky: 'bg-[#1e3a5f]',  dark: true,  indent: false, bold: true  },
   }
 
   return (
