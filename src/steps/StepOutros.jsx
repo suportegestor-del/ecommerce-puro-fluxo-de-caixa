@@ -9,6 +9,7 @@ const SUGESTOES = [
   { nome: 'Contabilidade', icone: '📒' },
   { nome: 'Software / SaaS', icone: '💻' },
   { nome: 'Frete / logística', icone: '📦' },
+  { nome: 'Prestador de Serviços PJ', icone: '🤝' },
 ]
 
 const empty = (nome = '') => ({ id: Date.now() + Math.random(), nome, valor: '', diaVencimento: '' })
