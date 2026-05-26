@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { gerarFluxoDiario, brl, FERIADOS_BR } from '../utils/gerarFluxo'
+import { exportarExcel } from '../utils/exportarExcel'
 
 const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
@@ -338,10 +339,14 @@ export default function StepResultado({ data, back, restart, className }) {
             <span className="hidden sm:inline"><span className="inline-block w-2.5 h-2.5 rounded-sm bg-slate-200 mr-1 align-middle"></span>Fim de semana</span>
             <span className="hidden sm:inline text-slate-300">1k = R$ 1.000 · 1M = R$ 1.000.000</span>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <button onClick={back}
               className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition font-medium text-sm shadow-sm">
               ← Ajustar
+            </button>
+            <button onClick={() => exportarExcel(data)}
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition text-sm shadow-md shadow-emerald-600/30 flex items-center gap-2">
+              ⬇️ Baixar Excel
             </button>
             <button onClick={restart}
               className="px-5 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-bold transition text-sm shadow-md shadow-blue-500/30">
