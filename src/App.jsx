@@ -80,9 +80,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(160deg, #0a0a0a 0%, #0d0d0d 60%, #00091a 100%)' }}>
-      <header className="flex items-center justify-between py-4 px-6 border-b border-white/5 relative">
+      <header className="flex items-center justify-between py-5 px-6 border-b border-white/5 relative">
         <div className="w-10" />
-        <img src="/logo.png" alt="Ecommerce Puro" className="h-14 object-contain" />
+        <img src="/logo.png" alt="Ecommerce Puro" className="h-20 object-contain" />
         <div className="relative" ref={qrRef}>
           <button
             onClick={() => setShowQR(v => !v)}
