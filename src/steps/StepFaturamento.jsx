@@ -4,7 +4,7 @@ const MESES_ABREV = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out'
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 const SUGESTOES = [
-  { nome: 'Mercado Livre MG', deducao: '17', leadTime: '14' },
+  { nome: 'Mercado Livre',    deducao: '17', leadTime: '14' },
   { nome: 'Shopee',           deducao: '20', leadTime: '14' },
   { nome: 'Amazon',           deducao: '15', leadTime: '21' },
   { nome: 'Site Próprio',     deducao: '3',  leadTime: '1'  },
