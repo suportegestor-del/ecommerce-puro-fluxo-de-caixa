@@ -25,7 +25,7 @@ const initialData = {
   canais: [],
   fornecedores: [],
   dividas: [],
-  pessoal: [],
+  pessoal: { total: '', diaPagamento: '5' },
   outros: [],
   naoOperacional: { entradas: [], saidas: [] },
 }

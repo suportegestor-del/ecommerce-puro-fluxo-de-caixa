@@ -2,16 +2,9 @@ import React from 'react'
 import Card from '../components/Card'
 import InputMoney from '../components/InputMoney'
 
-const empty = () => ({ id: Date.now(), nome: '', salario: '', diaPagamento: '5' })
-
 export default function StepPessoal({ data, updateData, next, back, className }) {
-  const lista = data.pessoal
-
-  const add = () => updateData('pessoal', [...lista, empty()])
-  const remove = (id) => updateData('pessoal', lista.filter(f => f.id !== id))
-  const change = (id, field, value) => updateData('pessoal', lista.map(f => f.id === id ? { ...f, [field]: value } : f))
-
-  const totalFolha = lista.reduce((s, p) => s + (Number(p.salario) || 0), 0)
+  const pessoal = data.pessoal || { total: '', diaPagamento: '5' }
+  const patch = (field, value) => updateData('pessoal', { ...pessoal, [field]: value })
 
   return (
     <div className={`w-full max-w-lg ${className}`}>
@@ -19,70 +12,54 @@ export default function StepPessoal({ data, updateData, next, back, className })
         <div className="text-4xl mb-4 text-center">👥</div>
         <h2 className="text-2xl font-bold text-white text-center mb-2">Pessoal & Folha</h2>
         <p className="text-slate-400 text-sm text-center mb-6">
-          Funcionários, sócios, freelancers — tudo que é pago para pessoas
+          Total consolidado da folha — salários, pró-labore, freelancers
         </p>
 
-        <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-          {lista.length === 0 && (
-            <div className="text-center py-8 text-slate-500 text-sm">
-              Nenhum colaborador adicionado.<br />
-              <span className="text-slate-600">(pode pular se for solo)</span>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+              Total da Folha Mensal
+            </label>
+            <InputMoney
+              value={pessoal.total}
+              onChange={v => patch('total', v)}
+              placeholder="R$ 0,00"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+              Dia de Pagamento
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                max="31"
+                placeholder="Ex: 5"
+                value={pessoal.diaPagamento}
+                onChange={e => patch('diaPagamento', e.target.value)}
+                className="w-full bg-zinc-950/70 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">dia do mês</span>
+            </div>
+          </div>
+
+          {Number(pessoal.total) > 0 && (
+            <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-3 flex justify-between items-center">
+              <span className="text-sm text-slate-300">Saída no dia {pessoal.diaPagamento || '—'}</span>
+              <span className="font-bold text-white">
+                {Number(pessoal.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+              </span>
             </div>
           )}
-          {lista.map((p) => (
-            <div key={p.id} className="bg-zinc-950/60 border border-zinc-800 rounded-xl p-3 space-y-2">
-              <div className="flex gap-2 items-center">
-                <input
-                  type="text"
-                  placeholder="Nome / função"
-                  value={p.nome}
-                  onChange={e => change(p.id, 'nome', e.target.value)}
-                  className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-                <button onClick={() => remove(p.id)} className="text-slate-500 hover:text-red-400 transition text-lg w-8 h-8 flex items-center justify-center">✕</button>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <InputMoney
-                    value={p.salario}
-                    onChange={v => change(p.id, 'salario', v)}
-                    placeholder="Salário / pró-labore"
-                  />
-                </div>
-                <div className="relative w-24">
-                  <input
-                    type="number"
-                    min="1"
-                    max="31"
-                    placeholder="Dia"
-                    value={p.diaPagamento}
-                    onChange={e => change(p.id, 'diaPagamento', e.target.value)}
-                    className="w-full bg-zinc-950/70 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500">dia</span>
-                </div>
-              </div>
-            </div>
-          ))}
+
+          {!pessoal.total && (
+            <p className="text-center text-slate-600 text-xs pt-2">(pode pular se não tiver folha)</p>
+          )}
         </div>
 
-        {totalFolha > 0 && (
-          <div className="mt-3 bg-zinc-800/50 border border-zinc-700 rounded-xl p-3 flex justify-between items-center">
-            <span className="text-sm text-slate-300">Total folha mensal</span>
-            <span className="font-bold text-white">
-              {totalFolha.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            </span>
-          </div>
-        )}
-
-        <button
-          onClick={add}
-          className="w-full mt-4 py-2.5 border border-dashed border-zinc-700 rounded-xl text-zinc-500 hover:text-white hover:border-orange-500 transition text-sm font-medium flex items-center justify-center gap-2"
-        >
-          <span className="text-lg">+</span> Adicionar colaborador
-        </button>
-
-        <div className="flex gap-3 mt-6">
+        <div className="flex gap-3 mt-8">
           <button onClick={back} className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition font-medium">← Voltar</button>
           <button onClick={next} className="flex-[2] bg-orange-500 hover:bg-orange-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/20">Próximo →</button>
         </div>
