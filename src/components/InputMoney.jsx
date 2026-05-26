@@ -34,7 +34,7 @@ export default function InputMoney({ value, onChange, placeholder = 'R$ 0,00', c
           onFocus={handleFocus}
           disabled={disabled}
           placeholder={placeholder || '0,00'}
-          className={`w-full pl-10 pr-3 py-2.5 bg-zinc-950/70 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition text-sm ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+          className={`w-full pl-10 pr-3 py-2.5 bg-zinc-950/70 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
         />
       </div>
     </div>

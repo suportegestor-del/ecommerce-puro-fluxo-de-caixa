@@ -60,7 +60,7 @@ function MoneyCell({ value, onChange }) {
       onFocus={handleFocus}
       onBlur={handleBlur}
       placeholder="0"
-      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-orange-500 focus:bg-zinc-800 rounded px-1.5 py-1 text-white text-xs text-right placeholder-zinc-700 focus:outline-none transition min-w-[90px]"
+      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-1.5 py-1 text-white text-xs text-right placeholder-zinc-700 focus:outline-none transition min-w-[90px]"
     />
   )
 }
@@ -108,8 +108,8 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
             disabled={jaAdicionado(s.nome)}
             className={`text-xs px-3 py-1.5 rounded-full border transition font-medium ${
               jaAdicionado(s.nome)
-                ? 'bg-orange-900/30 border-orange-600 text-orange-300 cursor-default'
-                : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-orange-500 hover:text-white'
+                ? 'bg-orange-900/30 border-orange-600 text-blue-300 cursor-default'
+                : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-blue-500 hover:text-white'
             }`}
           >
             {s.nome} {jaAdicionado(s.nome) ? '✓' : '+'}
@@ -117,7 +117,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
         ))}
         <button
           onClick={() => addCanal()}
-          className="text-xs px-3 py-1.5 rounded-full border border-dashed border-zinc-600 text-zinc-500 hover:border-orange-500 hover:text-white transition font-medium"
+          className="text-xs px-3 py-1.5 rounded-full border border-dashed border-zinc-600 text-zinc-500 hover:border-blue-500 hover:text-white transition font-medium"
         >
           + Novo canal
         </button>
@@ -145,7 +145,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
                   key={i}
                   className={`text-center px-1 py-2.5 font-semibold min-w-[130px] ${
                     i === mesAtual
-                      ? 'bg-orange-900/40 text-orange-300'
+                      ? 'bg-orange-900/40 text-blue-300'
                       : ''
                   } ${col < visibleMeses.length - 1 ? 'border-r border-zinc-700/50' : ''}`}
                 >
@@ -175,7 +175,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
                     value={canal.nome}
                     onChange={e => changeCanal(canal.id, 'nome', e.target.value)}
                     placeholder="Nome do canal"
-                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-orange-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs font-medium placeholder-zinc-600 focus:outline-none transition"
+                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs font-medium placeholder-zinc-600 focus:outline-none transition"
                   />
                 </td>
 
@@ -187,7 +187,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
                       min="0" max="100" step="0.5"
                       value={canal.deducao}
                       onChange={e => changeCanal(canal.id, 'deducao', e.target.value)}
-                      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-orange-500 focus:bg-zinc-800 rounded px-2 pr-5 py-1 text-white text-xs text-center focus:outline-none transition"
+                      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 pr-5 py-1 text-white text-xs text-center focus:outline-none transition"
                     />
                     <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500 pointer-events-none">%</span>
                   </div>
@@ -200,7 +200,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
                     min="0" max="60"
                     value={canal.leadTime}
                     onChange={e => changeCanal(canal.id, 'leadTime', e.target.value)}
-                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-orange-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs text-center focus:outline-none transition"
+                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs text-center focus:outline-none transition"
                   />
                 </td>
 
@@ -253,7 +253,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
         <button onClick={back} className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition font-medium text-sm">
           ← Voltar
         </button>
-        <button onClick={next} className="flex-[2] bg-orange-500 hover:bg-orange-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/20 text-sm">
+        <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20 text-sm">
           Próximo →
         </button>
       </div>

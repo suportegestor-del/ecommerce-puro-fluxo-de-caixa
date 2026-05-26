@@ -95,7 +95,7 @@ function MoneyCell({ value, onChange }) {
       onChange={e => setRaw(e.target.value)}
       onFocus={handleFocus} onBlur={handleBlur}
       placeholder="0,00"
-      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-orange-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs text-right placeholder-zinc-700 focus:outline-none transition"
+      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs text-right placeholder-zinc-700 focus:outline-none transition"
     />
   )
 }
@@ -114,7 +114,7 @@ function ParcelasPreview({ f }) {
   if (n === 1 && !f.ato) return <span className="text-zinc-400 text-[10px]">À vista {compact(f.total)}</span>
   return (
     <div className="text-[10px] text-zinc-300 space-y-0.5">
-      {f.ato > 0 && <div className="text-orange-400">Ato {compact(Number(f.total) * (Number(f.ato)||0)/100)}</div>}
+      {f.ato > 0 && <div className="text-blue-400">Ato {compact(Number(f.total) * (Number(f.ato)||0)/100)}</div>}
       {n > (f.ato > 0 ? 1 : 0) && (
         <div>{n - (f.ato > 0 ? 1 : 0)}× {compact(parcelas[f.ato > 0 ? 1 : 0]?.valor)}</div>
       )}
@@ -146,13 +146,13 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
           <button key={s} onClick={() => !jaAdicionado(s) && add(s)} disabled={jaAdicionado(s)}
             className={`text-xs px-3 py-1.5 rounded-full border transition font-medium ${
               jaAdicionado(s)
-                ? 'bg-orange-900/30 border-orange-600 text-orange-300 cursor-default'
-                : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-orange-500 hover:text-white'
+                ? 'bg-orange-900/30 border-orange-600 text-blue-300 cursor-default'
+                : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-blue-500 hover:text-white'
             }`}>
             {s} {jaAdicionado(s) ? '✓' : '+'}
           </button>
         ))}
-        <button onClick={() => add()} className="text-xs px-3 py-1.5 rounded-full border border-dashed border-zinc-600 text-zinc-500 hover:border-orange-500 hover:text-white transition font-medium">
+        <button onClick={() => add()} className="text-xs px-3 py-1.5 rounded-full border border-dashed border-zinc-600 text-zinc-500 hover:border-blue-500 hover:text-white transition font-medium">
           + Novo
         </button>
       </div>
@@ -181,13 +181,13 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
                 {/* Nome */}
                 <td className="px-2 py-1.5 sticky left-0 bg-inherit z-10 border-r border-zinc-800">
                   <input type="text" value={f.nome} onChange={e => change(f.id, 'nome', e.target.value)} placeholder="Nome"
-                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-orange-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs font-medium placeholder-zinc-600 focus:outline-none transition" />
+                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs font-medium placeholder-zinc-600 focus:outline-none transition" />
                 </td>
 
                 {/* Previsto */}
                 <td className="px-2 py-1.5 border-r border-zinc-800">
                   <input type="date" value={f.previsto || ''} onChange={e => change(f.id, 'previsto', e.target.value)}
-                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-orange-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs text-center focus:outline-none transition [color-scheme:dark]" />
+                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs text-center focus:outline-none transition [color-scheme:dark]" />
                 </td>
 
                 {/* Prazo */}
@@ -196,11 +196,11 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
                     {PRAZO_RAPIDO.map(p => (
                       <button key={p} onClick={() => change(f.id, 'prazo', p)}
                         className={`text-[10px] px-1.5 py-0.5 rounded font-medium transition whitespace-nowrap ${
-                          f.prazo === p ? 'bg-orange-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                          f.prazo === p ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
                         }`}>{p}</button>
                     ))}
                     <input type="text" value={f.prazo || ''} onChange={e => change(f.id, 'prazo', e.target.value)}
-                      placeholder="ex: 30/60" className="w-16 bg-zinc-900 border border-zinc-700 rounded px-1.5 py-0.5 text-white text-[10px] text-center focus:outline-none focus:ring-1 focus:ring-orange-500" />
+                      placeholder="ex: 30/60" className="w-16 bg-zinc-900 border border-zinc-700 rounded px-1.5 py-0.5 text-white text-[10px] text-center focus:outline-none focus:ring-1 focus:ring-blue-500" />
                   </div>
                 </td>
 
@@ -208,7 +208,7 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
                 <td className="px-2 py-1.5 border-r border-zinc-800">
                   <div className="relative">
                     <input type="number" min="0" max="100" value={f.ato || ''} onChange={e => change(f.id, 'ato', e.target.value)} placeholder="0"
-                      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-orange-500 focus:bg-zinc-800 rounded px-2 pr-5 py-1 text-white text-xs text-center focus:outline-none transition" />
+                      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 pr-5 py-1 text-white text-xs text-center focus:outline-none transition" />
                     <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-zinc-600 pointer-events-none">%</span>
                   </div>
                 </td>
@@ -248,7 +248,7 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
 
       <div className="flex gap-3 mt-4 max-w-lg mx-auto">
         <button onClick={back} className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition font-medium text-sm">← Voltar</button>
-        <button onClick={next} className="flex-[2] bg-orange-500 hover:bg-orange-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/20 text-sm">Próximo →</button>
+        <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20 text-sm">Próximo →</button>
       </div>
     </div>
   )

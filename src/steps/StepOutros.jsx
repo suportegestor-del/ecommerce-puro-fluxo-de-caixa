@@ -40,8 +40,8 @@ export default function StepOutros({ data, updateData, next, back, className }) 
               disabled={jaAdicionado(s.nome)}
               className={`text-xs px-3 py-1.5 rounded-full border transition font-medium flex items-center gap-1 ${
                 jaAdicionado(s.nome)
-                  ? 'bg-orange-900/30 border-orange-600 text-orange-300 cursor-default'
-                  : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-orange-500 hover:text-white'
+                  ? 'bg-orange-900/30 border-orange-600 text-blue-300 cursor-default'
+                  : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-blue-500 hover:text-white'
               }`}
             >
               {s.icone} {s.nome} {jaAdicionado(s.nome) ? '✓' : '+'}
@@ -63,7 +63,7 @@ export default function StepOutros({ data, updateData, next, back, className }) 
                   placeholder="Descrição da despesa"
                   value={o.nome}
                   onChange={e => change(o.id, 'nome', e.target.value)}
-                  className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button onClick={() => remove(o.id)} className="text-slate-500 hover:text-red-400 transition text-lg w-8 h-8 flex items-center justify-center">✕</button>
               </div>
@@ -79,7 +79,7 @@ export default function StepOutros({ data, updateData, next, back, className }) 
                     placeholder="Dia"
                     value={o.diaVencimento}
                     onChange={e => change(o.id, 'diaVencimento', e.target.value)}
-                    className="w-full bg-zinc-950/70 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full bg-zinc-950/70 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500">dia</span>
                 </div>
@@ -90,14 +90,14 @@ export default function StepOutros({ data, updateData, next, back, className }) 
 
         <button
           onClick={() => add()}
-          className="w-full mt-4 py-2.5 border border-dashed border-zinc-700 rounded-xl text-zinc-500 hover:text-white hover:border-orange-500 transition text-sm font-medium flex items-center justify-center gap-2"
+          className="w-full mt-4 py-2.5 border border-dashed border-zinc-700 rounded-xl text-zinc-500 hover:text-white hover:border-blue-500 transition text-sm font-medium flex items-center justify-center gap-2"
         >
           <span className="text-lg">+</span> Adicionar despesa manualmente
         </button>
 
         <div className="flex gap-3 mt-6">
           <button onClick={back} className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition font-medium">← Voltar</button>
-          <button onClick={next} className="flex-[2] bg-orange-500 hover:bg-orange-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/20">
+          <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20">
             Próximo →
           </button>
         </div>

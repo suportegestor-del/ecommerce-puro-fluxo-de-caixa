@@ -79,15 +79,15 @@ export default function App() {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(160deg, #0a0a0a 0%, #111111 60%, #1a0a00 100%)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(160deg, #0a0a0a 0%, #0d0d0d 60%, #00091a 100%)' }}>
       <header className="flex items-center justify-between py-4 px-6 border-b border-white/5 relative">
         <div className="w-10" />
-        <img src="/logo.png" alt="Ecommerce Puro" className="h-10 object-contain" />
+        <img src="/logo.png" alt="Ecommerce Puro" className="h-14 object-contain" />
         <div className="relative" ref={qrRef}>
           <button
             onClick={() => setShowQR(v => !v)}
             title="Gerar QR Code"
-            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-orange-500/20 border border-white/10 hover:border-orange-500/50 transition flex items-center justify-center text-white/60 hover:text-orange-400"
+            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-blue-500/20 border border-white/10 hover:border-blue-500/50 transition flex items-center justify-center text-white/60 hover:text-blue-400"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="7" height="7" rx="1"/>

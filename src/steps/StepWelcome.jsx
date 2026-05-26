@@ -4,14 +4,14 @@ export default function StepWelcome({ next, className }) {
   return (
     <div className={`flex flex-col items-center text-center max-w-lg w-full px-4 ${className}`}>
       <div className="mb-4">
-        <img src="/logo.png" alt="Ecommerce Puro" className="h-16 object-contain mx-auto" />
+        <img src="/logo.png" alt="Ecommerce Puro" className="h-24 object-contain mx-auto" />
       </div>
 
-      <div className="w-16 h-0.5 bg-orange-500 rounded-full mx-auto mb-6" />
+      <div className="w-16 h-0.5 bg-blue-500 rounded-full mx-auto mb-6" />
 
       <h1 className="text-4xl font-extrabold text-white mb-3 leading-tight">
         Simulador de<br />
-        <span className="bg-gradient-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent">
           Fluxo de Caixa
         </span>
       </h1>
@@ -38,7 +38,7 @@ export default function StepWelcome({ next, className }) {
       </div>
       <button
         onClick={next}
-        className="w-full bg-orange-500 hover:bg-orange-400 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-200 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98]"
+        className="w-full bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98]"
       >
         Vamos lá! →
       </button>

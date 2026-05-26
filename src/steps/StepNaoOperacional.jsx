@@ -149,7 +149,7 @@ export default function StepNaoOperacional({ data, updateData, next, back, class
 
         <div className="flex gap-3 mt-6">
           <button onClick={back} className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition font-medium">← Voltar</button>
-          <button onClick={next} className="flex-[2] bg-orange-500 hover:bg-orange-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/20">
+          <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20">
             Gerar Fluxo de Caixa 🚀
           </button>
         </div>

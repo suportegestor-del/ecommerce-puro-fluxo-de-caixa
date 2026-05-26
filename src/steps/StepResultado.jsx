@@ -231,7 +231,7 @@ export default function StepResultado({ data, back, restart, className }) {
                       {d}
                     </th>
                   ))}
-                  <th className="px-3 py-3 text-[11px] font-bold text-orange-200 min-w-[80px] border-l border-white/20 text-right pr-4 whitespace-nowrap uppercase tracking-wider">
+                  <th className="px-3 py-3 text-[11px] font-bold text-blue-200 min-w-[80px] border-l border-white/20 text-right pr-4 whitespace-nowrap uppercase tracking-wider">
                     Total
                   </th>
                 </tr>
@@ -344,7 +344,7 @@ export default function StepResultado({ data, back, restart, className }) {
               ← Ajustar
             </button>
             <button onClick={restart}
-              className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-white font-bold transition text-sm shadow-md shadow-orange-500/30">
+              className="px-5 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-bold transition text-sm shadow-md shadow-blue-500/30">
               🔄 Recomeçar
             </button>
           </div>

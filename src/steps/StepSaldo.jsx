@@ -20,7 +20,7 @@ export default function StepSaldo({ data, updateData, next, back, className }) {
         />
 
         <div className="mt-4 bg-orange-900/20 border border-orange-700/30 rounded-xl p-3">
-          <p className="text-xs text-orange-300">
+          <p className="text-xs text-blue-300">
             💡 <strong>Dica:</strong> Some o saldo de todas as contas bancárias e o dinheiro físico disponível.
           </p>
         </div>
@@ -34,7 +34,7 @@ export default function StepSaldo({ data, updateData, next, back, className }) {
           </button>
           <button
             onClick={next}
-            className="flex-[2] bg-orange-500 hover:bg-orange-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/20"
+            className="flex-[2] bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20"
           >
             Próximo →
           </button>

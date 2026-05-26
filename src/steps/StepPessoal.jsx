@@ -47,7 +47,7 @@ export default function StepPessoal({ data, updateData, next, back, className })
                 placeholder="Ex: 5"
                 value={pessoal.diaPagamento}
                 onChange={e => patch('diaPagamento', e.target.value)}
-                className="w-full bg-zinc-950/70 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-zinc-950/70 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">dia do mês</span>
             </div>
@@ -69,7 +69,7 @@ export default function StepPessoal({ data, updateData, next, back, className })
 
         <div className="flex gap-3 mt-8">
           <button onClick={back} className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition font-medium">← Voltar</button>
-          <button onClick={next} className="flex-[2] bg-orange-500 hover:bg-orange-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/20">Próximo →</button>
+          <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20">Próximo →</button>
         </div>
       </Card>
     </div>

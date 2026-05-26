@@ -12,15 +12,15 @@ export default function ProgressBar({ current, total, labels }) {
             <div key={i} className="flex flex-col items-center flex-1">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                 done
-                  ? 'bg-orange-500 text-white'
+                  ? 'bg-blue-500 text-white'
                   : active
-                  ? 'bg-orange-500 text-white ring-4 ring-orange-500/30 scale-110'
+                  ? 'bg-blue-500 text-white ring-4 ring-blue-500/30 scale-110'
                   : 'bg-zinc-700 text-zinc-400'
               }`}>
                 {done ? '✓' : stepNum}
               </div>
               <span className={`mt-1 text-[10px] font-medium hidden sm:block transition-colors ${
-                active ? 'text-orange-400' : done ? 'text-orange-300' : 'text-zinc-500'
+                active ? 'text-blue-400' : done ? 'text-blue-300' : 'text-zinc-500'
               }`}>
                 {label}
               </span>
@@ -30,7 +30,7 @@ export default function ProgressBar({ current, total, labels }) {
       </div>
       <div className="relative h-1.5 bg-zinc-800 rounded-full overflow-hidden">
         <div
-          className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full transition-all duration-500"
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-600 to-blue-400 rounded-full transition-all duration-500"
           style={{ width: `${((current - 1) / (total - 1)) * 100}%` }}
         />
       </div>
