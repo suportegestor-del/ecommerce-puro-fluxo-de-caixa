@@ -108,7 +108,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
             disabled={jaAdicionado(s.nome)}
             className={`text-xs px-3 py-1.5 rounded-full border transition font-medium ${
               jaAdicionado(s.nome)
-                ? 'bg-orange-900/30 border-orange-600 text-blue-300 cursor-default'
+                ? 'bg-blue-900/30 border-blue-600 text-blue-300 cursor-default'
                 : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-blue-500 hover:text-white'
             }`}
           >
@@ -145,7 +145,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
                   key={i}
                   className={`text-center px-1 py-2.5 font-semibold min-w-[130px] ${
                     i === mesAtual
-                      ? 'bg-orange-900/40 text-blue-300'
+                      ? 'bg-blue-900/40 text-blue-300'
                       : ''
                   } ${col < visibleMeses.length - 1 ? 'border-r border-zinc-700/50' : ''}`}
                 >
@@ -213,7 +213,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
                 {visibleMeses.map((mesIdx, col) => (
                   <td
                     key={mesIdx}
-                    className={`px-1 py-1 ${mesIdx === mesAtual ? 'bg-orange-950/20' : ''} ${col < visibleMeses.length - 1 ? 'border-r border-zinc-800/50' : ''}`}
+                    className={`px-1 py-1 ${mesIdx === mesAtual ? 'bg-blue-950/30' : ''} ${col < visibleMeses.length - 1 ? 'border-r border-zinc-800/50' : ''}`}
                   >
                     <MoneyCell
                       value={canal.meses[mesIdx]}
@@ -241,7 +241,7 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
       {canais.length > 0 && (
         <div className="mt-3 flex gap-3 flex-wrap text-xs text-zinc-500">
           <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-orange-900/40 border border-orange-700/50 inline-block"></span>
+            <span className="w-2.5 h-2.5 rounded-sm bg-blue-900/40 border border-blue-700/50 inline-block"></span>
             Coluna destacada = {MESES_FULL[mesAtual]} (mês atual)
           </span>
           <span>· Coluna destacada = mês atual · Clique em qualquer célula para editar</span>
