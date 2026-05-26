@@ -4,7 +4,7 @@ export default function StepWelcome({ next, className }) {
   return (
     <div className={`flex flex-col items-center text-center max-w-lg w-full px-4 ${className}`}>
       <div className="mb-4">
-        <img src="/logo.png" alt="Ecommerce Puro" className="h-16 brightness-0 invert mx-auto" />
+        <img src="/logo.png" alt="Ecommerce Puro" className="h-16 object-contain mx-auto" />
       </div>
 
       <div className="w-16 h-0.5 bg-orange-500 rounded-full mx-auto mb-6" />
