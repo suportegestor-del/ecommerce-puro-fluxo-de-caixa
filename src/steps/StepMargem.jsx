@@ -451,6 +451,9 @@ export default function StepMargem({ className, back }) {
                 <tr className="border-b border-emerald-500/20">
                   <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Aumento</th>
                   <th className="text-left py-3 px-4 text-cyan-300 font-semibold">Preço novo</th>
+                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Qtd (receita)</th>
+                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Qtd (lucro)</th>
+                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Diferença</th>
                   <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Receita total</th>
                   <th className="text-left py-3 px-4 text-amber-300 font-semibold">Lucro total</th>
                   <th className="text-left py-3 px-4 text-slate-300 font-semibold">Dif. lucro</th>
@@ -462,6 +465,17 @@ export default function StepMargem({ className, back }) {
                   <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
                     <td className="py-3 px-4 text-emerald-300 font-semibold">{sim.aumento}%</td>
                     <td className="py-3 px-4 text-cyan-300">{formatBRL(sim.precoNovo)}</td>
+                    <td className="py-3 px-4 text-emerald-300">{sim.qtdReceita}</td>
+                    <td className="py-3 px-4 text-amber-300">{sim.qtdLucro === null ? '❌ Impossível' : sim.qtdLucro}</td>
+                    <td className="py-3 px-4">
+                      {sim.diferenca !== null ? (
+                        <span className={`font-bold ${sim.melhor ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {sim.melhor ? '↓' : '↑'} {sim.diferenca}
+                        </span>
+                      ) : (
+                        <span className="text-slate-500">-</span>
+                      )}
+                    </td>
                     <td className="py-3 px-4 text-emerald-300">{formatBRL(sim.receitaNovo)}</td>
                     <td className="py-3 px-4 text-amber-300">{sim.lucroNovo === null ? '❌ Impossível' : formatBRL(sim.lucroNovo)}</td>
                     <td className="py-3 px-4">
