@@ -7,6 +7,7 @@ import StepPessoal from './steps/StepPessoal'
 import StepOutros from './steps/StepOutros'
 import StepNaoOperacional from './steps/StepNaoOperacional'
 import StepResultado from './steps/StepResultado'
+import StepMargem from './steps/StepMargem'
 import ProgressBar from './components/ProgressBar'
 
 const STEPS = [
@@ -35,6 +36,12 @@ export default function App() {
   const [direction, setDirection] = useState('right')
   const [data, setData] = useState(initialData)
   const [animKey, setAnimKey] = useState(0)
+  const [mode, setMode] = useState('fluxo')
+
+  const switchMode = (newMode) => {
+    setMode(newMode)
+    if (newMode === 'fluxo') setStep(0)
+  }
 
   const goTo = (nextStep) => {
     setDirection(nextStep > step ? 'right' : 'left')
@@ -65,7 +72,7 @@ export default function App() {
 
   const stepClass = direction === 'right' ? 'step-enter' : 'step-enter-back'
 
-  const stepProps = { data, updateData, next, back, restart }
+  const stepProps = { data, updateData, next, back, restart, setMode: switchMode }
 
   const stepComponents = [
     <StepWelcome key={animKey} className={stepClass} {...stepProps} />,
@@ -83,6 +90,24 @@ export default function App() {
       <header className="flex items-center justify-between py-5 px-6 border-b border-white/5 relative">
         <div className="w-10" />
         <img src="/logo.png" alt="Ecommerce Puro" className="h-20 object-contain" />
+        <div className="hidden sm:flex items-center gap-2 mr-4">
+          <button
+            onClick={() => switchMode('fluxo')}
+            className={`rounded-xl px-4 py-2 text-sm font-medium transition ${mode === 'fluxo'
+              ? 'bg-blue-500 text-white'
+              : 'bg-white/5 text-white/70 hover:bg-blue-500/20 hover:text-white'}`}
+          >
+            Fluxo de Caixa
+          </button>
+          <button
+            onClick={() => switchMode('margem')}
+            className={`rounded-xl px-4 py-2 text-sm font-medium transition ${mode === 'margem'
+              ? 'bg-blue-500 text-white'
+              : 'bg-white/5 text-white/70 hover:bg-blue-500/20 hover:text-white'}`}
+          >
+            Simulador de Margens
+          </button>
+        </div>
         <div className="relative" ref={qrRef}>
           <button
             onClick={() => setShowQR(v => !v)}
@@ -122,11 +147,11 @@ export default function App() {
           )}
         </div>
       </header>
-      {step > 0 && step < STEPS.length - 1 && (
+      {mode === 'fluxo' && step > 0 && step < STEPS.length - 1 && (
         <ProgressBar current={step} total={STEPS.length - 2} labels={STEPS.slice(1, -1)} />
       )}
       <div className="flex-1 flex items-center justify-center p-4">
-        {stepComponents[step]}
+        {mode === 'fluxo' ? stepComponents[step] : <StepMargem key={animKey} className={stepClass} back={() => switchMode('fluxo')} />}
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function StepWelcome({ next, className }) {
+export default function StepWelcome({ next, setMode, className }) {
   return (
     <div className={`flex flex-col items-center text-center max-w-lg w-full px-4 ${className}`}>
       <div className="mb-4">
@@ -21,7 +21,7 @@ export default function StepWelcome({ next, className }) {
       <p className="text-zinc-600 text-sm mb-10">
         Preencha as etapas em menos de 5 minutos e veja um fluxo de caixa diário completo! 🚀
       </p>
-      <div className="grid grid-cols-3 gap-3 mb-10 w-full">
+      <div className="grid grid-cols-3 gap-3 mb-6 w-full">
         {[
           { icon: '📊', label: 'Faturamento' },
           { icon: '🏭', label: 'Fornecedores' },
@@ -36,12 +36,21 @@ export default function StepWelcome({ next, className }) {
           </div>
         ))}
       </div>
-      <button
-        onClick={next}
-        className="w-full bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98]"
-      >
-        Vamos lá! →
-      </button>
+
+      <div className="grid gap-3 sm:grid-cols-2 mb-8 w-full max-w-xl mx-auto">
+        <button
+          onClick={next}
+          className="w-full bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98]"
+        >
+          Fluxo de Caixa →
+        </button>
+        <button
+          onClick={() => setMode('margem')}
+          className="w-full bg-white/10 border border-white/10 text-white hover:bg-white/15 hover:border-blue-500/50 transition font-bold py-4 px-8 rounded-2xl text-lg"
+        >
+          Simulador de Margens
+        </button>
+      </div>
     </div>
   )
 }
