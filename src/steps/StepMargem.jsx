@@ -96,7 +96,8 @@ export default function StepMargem({ className, back }) {
       const qtdParaLucro = precoComDesconto > custoUnitario ? Math.ceil(lucroAtual / (precoComDesconto - custoUnitario)) : null
       
       const receitaNovo = qtdParaReceita * precoComDesconto
-      const lucroNovo = qtdParaLucro !== null ? qtdParaLucro * (precoComDesconto - custoUnitario) : null
+      const lucroUnitarioNovo = precoComDesconto - custoUnitario
+      const lucroNovo = lucroUnitarioNovo > 0 ? qtdParaReceita * lucroUnitarioNovo : null
       const difReceita = receitaNovo - receitaAtual
       const difLucro = lucroNovo !== null ? lucroNovo - lucroAtual : null
       const pctDifLucro = lucroAtual > 0 && lucroNovo !== null ? ((lucroNovo - lucroAtual) / lucroAtual) * 100 : null
