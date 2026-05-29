@@ -193,6 +193,7 @@ export function gerarFluxoDiario(data, { targetMes, targetAno } = {}) {
   let saldoAcumulado = Number(data.saldoInicial) || 0
 
   for (let d = 1; d <= diasNoMes; d++) {
+    const saldoInicialDia = saldoAcumulado
     const entradas = [...entregas[d]]
     const saidas   = [...(fornecPag[d] || [])]
 
@@ -240,7 +241,7 @@ export function gerarFluxoDiario(data, { targetMes, targetAno } = {}) {
     saldoAcumulado        += saldoDia
 
     dias.push({ dia: d, entradas, saidas, entradasNaoOp, saidasNaoOp,
-      totalEntradas, totalSaidas, totalEntNaoOp, totalSaidNaoOp, saldoDia, saldoAcumulado })
+      totalEntradas, totalSaidas, totalEntNaoOp, totalSaidNaoOp, saldoDia, saldoAcumulado, saldoInicialDia })
   }
 
   return { dias, diasNoMes, mes: mesAtual, ano: anoAtual }

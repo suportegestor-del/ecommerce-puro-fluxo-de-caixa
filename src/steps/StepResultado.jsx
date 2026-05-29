@@ -107,7 +107,7 @@ export default function StepResultado({ data, back, restart, className }) {
 
   const rows = [
     { kind: 'saldo-top', label: 'SALDO INICIAL DO CAIXA',
-      values: dayNums.map(d => d === 1 ? saldoInicialSel : 0),
+      values: dias.map(d => d.saldoInicialDia),
       total: saldoInicialSel },
     { kind: 'saldo-top', label: 'SALDO FINAL',
       values: dias.map(d => d.saldoAcumulado), isSaldo: true,
@@ -118,12 +118,14 @@ export default function StepResultado({ data, back, restart, className }) {
     ...entCats.map(({ label, values }) => ({ kind: 'item', label, values, numColor: 'green' })),
     { kind: 'subheader', label: 'SAÍDAS', values: dias.map(d => d.totalSaidas) },
     ...saidCats.map(({ label, values }) => ({ kind: 'item', label, values, numColor: 'red' })),
+    { kind: 'subheader', label: 'TOTAL OPERACIONAL', values: dias.map(d => d.totalEntradas - d.totalSaidas) },
     { kind: 'spacer' },
     { kind: 'header',    label: 'ATIVIDADES NÃO OPERACIONAIS' },
     { kind: 'subheader', label: 'ENTRADAS', values: dias.map(d => d.totalEntNaoOp || 0) },
     ...naoEntCats.map(({ label, values }) => ({ kind: 'item', label, values, numColor: 'green' })),
     { kind: 'subheader', label: 'SAÍDAS', values: dias.map(d => d.totalSaidNaoOp || 0) },
     ...naoSaidCats.map(({ label, values }) => ({ kind: 'item', label, values, numColor: 'red' })),
+    { kind: 'subheader', label: 'TOTAL NÃO OPERACIONAL', values: dias.map(d => (d.totalEntNaoOp || 0) - (d.totalSaidNaoOp || 0)) },
     { kind: 'saldo-dia', label: 'SALDO DO DIA',   values: dias.map(d => d.saldoDia), isSaldo: true },
   ]
 

@@ -35,7 +35,7 @@ export function exportarExcel(data) {
     rows.push(['CATEGORIA', ...dayNums, 'TOTAL'])
 
     // Saldos
-    addRow('SALDO INICIAL DO CAIXA', dayNums.map(d => d === 1 ? saldoInicial : 0), saldoInicial)
+    addRow('SALDO INICIAL DO CAIXA', dias.map(d => d.saldoInicialDia), saldoInicial)
     addRow('SALDO FINAL', dias.map(d => d.saldoAcumulado), dias[dias.length - 1]?.saldoAcumulado || 0)
 
     rows.push([])
@@ -60,6 +60,8 @@ export function exportarExcel(data) {
     const saidTotais = dias.map(d => d.totalSaidas)
     addRow('SAÍDAS', saidTotais, sum(saidTotais))
     saidMap.forEach((values, label) => addRow(`  ${label}`, values, sum(values)))
+    const totalOp = dias.map(d => d.totalEntradas - d.totalSaidas)
+    addRow('TOTAL OPERACIONAL', totalOp, sum(totalOp))
 
     rows.push([])
     rows.push(['ATIVIDADES NÃO OPERACIONAIS'])
@@ -83,6 +85,8 @@ export function exportarExcel(data) {
     const naoSaidTotais = dias.map(d => d.totalSaidNaoOp || 0)
     addRow('SAÍDAS', naoSaidTotais, sum(naoSaidTotais))
     naoSaidMap.forEach((values, label) => addRow(`  ${label}`, values, sum(values)))
+    const totalNaoOp = dias.map(d => (d.totalEntNaoOp || 0) - (d.totalSaidNaoOp || 0))
+    addRow('TOTAL NÃO OPERACIONAL', totalNaoOp, sum(totalNaoOp))
 
     // Saldo do dia
     addRow('SALDO DO DIA', dias.map(d => d.saldoDia), sum(dias.map(d => d.saldoDia)))
