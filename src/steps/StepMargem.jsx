@@ -120,6 +120,50 @@ export default function StepMargem({ className, back }) {
     })
   }, [price, margin, quantity])
 
+  const simulationsAumento = useMemo(() => {
+    const preco = parseNumber(price)
+    const margem = parseNumber(margin)
+    const qtd = Math.max(0, Math.floor(parseNumber(quantity)))
+    const custoUnitario = preco * (1 - margem / 100)
+    const lucroUnitario = preco - custoUnitario
+    const lucroAtual = lucroUnitario * qtd
+    const receitaAtual = preco * qtd
+
+    const aumentos = []
+    for (let i = 2; i <= 30; i += 2) {
+      aumentos.push(i)
+    }
+
+    return aumentos.map(inc => {
+      const precoComAumento = preco * (1 + inc / 100)
+      const qtdParaReceita = precoComAumento > 0 ? Math.ceil(receitaAtual / precoComAumento) : 0
+      const qtdParaLucro = precoComAumento > custoUnitario ? Math.ceil(lucroAtual / (precoComAumento - custoUnitario)) : null
+
+      const receitaNovo = qtdParaReceita * precoComAumento
+      const lucroUnitarioNovo = precoComAumento - custoUnitario
+      const lucroNovo = lucroUnitarioNovo > 0 ? qtdParaReceita * lucroUnitarioNovo : null
+      const difReceita = receitaNovo - receitaAtual
+      const difLucro = lucroNovo !== null ? lucroNovo - lucroAtual : null
+      const pctDifLucro = lucroAtual > 0 && lucroNovo !== null ? ((lucroNovo - lucroAtual) / lucroAtual) * 100 : null
+
+      return {
+        aumento: inc,
+        precoNovo: precoComAumento,
+        qtdReceita: qtdParaReceita,
+        qtdLucro: qtdParaLucro,
+        diferenca: qtdParaLucro !== null ? Math.abs(qtdParaLucro - qtd) : null,
+        melhor: qtdParaLucro !== null && qtdParaLucro < qtd,
+        receitaAtual,
+        lucroAtual,
+        receitaNovo,
+        lucroNovo,
+        difReceita,
+        difLucro,
+        pctDifLucro,
+      }
+    })
+  }, [price, margin, quantity])
+
   return (
     <div className={`w-full max-w-[98vw] px-2 ${className}`}>
       {!showTable ? (
@@ -373,6 +417,50 @@ export default function StepMargem({ className, back }) {
                 {simulations.map((sim, idx) => (
                   <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
                     <td className="py-3 px-4 text-violet-300 font-semibold">{sim.desconto}%</td>
+                    <td className="py-3 px-4 text-cyan-300">{formatBRL(sim.precoNovo)}</td>
+                    <td className="py-3 px-4 text-emerald-300">{formatBRL(sim.receitaNovo)}</td>
+                    <td className="py-3 px-4 text-amber-300">{sim.lucroNovo === null ? '❌ Impossível' : formatBRL(sim.lucroNovo)}</td>
+                    <td className="py-3 px-4">
+                      {sim.difLucro !== null ? (
+                        <span className={`font-bold ${sim.difLucro >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {sim.difLucro >= 0 ? '↑' : '↓'} {formatBRL(Math.abs(sim.difLucro))}
+                        </span>
+                      ) : (
+                        <span className="text-slate-500">-</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      {sim.pctDifLucro !== null ? (
+                        <span className={`font-bold ${sim.pctDifLucro >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {sim.pctDifLucro >= 0 ? '↑' : '↓'} {formatPercent(Math.abs(sim.pctDifLucro))}
+                        </span>
+                      ) : (
+                        <span className="text-slate-500">-</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-8 rounded-[28px] border border-emerald-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-emerald-500/10">
+            <h3 className="text-lg font-bold text-emerald-300 mb-4">Tabela de Aumento de Preço</h3>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-emerald-500/20">
+                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Aumento</th>
+                  <th className="text-left py-3 px-4 text-cyan-300 font-semibold">Preço novo</th>
+                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Receita total</th>
+                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Lucro total</th>
+                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Dif. lucro</th>
+                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Var. lucro</th>
+                </tr>
+              </thead>
+              <tbody>
+                {simulationsAumento.map((sim, idx) => (
+                  <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
+                    <td className="py-3 px-4 text-emerald-300 font-semibold">{sim.aumento}%</td>
                     <td className="py-3 px-4 text-cyan-300">{formatBRL(sim.precoNovo)}</td>
                     <td className="py-3 px-4 text-emerald-300">{formatBRL(sim.receitaNovo)}</td>
                     <td className="py-3 px-4 text-amber-300">{sim.lucroNovo === null ? '❌ Impossível' : formatBRL(sim.lucroNovo)}</td>
