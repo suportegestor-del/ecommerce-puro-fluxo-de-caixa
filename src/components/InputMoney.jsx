@@ -1,24 +1,45 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
-function formatBRL(value) {
-  if (!value && value !== 0) return ''
-  const num = parseFloat(String(value).replace(/\D/g, '')) / 100
-  if (isNaN(num)) return ''
-  return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+function fmtBRL(num) {
+  if (num === '' || num === undefined || num === null) return ''
+  const n = Number(num)
+  if (isNaN(n)) return ''
+  return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+function parseRawToBRL(raw) {
+  const digits = String(raw || '').replace(/\D/g, '')
+  const n = parseFloat(digits) / 100
+  return isNaN(n) ? 0 : n
 }
 
 export default function InputMoney({ value, onChange, placeholder = 'R$ 0,00', className = '', label = '', disabled = false }) {
-  const [display, setDisplay] = useState(value ? formatBRL(value) : '')
+  const [display, setDisplay] = useState('')
+  const [focused, setFocused] = useState(false)
+
+  const numericValue = Number(value || 0)
+
+  useEffect(() => {
+    if (!focused) {
+      setDisplay(value ? fmtBRL(value) : '')
+    }
+  }, [value, focused])
 
   const handleChange = (e) => {
-    const raw = e.target.value.replace(/\D/g, '')
-    const num = parseFloat(raw) / 100 || 0
-    setDisplay(formatBRL(num * 100))
+    const raw = e.target.value
+    const num = parseRawToBRL(raw)
+    setDisplay(fmtBRL(num))
     onChange(num)
   }
 
-  const handleFocus = (e) => {
-    if (!display) return
+  const handleFocus = () => {
+    setFocused(true)
+    setDisplay(value ? fmtBRL(value) : '')
+  }
+
+  const handleBlur = () => {
+    setFocused(false)
+    setDisplay(value ? fmtBRL(value) : '')
   }
 
   return (
@@ -32,6 +53,7 @@ export default function InputMoney({ value, onChange, placeholder = 'R$ 0,00', c
           value={display}
           onChange={handleChange}
           onFocus={handleFocus}
+          onBlur={handleBlur}
           disabled={disabled}
           placeholder={placeholder || '0,00'}
           className={`w-full pl-10 pr-3 py-2.5 bg-zinc-950/70 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
