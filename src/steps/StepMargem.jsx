@@ -94,13 +94,6 @@ export default function StepMargem({ className, back }) {
       const precoComDesconto = preco * (1 - desc / 100)
       const qtdParaReceita = precoComDesconto > 0 ? Math.ceil(receitaAtual / precoComDesconto) : 0
       const qtdParaLucro = precoComDesconto > custoUnitario ? Math.ceil(lucroAtual / (precoComDesconto - custoUnitario)) : null
-      
-      const receitaNovo = qtdParaReceita * precoComDesconto
-      const lucroUnitarioNovo = precoComDesconto - custoUnitario
-      const lucroNovo = lucroUnitarioNovo > 0 ? qtdParaReceita * lucroUnitarioNovo : null
-      const difReceita = receitaNovo - receitaAtual
-      const difLucro = lucroNovo !== null ? lucroNovo - lucroAtual : null
-      const pctDifLucro = lucroAtual > 0 && lucroNovo !== null ? ((lucroNovo - lucroAtual) / lucroAtual) * 100 : null
 
       return {
         desconto: desc,
@@ -108,14 +101,6 @@ export default function StepMargem({ className, back }) {
         qtdReceita: qtdParaReceita,
         qtdLucro: qtdParaLucro,
         diferenca: qtdParaLucro !== null ? Math.abs(qtdParaLucro - qtd) : null,
-        melhor: qtdParaLucro !== null && qtdParaLucro < qtd,
-        receitaAtual,
-        lucroAtual,
-        receitaNovo,
-        lucroNovo,
-        difReceita,
-        difLucro,
-        pctDifLucro,
       }
     })
   }, [price, margin, quantity])
@@ -139,27 +124,12 @@ export default function StepMargem({ className, back }) {
       const qtdParaReceita = precoComAumento > 0 ? Math.ceil(receitaAtual / precoComAumento) : 0
       const qtdParaLucro = precoComAumento > custoUnitario ? Math.ceil(lucroAtual / (precoComAumento - custoUnitario)) : null
 
-      const receitaNovo = qtdParaReceita * precoComAumento
-      const lucroUnitarioNovo = precoComAumento - custoUnitario
-      const lucroNovo = lucroUnitarioNovo > 0 ? qtdParaReceita * lucroUnitarioNovo : null
-      const difReceita = receitaNovo - receitaAtual
-      const difLucro = lucroNovo !== null ? lucroNovo - lucroAtual : null
-      const pctDifLucro = lucroAtual > 0 && lucroNovo !== null ? ((lucroNovo - lucroAtual) / lucroAtual) * 100 : null
-
       return {
         aumento: inc,
         precoNovo: precoComAumento,
         qtdReceita: qtdParaReceita,
         qtdLucro: qtdParaLucro,
         diferenca: qtdParaLucro !== null ? Math.abs(qtdParaLucro - qtd) : null,
-        melhor: qtdParaLucro !== null && qtdParaLucro < qtd,
-        receitaAtual,
-        lucroAtual,
-        receitaNovo,
-        lucroNovo,
-        difReceita,
-        difLucro,
-        pctDifLucro,
       }
     })
   }, [price, margin, quantity])
@@ -368,14 +338,17 @@ export default function StepMargem({ className, back }) {
           </div>
 
           <div className="mt-6 rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-violet-500/10">
+            <h3 className="text-lg font-bold text-violet-300 mb-4">Tabela de Descontos — Mesmo lucro</h3>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-violet-500/20">
-                  <th className="text-left py-3 px-4 text-violet-300 font-semibold">Redução</th>
+                  <th className="text-left py-3 px-4 text-violet-300 font-semibold">Desconto</th>
                   <th className="text-left py-3 px-4 text-cyan-300 font-semibold">Preço novo</th>
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Qtd (receita)</th>
-                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Qtd (lucro)</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Diferença</th>
+                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Qtd atual</th>
+                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Qtd p/ mesma receita</th>
+                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Qtd p/ mesmo lucro</th>
+                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Vender a mais</th>
+                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Lucro mantido</th>
                 </tr>
               </thead>
               <tbody>
@@ -383,61 +356,17 @@ export default function StepMargem({ className, back }) {
                   <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
                     <td className="py-3 px-4 text-violet-300 font-semibold">{sim.desconto}%</td>
                     <td className="py-3 px-4 text-cyan-300">{formatBRL(sim.precoNovo)}</td>
+                    <td className="py-3 px-4 text-slate-300">{results.qtd}</td>
                     <td className="py-3 px-4 text-emerald-300">{sim.qtdReceita}</td>
                     <td className="py-3 px-4 text-amber-300">{sim.qtdLucro === null ? '❌ Impossível' : sim.qtdLucro}</td>
                     <td className="py-3 px-4">
                       {sim.diferenca !== null ? (
-                        <span className={`font-bold ${sim.melhor ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {sim.melhor ? '↓' : '↑'} {sim.diferenca}
-                        </span>
+                        <span className="font-bold text-red-400">↑ {sim.diferenca}</span>
                       ) : (
                         <span className="text-slate-500">-</span>
                       )}
                     </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-8 rounded-[28px] border border-cyan-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-cyan-500/10">
-            <h3 className="text-lg font-bold text-cyan-300 mb-4">Tabela de Receitas</h3>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-cyan-500/20">
-                  <th className="text-left py-3 px-4 text-violet-300 font-semibold">Redução</th>
-                  <th className="text-left py-3 px-4 text-cyan-300 font-semibold">Preço novo</th>
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Receita total</th>
-                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Lucro total</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Dif. lucro</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Var. lucro</th>
-                </tr>
-              </thead>
-              <tbody>
-                {simulations.map((sim, idx) => (
-                  <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
-                    <td className="py-3 px-4 text-violet-300 font-semibold">{sim.desconto}%</td>
-                    <td className="py-3 px-4 text-cyan-300">{formatBRL(sim.precoNovo)}</td>
-                    <td className="py-3 px-4 text-emerald-300">{formatBRL(sim.receitaNovo)}</td>
-                    <td className="py-3 px-4 text-amber-300">{sim.lucroNovo === null ? '❌ Impossível' : formatBRL(sim.lucroNovo)}</td>
-                    <td className="py-3 px-4">
-                      {sim.difLucro !== null ? (
-                        <span className={`font-bold ${sim.difLucro >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {sim.difLucro >= 0 ? '↑' : '↓'} {formatBRL(Math.abs(sim.difLucro))}
-                        </span>
-                      ) : (
-                        <span className="text-slate-500">-</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      {sim.pctDifLucro !== null ? (
-                        <span className={`font-bold ${sim.pctDifLucro >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {sim.pctDifLucro >= 0 ? '↑' : '↓'} {formatPercent(Math.abs(sim.pctDifLucro))}
-                        </span>
-                      ) : (
-                        <span className="text-slate-500">-</span>
-                      )}
-                    </td>
+                    <td className="py-3 px-4 text-emerald-300 font-semibold">{formatBRL(results.lucroAtual)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -445,19 +374,17 @@ export default function StepMargem({ className, back }) {
           </div>
 
           <div className="mt-8 rounded-[28px] border border-emerald-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-emerald-500/10">
-            <h3 className="text-lg font-bold text-emerald-300 mb-4">Tabela de Aumento de Preço</h3>
+            <h3 className="text-lg font-bold text-emerald-300 mb-4">Tabela de Aumento de Preço — Mesmo lucro</h3>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-emerald-500/20">
                   <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Aumento</th>
                   <th className="text-left py-3 px-4 text-cyan-300 font-semibold">Preço novo</th>
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Qtd (receita)</th>
-                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Qtd (lucro)</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Diferença</th>
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Receita total</th>
-                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Lucro total</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Dif. lucro</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Var. lucro</th>
+                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Qtd atual</th>
+                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Qtd p/ mesma receita</th>
+                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Qtd p/ mesmo lucro</th>
+                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Pode vender a menos</th>
+                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Lucro mantido</th>
                 </tr>
               </thead>
               <tbody>
@@ -465,37 +392,17 @@ export default function StepMargem({ className, back }) {
                   <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
                     <td className="py-3 px-4 text-emerald-300 font-semibold">{sim.aumento}%</td>
                     <td className="py-3 px-4 text-cyan-300">{formatBRL(sim.precoNovo)}</td>
+                    <td className="py-3 px-4 text-slate-300">{results.qtd}</td>
                     <td className="py-3 px-4 text-emerald-300">{sim.qtdReceita}</td>
                     <td className="py-3 px-4 text-amber-300">{sim.qtdLucro === null ? '❌ Impossível' : sim.qtdLucro}</td>
                     <td className="py-3 px-4">
                       {sim.diferenca !== null ? (
-                        <span className={`font-bold ${sim.melhor ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {sim.melhor ? '↓' : '↑'} {sim.diferenca}
-                        </span>
+                        <span className="font-bold text-emerald-400">↓ {sim.diferenca}</span>
                       ) : (
                         <span className="text-slate-500">-</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-emerald-300">{formatBRL(sim.receitaNovo)}</td>
-                    <td className="py-3 px-4 text-amber-300">{sim.lucroNovo === null ? '❌ Impossível' : formatBRL(sim.lucroNovo)}</td>
-                    <td className="py-3 px-4">
-                      {sim.difLucro !== null ? (
-                        <span className={`font-bold ${sim.difLucro >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {sim.difLucro >= 0 ? '↑' : '↓'} {formatBRL(Math.abs(sim.difLucro))}
-                        </span>
-                      ) : (
-                        <span className="text-slate-500">-</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      {sim.pctDifLucro !== null ? (
-                        <span className={`font-bold ${sim.pctDifLucro >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {sim.pctDifLucro >= 0 ? '↑' : '↓'} {formatPercent(Math.abs(sim.pctDifLucro))}
-                        </span>
-                      ) : (
-                        <span className="text-slate-500">-</span>
-                      )}
-                    </td>
+                    <td className="py-3 px-4 text-emerald-300 font-semibold">{formatBRL(results.lucroAtual)}</td>
                   </tr>
                 ))}
               </tbody>
