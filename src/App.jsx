@@ -62,7 +62,7 @@ export default function App() {
 
   const [showQR, setShowQR] = useState(false)
   const qrRef = useRef(null)
-  const SITE_URL = 'https://melodic-entremet-7584d7.netlify.app/'
+  const SITE_URL = 'https://ecommerce-puro-fluxo-de-caixa-tasks.vercel.app/'
 
   useEffect(() => {
     const handler = (e) => { if (qrRef.current && !qrRef.current.contains(e.target)) setShowQR(false) }
