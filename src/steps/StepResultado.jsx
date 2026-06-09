@@ -53,8 +53,8 @@ export default function StepResultado({ data, back, restart, className }) {
 
   const saldoFinal    = dias[dias.length - 1]?.saldoAcumulado || 0
   const diasNegativos = dias.filter(d => d.saldoAcumulado < 0).length
-  const totalEntradas = dias.reduce((s, d) => s + d.totalEntradas, 0)
-  const totalSaidas   = dias.reduce((s, d) => s + d.totalSaidas, 0)
+  const totalEntradas = dias.reduce((s, d) => s + d.totalEntradas + (d.totalEntNaoOp || 0), 0)
+  const totalSaidas   = dias.reduce((s, d) => s + d.totalSaidas + (d.totalSaidNaoOp || 0), 0)
 
   const veredicto = saldoFinal >= 0
     ? { emoji: '🎉', cor: 'text-emerald-400', texto: 'Caixa fecha POSITIVO!', bg: 'from-emerald-900/40 to-emerald-900/10 border-emerald-700/40' }
