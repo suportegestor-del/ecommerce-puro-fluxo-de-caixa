@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 function parseNumber(value) {
   if (value === undefined || value === null || value === '') return 0
@@ -10,8 +9,8 @@ function formatBRL(value) {
   return Number(value || 0).toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   })
 }
 
@@ -26,220 +25,502 @@ function formatNumber(value) {
   })
 }
 
+function newId() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
+}
+
+const emptySku = () => ({
+  id: newId(),
+  nome: 'SKU A',
+  impostosPct: 12,
+  descontoPct: 0,
+  cpvPct: 50,
+  comissaoFretePct: 23,
+  addPct: 1,
+})
+
+const initialSkus = [
+  { id: 'sku-a', nome: 'SKU A', impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
+  { id: 'sku-b', nome: 'SKU B', impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
+  { id: 'sku-c', nome: 'SKU C', impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
+]
+
+const valoresIniciais = {
+  'sku-a': { qtde: 1000, unit: 150 },
+  'sku-b': { qtde: 2200, unit: 114 },
+  'sku-c': { qtde: 3000, unit: 67 },
+}
+
+const initialPeriodos = [
+  { id: 'p1', nome: 'Período 1', valores: JSON.parse(JSON.stringify(valoresIniciais)) },
+]
+
+const colors = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c']
+
+function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
+  const max = Math.max(...data.map((d) => Math.abs(d[valueKey]) || 0), 1)
+  return (
+    <div className="flex items-end gap-3 h-full px-2">
+      {data.map((d, idx) => {
+        const val = d[valueKey] || 0
+        const height = `${(Math.abs(val) / max) * 100}%`
+        return (
+          <div key={idx} className="flex-1 flex flex-col items-center justify-end group relative">
+            <div className="opacity-0 group-hover:opacity-100 transition absolute -top-8 text-[10px] text-slate-300 bg-slate-800 px-2 py-1 rounded-lg whitespace-nowrap">
+              {formatBRL(val)}
+            </div>
+            <div
+              style={{ height, backgroundColor: colors[idx % colors.length] || color }}
+              className="w-full rounded-t-lg min-h-[4px] transition-all"
+            />
+            <div className="text-[10px] text-slate-400 mt-2 truncate max-w-full">{d[labelKey]}</div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function SimpleLineChart({ data, valueKey, labelKey, color = '#fbbf24' }) {
+  const max = Math.max(...data.map((d) => d[valueKey] || 0), 1)
+  const min = Math.min(...data.map((d) => d[valueKey] || 0), 0)
+  const range = max - min || 1
+  const points = data.map((d, idx) => {
+    const x = data.length === 1 ? 50 : (idx / (data.length - 1)) * 100
+    const y = 100 - ((d[valueKey] - min) / range) * 100
+    return `${x},${y}`
+  }).join(' ')
+
+  return (
+    <div className="h-full w-full relative">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
+        <polyline
+          fill="none"
+          stroke={color}
+          strokeWidth="1.5"
+          points={points}
+          vectorEffect="non-scaling-stroke"
+        />
+        {data.map((d, idx) => {
+          const x = data.length === 1 ? 50 : (idx / (data.length - 1)) * 100
+          const y = 100 - ((d[valueKey] - min) / range) * 100
+          return <circle key={idx} cx={x} cy={y} r="1.2" fill={color} />
+        })}
+      </svg>
+      <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2">
+        {data.map((d, idx) => (
+          <div key={idx} className="text-[10px] text-slate-400 truncate max-w-[80px] text-center">{d[labelKey]}</div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function StepPmv({ className, back }) {
-  const [custoUnitario, setCustoUnitario] = useState(45)
-  const [quantidade, setQuantidade] = useState(1000)
-  const [despesasFixas, setDespesasFixas] = useState(20000)
-  const [comissaoImpostos, setComissaoImpostos] = useState(25)
-  const [outrasVariaveis, setOutrasVariaveis] = useState(8)
-  const [lucroDesejado, setLucroDesejado] = useState(15000)
+  const [skus, setSkus] = useState(initialSkus)
+  const [periodos, setPeriodos] = useState(initialPeriodos)
+  const [periodoAtivo, setPeriodoAtivo] = useState(initialPeriodos[0].id)
 
-  const results = useMemo(() => {
-    const custo = parseNumber(custoUnitario)
-    const qtd = Math.max(1, parseNumber(quantidade))
-    const fixo = parseNumber(despesasFixas)
-    const varPct = parseNumber(comissaoImpostos) + parseNumber(outrasVariaveis)
-    const lucro = parseNumber(lucroDesejado)
+  const calculaLinhaSku = (sku, valores) => {
+    const qtde = parseNumber(valores?.qtde ?? 0)
+    const unit = parseNumber(valores?.unit ?? 0)
+    const rob = qtde * unit
+    const impostos = rob * (parseNumber(sku.impostosPct) / 100)
+    const desconto = rob * (parseNumber(sku.descontoPct) / 100)
+    const rol = rob - impostos - desconto
+    const cmv = -rol * (parseNumber(sku.cpvPct) / 100)
+    const mb = rol + cmv
+    const comissaoFrete = rol * (parseNumber(sku.comissaoFretePct) / 100)
+    const add = rol * (parseNumber(sku.addPct) / 100)
+    const mc = mb - comissaoFrete - add
+    return { sku, qtde, unit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc }
+  }
 
-    const divisor = qtd * (1 - varPct / 100)
-    const pmv = divisor > 0 ? (custo * qtd + fixo + lucro) / divisor : 0
-    const receitaTotal = pmv * qtd
-    const custoTotal = custo * qtd
-    const despesasVariaveisTotal = receitaTotal * (varPct / 100)
-    const lucroTotal = receitaTotal - custoTotal - despesasVariaveisTotal - fixo
-    const margemLiquida = receitaTotal > 0 ? (lucroTotal / receitaTotal) * 100 : 0
-
-    return {
-      pmv,
-      receitaTotal,
-      custoTotal,
-      despesasVariaveisTotal,
-      lucroTotal,
-      margemLiquida,
-      varPct,
-      custo,
-      qtd,
-      fixo,
-      lucro,
-    }
-  }, [custoUnitario, quantidade, despesasFixas, comissaoImpostos, outrasVariaveis, lucroDesejado])
-
-  const cenarios = useMemo(() => {
-    const fixo = results.fixo
-    const lucro = results.lucro
-    const custo = results.custo
-    const varPct = results.varPct
-    const baseQtd = results.qtd
-
-    const variacoes = [0.5, 0.75, 1, 1.25, 1.5, 2]
-    return variacoes.map((fator) => {
-      const qtd = Math.max(1, Math.round(baseQtd * fator))
-      const divisor = qtd * (1 - varPct / 100)
-      const pmv = divisor > 0 ? (custo * qtd + fixo + lucro) / divisor : 0
-      const receita = pmv * qtd
-      const lucroReal = receita - custo * qtd - receita * (varPct / 100) - fixo
-      return {
-        qtd,
-        pmv,
-        receita,
-        lucroReal,
-        label: `${formatNumber(qtd)} un`,
-      }
+  const resultadoPeriodos = useMemo(() => {
+    return periodos.map((p) => {
+      const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id]))
+      const total = skuLinhas.reduce(
+        (acc, l) => ({
+          qtde: acc.qtde + l.qtde,
+          rob: acc.rob + l.rob,
+          rol: acc.rol + l.rol,
+          cmv: acc.cmv + l.cmv,
+          mb: acc.mb + l.mb,
+          comissaoFrete: acc.comissaoFrete + l.comissaoFrete,
+          add: acc.add + l.add,
+          mc: acc.mc + l.mc,
+        }),
+        { qtde: 0, rob: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
+      )
+      const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
+      const mcPct = total.rol > 0 ? (total.mc / total.rol) * 100 : 0
+      return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct } }
     })
-  }, [results])
+  }, [periodos, skus])
+
+  const periodoSelecionado = useMemo(
+    () => resultadoPeriodos.find((r) => r.periodo.id === periodoAtivo) || resultadoPeriodos[0],
+    [resultadoPeriodos, periodoAtivo]
+  )
+
+  const addPeriodo = () => {
+    const ultimo = periodos[periodos.length - 1]
+    const novoValores = {}
+    skus.forEach((sku) => {
+      novoValores[sku.id] = ultimo ? { ...ultimo.valores[sku.id] } : { qtde: 1000, unit: 150 }
+    })
+    const novo = { id: newId(), nome: `Período ${periodos.length + 1}`, valores: novoValores }
+    setPeriodos((prev) => [...prev, novo])
+    setPeriodoAtivo(novo.id)
+  }
+
+  const removePeriodo = (id) => {
+    if (periodos.length <= 1) return
+    setPeriodos((prev) => {
+      const filtrados = prev.filter((p) => p.id !== id)
+      if (periodoAtivo === id) setPeriodoAtivo(filtrados[filtrados.length - 1].id)
+      return filtrados
+    })
+  }
+
+  const updatePeriodoNome = (id, nome) => {
+    setPeriodos((prev) => prev.map((p) => (p.id === id ? { ...p, nome } : p)))
+  }
+
+  const addSku = () => {
+    const novo = emptySku()
+    setSkus((prev) => [...prev, novo])
+    setPeriodos((prev) =>
+      prev.map((p) => ({
+        ...p,
+        valores: { ...p.valores, [novo.id]: { qtde: 1000, unit: 150 } },
+      }))
+    )
+  }
+
+  const removeSku = (id) => {
+    setSkus((prev) => prev.filter((s) => s.id !== id))
+    setPeriodos((prev) =>
+      prev.map((p) => {
+        const valores = { ...p.valores }
+        delete valores[id]
+        return { ...p, valores }
+      })
+    )
+  }
+
+  const updateSku = (id, field, value) => {
+    setSkus((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
+  }
+
+  const updateValores = (periodoId, skuId, field, value) => {
+    setPeriodos((prev) =>
+      prev.map((p) =>
+        p.id === periodoId
+          ? { ...p, valores: { ...p.valores, [skuId]: { ...p.valores[skuId], [field]: value } } }
+          : p
+      )
+    )
+  }
 
   const reset = () => {
-    setCustoUnitario(45)
-    setQuantidade(1000)
-    setDespesasFixas(20000)
-    setComissaoImpostos(25)
-    setOutrasVariaveis(8)
-    setLucroDesejado(15000)
+    setSkus(initialSkus)
+    setPeriodos(initialPeriodos)
+    setPeriodoAtivo(initialPeriodos[0].id)
   }
 
   const inputClass =
-    'mt-4 w-full bg-slate-950/40 border border-slate-700/40 rounded-3xl px-4 py-4 text-slate-100 text-lg outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:bg-slate-950/60'
+    'w-full bg-transparent border-b border-slate-600/50 text-center text-slate-100 py-1 outline-none transition focus:border-cyan-400 focus:bg-slate-800/30'
+  const inputPctClass =
+    'w-full bg-transparent border-b border-slate-600/50 text-center text-slate-100 py-1 outline-none transition focus:border-cyan-400 focus:bg-slate-800/30'
+
+  const chartData = resultadoPeriodos.map((r) => ({ nome: r.periodo.nome, mc: r.total.mc, pmv: r.total.pmv }))
 
   return (
-    <div className={`w-full max-w-[98vw] px-2 ${className}`}>
+    <div className={`w-full max-w-[99vw] px-2 ${className}`}>
       <div className="rounded-[28px] border border-amber-500/20 bg-gradient-to-r from-amber-500/5 via-orange-500/5 to-amber-600/5 p-6 shadow-[0_40px_100px_-40px_rgba(245,158,11,0.15)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.32em] text-amber-300/70 font-semibold">Simulador PMV</p>
             <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent tracking-tight">
-              Preço Médio de Venda
+              Mix por Período
             </h2>
             <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-300">
-              Descubra qual preço médio você precisa praticar para cobrir custos, despesas e atingir o lucro desejado.
+              Compare períodos com os mesmos SKUs, ajuste quantidade e preço unitário, e veja a evolução do PMV e da margem de contribuição.
             </p>
           </div>
           <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-5 text-center shadow-lg shadow-amber-500/10">
-            <p className="text-xs uppercase tracking-[0.28em] text-amber-300/80 font-semibold">PMV ideal</p>
-            <p className="mt-3 text-4xl font-bold text-amber-200">{formatBRL(results.pmv)}</p>
-            <p className="text-sm text-amber-300/70">por unidade</p>
+            <p className="text-xs uppercase tracking-[0.28em] text-amber-300/80 font-semibold">PMV {periodoSelecionado.periodo.nome}</p>
+            <p className="mt-3 text-4xl font-bold text-amber-200">{formatBRL(periodoSelecionado.total.pmv)}</p>
+            <p className="text-sm text-amber-300/70">preço médio de venda</p>
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 mt-6 xl:grid-cols-4">
         <div className="rounded-[28px] border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 p-5 shadow-lg shadow-cyan-500/10 hover:border-cyan-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-cyan-300/80 mb-3 font-semibold">Receita total</p>
-          <p className="text-3xl font-bold text-cyan-300">{formatBRL(results.receitaTotal)}</p>
-          <p className="mt-2 text-sm text-cyan-400/60">{formatNumber(results.qtd)} unidades × {formatBRL(results.pmv)}</p>
-        </div>
-        <div className="rounded-[28px] border border-rose-500/30 bg-gradient-to-br from-rose-500/10 to-rose-600/5 p-5 shadow-lg shadow-rose-500/10 hover:border-rose-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-rose-300/80 mb-3 font-semibold">Custos e despesas</p>
-          <p className="text-3xl font-bold text-rose-300">{formatBRL(results.custoTotal + results.despesasVariaveisTotal + results.fixo)}</p>
-          <p className="mt-2 text-sm text-rose-400/60">CMV + variáveis + fixas</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-cyan-300/80 mb-3 font-semibold">Receita bruta</p>
+          <p className="text-3xl font-bold text-cyan-300">{formatBRL(periodoSelecionado.total.rob)}</p>
+          <p className="mt-2 text-sm text-cyan-400/60">{formatNumber(periodoSelecionado.total.qtde)} unidades</p>
         </div>
         <div className="rounded-[28px] border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5 shadow-lg shadow-emerald-500/10 hover:border-emerald-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-emerald-300/80 mb-3 font-semibold">Lucro estimado</p>
-          <p className="text-3xl font-bold text-emerald-300">{formatBRL(results.lucroTotal)}</p>
-          <p className="mt-2 text-sm text-emerald-400/60">Meta: {formatBRL(results.lucro)}</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-emerald-300/80 mb-3 font-semibold">ROL</p>
+          <p className="text-3xl font-bold text-emerald-300">{formatBRL(periodoSelecionado.total.rol)}</p>
+          <p className="mt-2 text-sm text-emerald-400/60">Receita líquida</p>
         </div>
         <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-violet-600/5 p-5 shadow-lg shadow-violet-500/10 hover:border-violet-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-violet-300/80 mb-3 font-semibold">Margem líquida</p>
-          <p className="text-3xl font-bold text-violet-300">{formatPercent(results.margemLiquida)}</p>
-          <p className="mt-2 text-sm text-violet-400/60">sobre a receita</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-violet-300/80 mb-3 font-semibold">MC</p>
+          <p className="text-3xl font-bold text-violet-300">{formatBRL(periodoSelecionado.total.mc)}</p>
+          <p className="mt-2 text-sm text-violet-400/70">{formatPercent(periodoSelecionado.total.mcPct)} sobre ROL</p>
+        </div>
+        <div className="rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-5 shadow-lg shadow-amber-500/10 hover:border-amber-500/50 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-amber-300/80 mb-3 font-semibold">PMV</p>
+          <p className="text-3xl font-bold text-amber-300">{formatBRL(periodoSelecionado.total.pmv)}</p>
+          <p className="mt-2 text-sm text-amber-400/60">preço médio de venda</p>
         </div>
       </div>
 
-      <div className="grid gap-4 mt-6 lg:grid-cols-2 xl:grid-cols-3">
-        {[
-          { label: 'Custo unitário do produto', value: custoUnitario, setter: setCustoUnitario, step: '0.01' },
-          { label: 'Quantidade estimada', value: quantidade, setter: setQuantidade, step: '1' },
-          { label: 'Despesas fixas mensais', value: despesasFixas, setter: setDespesasFixas, step: '0.01' },
-        ].map(({ label, value, setter, step }) => (
-          <label key={label} className="rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-5 transition hover:border-amber-500/60 hover:bg-slate-900/70 hover:shadow-lg hover:shadow-amber-500/10">
-            <span className="text-xs uppercase tracking-[0.32em] text-slate-300 font-semibold">{label}</span>
-            <input
-              type="number"
-              step={step}
-              min="0"
-              value={value}
-              onChange={(e) => setter(e.target.value)}
-              className={inputClass}
-            />
-          </label>
-        ))}
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        {periodos.map((p) => {
+          const ativo = p.id === periodoAtivo
+          return (
+            <button
+              key={p.id}
+              onClick={() => setPeriodoAtivo(p.id)}
+              className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
+                ativo
+                  ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
+                  : 'bg-white/5 text-white/70 hover:bg-amber-500/20 hover:text-white'
+              }`}
+            >
+              {p.nome}
+            </button>
+          )
+        })}
+        <button
+          onClick={addPeriodo}
+          className="rounded-2xl px-4 py-2 text-sm font-medium bg-white/5 text-white/70 hover:bg-emerald-500/20 hover:text-white transition"
+        >
+          + Período
+        </button>
       </div>
 
-      <div className="grid gap-4 mt-4 lg:grid-cols-2 xl:grid-cols-3">
-        {[
-          { label: 'Comissão + impostos (%)', value: comissaoImpostos, setter: setComissaoImpostos, step: '0.1' },
-          { label: 'Outras despesas variáveis (%)', value: outrasVariaveis, setter: setOutrasVariaveis, step: '0.1' },
-          { label: 'Lucro desejado', value: lucroDesejado, setter: setLucroDesejado, step: '0.01' },
-        ].map(({ label, value, setter, step }) => (
-          <label key={label} className="rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-5 transition hover:border-amber-500/60 hover:bg-slate-900/70 hover:shadow-lg hover:shadow-amber-500/10">
-            <span className="text-xs uppercase tracking-[0.32em] text-slate-300 font-semibold">{label}</span>
-            <input
-              type="number"
-              step={step}
-              min="0"
-              value={value}
-              onChange={(e) => setter(e.target.value)}
-              className={inputClass}
-            />
-          </label>
-        ))}
+      <div className="mt-4 rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <h3 className="text-lg font-bold text-slate-200">DRE por SKU — {periodoSelecionado.periodo.nome}</h3>
+          <input
+            type="text"
+            value={periodoSelecionado.periodo.nome}
+            onChange={(e) => updatePeriodoNome(periodoSelecionado.periodo.id, e.target.value)}
+            className="bg-transparent border-b border-slate-600 text-slate-200 text-sm outline-none focus:border-amber-400 px-1"
+          />
+        </div>
+        <table className="w-full text-sm min-w-[1200px]">
+          <thead>
+            <tr className="border-b border-slate-700/60 text-left">
+              <th className="py-3 px-2 text-slate-300 font-semibold sticky left-0 bg-slate-900/90 z-10">SKU</th>
+              <th className="py-3 px-2 text-slate-300 font-semibold text-center">Qtde</th>
+              <th className="py-3 px-2 text-slate-300 font-semibold text-center">Unit</th>
+              <th className="py-3 px-2 text-cyan-300 font-semibold text-center">ROB</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Impostos %</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Desc %</th>
+              <th className="py-3 px-2 text-emerald-300 font-semibold text-center">ROL</th>
+              <th className="py-3 px-2 text-orange-300 font-semibold text-center">CPV %</th>
+              <th className="py-3 px-2 text-orange-300 font-semibold text-center">CMV</th>
+              <th className="py-3 px-2 text-amber-300 font-semibold text-center">MB</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Comissão/Frete %</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">ADD %</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">ADD</th>
+              <th className="py-3 px-2 text-violet-300 font-semibold text-center">MC</th>
+              <th className="py-3 px-2 text-violet-300 font-semibold text-center">MC %</th>
+              <th className="py-3 px-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {periodoSelecionado.skuLinhas.map((l) => (
+              <tr key={l.sku.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
+                <td className="py-2 px-2 sticky left-0 bg-slate-900/90 z-10">
+                  <input
+                    type="text"
+                    value={l.sku.nome}
+                    onChange={(e) => updateSku(l.sku.id, 'nome', e.target.value)}
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={periodoSelecionado.periodo.valores[l.sku.id].qtde}
+                    onChange={(e) => updateValores(periodoSelecionado.periodo.id, l.sku.id, 'qtde', e.target.value)}
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={periodoSelecionado.periodo.valores[l.sku.id].unit}
+                    onChange={(e) => updateValores(periodoSelecionado.periodo.id, l.sku.id, 'unit', e.target.value)}
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 px-2 text-center text-cyan-300 font-semibold">{formatBRL(l.rob)}</td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.sku.impostosPct}
+                    onChange={(e) => updateSku(l.sku.id, 'impostosPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.sku.descontoPct}
+                    onChange={(e) => updateSku(l.sku.id, 'descontoPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2 text-center text-emerald-300 font-semibold">{formatBRL(l.rol)}</td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.sku.cpvPct}
+                    onChange={(e) => updateSku(l.sku.id, 'cpvPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2 text-center text-orange-300">{formatBRL(l.cmv)}</td>
+                <td className="py-2 px-2 text-center text-amber-300 font-semibold">{formatBRL(l.mb)}</td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.sku.comissaoFretePct}
+                    onChange={(e) => updateSku(l.sku.id, 'comissaoFretePct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.sku.addPct}
+                    onChange={(e) => updateSku(l.sku.id, 'addPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2 text-center text-rose-300">{formatBRL(l.add)}</td>
+                <td className="py-2 px-2 text-center text-violet-300 font-bold">{formatBRL(l.mc)}</td>
+                <td className="py-2 px-2 text-center text-violet-300 font-bold">{formatPercent(l.rol > 0 ? (l.mc / l.rol) * 100 : 0)}</td>
+                <td className="py-2 px-2 text-center">
+                  <button
+                    onClick={() => removeSku(l.sku.id)}
+                    className="text-rose-400 hover:text-rose-300 transition text-lg leading-none"
+                    title="Remover SKU"
+                  >
+                    ×
+                  </button>
+                </td>
+              </tr>
+            ))}
+            <tr className="border-t-2 border-slate-600/60 bg-slate-900/60 font-semibold">
+              <td className="py-3 px-2 sticky left-0 bg-slate-900/95 z-10 text-slate-200">TOTAL</td>
+              <td className="py-3 px-2 text-center text-slate-300">{formatNumber(periodoSelecionado.total.qtde)}</td>
+              <td className="py-3 px-2 text-center text-amber-300">{formatBRL(periodoSelecionado.total.pmv)}</td>
+              <td className="py-3 px-2 text-center text-cyan-300">{formatBRL(periodoSelecionado.total.rob)}</td>
+              <td className="py-3 px-2 text-center text-slate-400">-</td>
+              <td className="py-3 px-2 text-center text-slate-400">-</td>
+              <td className="py-3 px-2 text-center text-emerald-300">{formatBRL(periodoSelecionado.total.rol)}</td>
+              <td className="py-3 px-2 text-center text-slate-400">-</td>
+              <td className="py-3 px-2 text-center text-orange-300">{formatBRL(periodoSelecionado.total.cmv)}</td>
+              <td className="py-3 px-2 text-center text-amber-300">{formatBRL(periodoSelecionado.total.mb)}</td>
+              <td className="py-3 px-2 text-center text-rose-300">{formatBRL(periodoSelecionado.total.comissaoFrete)}</td>
+              <td className="py-3 px-2 text-center text-slate-400">-</td>
+              <td className="py-3 px-2 text-center text-rose-300">{formatBRL(periodoSelecionado.total.add)}</td>
+              <td className="py-3 px-2 text-center text-violet-300 text-lg">{formatBRL(periodoSelecionado.total.mc)}</td>
+              <td className="py-3 px-2 text-center text-violet-300">{formatPercent(periodoSelecionado.total.mcPct)}</td>
+              <td className="py-3 px-2"></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div className="mt-6 rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg">
-        <h3 className="text-lg font-bold text-slate-200 mb-2">Fórmula do PMV</h3>
-        <div className="rounded-2xl bg-slate-950/50 border border-slate-700/50 p-4 text-sm text-slate-300 font-mono leading-relaxed">
-          PMV = (Custo Total + Despesas Fixas + Lucro Desejado) ÷ (Quantidade × (1 - % Variáveis))
-        </div>
-        <div className="mt-4 text-sm text-slate-400 space-y-2">
-          <p>Custo total: <strong className="text-slate-200">{formatBRL(results.custoTotal)}</strong></p>
-          <p>Despesas fixas: <strong className="text-slate-200">{formatBRL(results.fixo)}</strong></p>
-          <p>Lucro desejado: <strong className="text-slate-200">{formatBRL(results.lucro)}</strong></p>
-          <p>Despesas variáveis sobre receita: <strong className="text-slate-200">{formatPercent(results.varPct)}</strong></p>
-        </div>
+      <div className="mt-6 rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-amber-500/10">
+        <h3 className="text-lg font-bold text-amber-300 mb-4">Tabela PMV comparativa</h3>
+        <table className="w-full text-sm min-w-[900px]">
+          <thead>
+            <tr className="border-b border-amber-500/20 text-left">
+              <th className="py-3 px-3 text-slate-300 font-semibold">Período</th>
+              <th className="py-3 px-3 text-slate-300 font-semibold text-center">Unidades</th>
+              <th className="py-3 px-3 text-cyan-300 font-semibold text-center">ROB</th>
+              <th className="py-3 px-3 text-emerald-300 font-semibold text-center">ROL</th>
+              <th className="py-3 px-3 text-orange-300 font-semibold text-center">CMV</th>
+              <th className="py-3 px-3 text-rose-300 font-semibold text-center">Comissão/Frete + ADD</th>
+              <th className="py-3 px-3 text-violet-300 font-semibold text-center">MC</th>
+              <th className="py-3 px-3 text-violet-300 font-semibold text-center">MC %</th>
+              <th className="py-3 px-3 text-amber-300 font-semibold text-center">PMV</th>
+              <th className="py-3 px-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {resultadoPeriodos.map((r) => (
+              <tr key={r.periodo.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
+                <td className="py-3 px-3 text-slate-200 font-semibold">{r.periodo.nome}</td>
+                <td className="py-3 px-3 text-center text-slate-300">{formatNumber(r.total.qtde)}</td>
+                <td className="py-3 px-3 text-center text-cyan-300">{formatBRL(r.total.rob)}</td>
+                <td className="py-3 px-3 text-center text-emerald-300">{formatBRL(r.total.rol)}</td>
+                <td className="py-3 px-3 text-center text-orange-300">{formatBRL(r.total.cmv)}</td>
+                <td className="py-3 px-3 text-center text-rose-300">{formatBRL(r.total.comissaoFrete + r.total.add)}</td>
+                <td className="py-3 px-3 text-center text-violet-300 font-bold">{formatBRL(r.total.mc)}</td>
+                <td className="py-3 px-3 text-center text-violet-300 font-bold">{formatPercent(r.total.mcPct)}</td>
+                <td className="py-3 px-3 text-center text-amber-300 font-bold">{formatBRL(r.total.pmv)}</td>
+                <td className="py-3 px-3 text-center">
+                  {periodos.length > 1 && (
+                    <button
+                      onClick={() => removePeriodo(r.periodo.id)}
+                      className="text-rose-400 hover:text-rose-300 transition text-lg leading-none"
+                      title="Remover período"
+                    >
+                      ×
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
-        <div className="rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-amber-500/10">
-          <h3 className="text-lg font-bold text-amber-300 mb-4">PMV por volume de vendas</h3>
-          <p className="text-sm text-slate-400 mb-4">Quanto maior a quantidade vendida, menor pode ser o preço médio para atingir o mesmo lucro.</p>
+        <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-violet-500/10">
+          <h3 className="text-lg font-bold text-violet-300 mb-4">Evolução da Margem de Contribuição</h3>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={cenarios} margin={{ top: 8, right: 16, bottom: 8, left: -8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={{ stroke: '#334155' }} tickLine={false} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v}`} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '16px' }}
-                  itemStyle={{ color: '#fbbf24' }}
-                  formatter={(value) => [formatBRL(value), 'PMV']}
-                />
-                <Line type="monotone" dataKey="pmv" stroke="#fbbf24" strokeWidth={3} dot={{ r: 4, fill: '#fbbf24' }} activeDot={{ r: 6 }} />
-              </LineChart>
-            </ResponsiveContainer>
+            <SimpleBarChart data={chartData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg">
-          <h3 className="text-lg font-bold text-slate-200 mb-4">Cenários de quantidade</h3>
-          <table className="w-full text-sm min-w-[360px]">
-            <thead>
-              <tr className="border-b border-slate-700/60 text-left">
-                <th className="py-3 px-3 text-slate-300 font-semibold">Quantidade</th>
-                <th className="py-3 px-3 text-amber-300 font-semibold">PMV</th>
-                <th className="py-3 px-3 text-cyan-300 font-semibold">Receita</th>
-                <th className="py-3 px-3 text-emerald-300 font-semibold">Lucro</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cenarios.map((c, idx) => (
-                <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
-                  <td className="py-3 px-3 text-slate-300">{formatNumber(c.qtd)}</td>
-                  <td className="py-3 px-3 text-amber-300 font-semibold">{formatBRL(c.pmv)}</td>
-                  <td className="py-3 px-3 text-cyan-300">{formatBRL(c.receita)}</td>
-                  <td className="py-3 px-3 text-emerald-300">{formatBRL(c.lucroReal)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-amber-500/10">
+          <h3 className="text-lg font-bold text-amber-300 mb-4">Evolução do PMV</h3>
+          <div className="h-64">
+            <SimpleLineChart data={chartData} valueKey="pmv" labelKey="nome" />
+          </div>
         </div>
       </div>
 
@@ -249,6 +530,12 @@ export default function StepPmv({ className, back }) {
           className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-700 text-slate-200 hover:bg-slate-900 transition"
         >
           ← Voltar
+        </button>
+        <button
+          onClick={addSku}
+          className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-violet-500 to-purple-500 text-white font-semibold shadow-lg shadow-violet-500/20 hover:brightness-110 transition"
+        >
+          + Adicionar SKU
         </button>
         <button
           onClick={reset}

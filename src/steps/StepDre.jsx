@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
 function parseNumber(value) {
   if (value === undefined || value === null || value === '') return 0
@@ -33,8 +32,6 @@ function newId() {
 const emptySku = () => ({
   id: newId(),
   nome: 'SKU A',
-  qtde: 1000,
-  precoUnitario: 150,
   impostosPct: 12,
   descontoPct: 0,
   cpvPct: 50,
@@ -43,10 +40,35 @@ const emptySku = () => ({
 })
 
 const initialSkus = [
-  { id: '1', nome: 'SKU A', qtde: 1000, precoUnitario: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
-  { id: '2', nome: 'SKU B', qtde: 2200, precoUnitario: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
-  { id: '3', nome: 'SKU C', qtde: 3000, precoUnitario: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
+  { id: 'sku-a', nome: 'SKU A', impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
+  { id: 'sku-b', nome: 'SKU B', impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
+  { id: 'sku-c', nome: 'SKU C', impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
 ]
+
+function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
+  const max = Math.max(...data.map((d) => Math.abs(d[valueKey]) || 0), 1)
+  return (
+    <div className="flex items-end gap-3 h-full px-2">
+      {data.map((d, idx) => {
+        const val = d[valueKey] || 0
+        const height = `${(Math.abs(val) / max) * 100}%`
+        const colors = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6']
+        return (
+          <div key={idx} className="flex-1 flex flex-col items-center justify-end group relative">
+            <div className="opacity-0 group-hover:opacity-100 transition absolute -top-8 text-[10px] text-slate-300 bg-slate-800 px-2 py-1 rounded-lg whitespace-nowrap">
+              {formatBRL(val)}
+            </div>
+            <div
+              style={{ height, backgroundColor: colors[idx % colors.length] || color }}
+              className="w-full rounded-t-lg min-h-[4px] transition-all"
+            />
+            <div className="text-[10px] text-slate-400 mt-2 truncate max-w-full">{d[labelKey]}</div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function StepDre({ className, back }) {
   const [skus, setSkus] = useState(initialSkus)
@@ -134,13 +156,6 @@ export default function StepDre({ className, back }) {
 
   const reset = () => setSkus(initialSkus)
 
-  const headerCell = (label, sub = '') => (
-    <div className="flex flex-col leading-tight">
-      <span>{label}</span>
-      {sub && <span className="text-[10px] opacity-70 font-normal">{sub}</span>}
-    </div>
-  )
-
   const inputClass =
     'w-full bg-transparent border-b border-slate-600/50 text-center text-slate-100 py-1 outline-none transition focus:border-cyan-400 focus:bg-slate-800/30'
   const inputPctClass =
@@ -196,20 +211,20 @@ export default function StepDre({ className, back }) {
           <thead>
             <tr className="border-b border-slate-700/60 text-left">
               <th className="py-3 px-2 text-slate-300 font-semibold sticky left-0 bg-slate-900/90 z-10">SKU</th>
-              <th className="py-3 px-2 text-slate-300 font-semibold text-center">{headerCell('Qtde')}</th>
-              <th className="py-3 px-2 text-slate-300 font-semibold text-center">{headerCell('Unit')}</th>
-              <th className="py-3 px-2 text-cyan-300 font-semibold text-center">{headerCell('ROB')}</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('Impostos', '%')}</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('Desconto', '%')}</th>
-              <th className="py-3 px-2 text-emerald-300 font-semibold text-center">{headerCell('ROL')}</th>
-              <th className="py-3 px-2 text-orange-300 font-semibold text-center">{headerCell('CPV', '%')}</th>
-              <th className="py-3 px-2 text-orange-300 font-semibold text-center">{headerCell('CMV')}</th>
-              <th className="py-3 px-2 text-amber-300 font-semibold text-center">{headerCell('MB')}</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('Comissão/Frete', '%')}</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('ADD', '%')}</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('ADD')}</th>
-              <th className="py-3 px-2 text-violet-300 font-semibold text-center">{headerCell('MC')}</th>
-              <th className="py-3 px-2 text-violet-300 font-semibold text-center">{headerCell('MC', '%')}</th>
+              <th className="py-3 px-2 text-slate-300 font-semibold text-center">Qtde</th>
+              <th className="py-3 px-2 text-slate-300 font-semibold text-center">Unit</th>
+              <th className="py-3 px-2 text-cyan-300 font-semibold text-center">ROB</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Impostos %</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Desc %</th>
+              <th className="py-3 px-2 text-emerald-300 font-semibold text-center">ROL</th>
+              <th className="py-3 px-2 text-orange-300 font-semibold text-center">CPV %</th>
+              <th className="py-3 px-2 text-orange-300 font-semibold text-center">CMV</th>
+              <th className="py-3 px-2 text-amber-300 font-semibold text-center">MB</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Comissão/Frete %</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">ADD %</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">ADD</th>
+              <th className="py-3 px-2 text-violet-300 font-semibold text-center">MC</th>
+              <th className="py-3 px-2 text-violet-300 font-semibold text-center">MC %</th>
               <th className="py-3 px-2 text-slate-400 font-semibold text-center"></th>
             </tr>
           </thead>
@@ -341,25 +356,10 @@ export default function StepDre({ className, back }) {
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-violet-500/10">
-          <h3 className="text-lg font-bold text-violet-300 mb-2">Participação na MC</h3>
+          <h3 className="text-lg font-bold text-violet-300 mb-4">Participação na MC</h3>
           <p className="text-sm text-slate-400 mb-4">Quanto cada SKU contribui para a margem total.</p>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={impactoData} margin={{ top: 8, right: 8, bottom: 8, left: -20 }}>
-                <XAxis dataKey="nome" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={{ stroke: '#334155' }} tickLine={false} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${formatNumber(v / 1000)}k`} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '16px' }}
-                  itemStyle={{ color: '#c4b5fd' }}
-                  formatter={(value) => [formatBRL(value), 'MC']}
-                />
-                <Bar dataKey="mc" radius={[6, 6, 0, 0]}>
-                  {impactoData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6'][index % 5]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <SimpleBarChart data={impactoData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
