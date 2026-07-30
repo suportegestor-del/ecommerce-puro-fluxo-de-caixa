@@ -116,6 +116,123 @@ function SimpleLineChart({ data, valueKey, labelKey, color = '#fbbf24' }) {
   )
 }
 
+function AnalisePmv({ resultadoPeriodos, periodoAtivo, periodos, removePeriodo }) {
+  const idxAtual = resultadoPeriodos.findIndex((r) => r.periodo.id === periodoAtivo)
+  const idxAnterior = idxAtual > 0 ? idxAtual - 1 : null
+  const resultadoAtual = resultadoPeriodos[idxAtual]
+  const resultadoAnterior = idxAnterior !== null ? resultadoPeriodos[idxAnterior] : null
+
+  const analise = useMemo(() => {
+    if (!resultadoAnterior || !resultadoAtual) return []
+    return resultadoAtual.skuLinhas.map((linhaAtual) => {
+      const linhaAnterior = resultadoAnterior.skuLinhas.find((l) => l.sku.id === linhaAtual.sku.id)
+      if (!linhaAnterior) return null
+
+      const qtdAnt = linhaAnterior.qtde
+      const qtdAtu = linhaAtual.qtde
+      const unitAnt = linhaAnterior.unit
+      const unitAtu = linhaAtual.unit
+      const robAnt = linhaAnterior.rob
+      const robAtu = linhaAtual.rob
+
+      const deltaQtd = qtdAtu - qtdAnt
+      const deltaRob = robAtu - robAnt
+      const impactoVolume = deltaQtd * unitAnt
+      const impactoPreco = (unitAtu - unitAnt) * qtdAtu
+      const impactoMix = deltaRob - impactoVolume - impactoPreco
+
+      return {
+        sku: linhaAtual.sku,
+        anterior: { qtd: qtdAnt, rob: robAnt, unit: unitAnt, mcPct: linhaAnterior.rol > 0 ? (linhaAnterior.mc / linhaAnterior.rol) * 100 : 0 },
+        atual: { qtd: qtdAtu, rob: robAtu, unit: unitAtu, mcPct: linhaAtual.rol > 0 ? (linhaAtual.mc / linhaAtual.rol) * 100 : 0 },
+        deltaQtd,
+        deltaRob,
+        impactoVolume,
+        impactoPreco,
+        impactoMix,
+      }
+    }).filter(Boolean)
+  }, [resultadoAnterior, resultadoAtual])
+
+  if (!resultadoAnterior) {
+    return (
+      <div className="mt-6 rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-amber-500/10">
+        <h3 className="text-lg font-bold text-amber-300 mb-2">Análise PMV</h3>
+        <p className="text-sm text-slate-400">Adicione pelo menos mais um período para comparar SKU a SKU.</p>
+      </div>
+    )
+  }
+
+  const nomeAnterior = resultadoAnterior.periodo.nome
+  const nomeAtual = resultadoAtual.periodo.nome
+
+  const deltaClass = (v) => (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-slate-400')
+  const deltaSignal = (v) => (v > 0 ? '+' : '')
+
+  return (
+    <div className="mt-6 rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-amber-500/10">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <h3 className="text-lg font-bold text-amber-300">Análise PMV</h3>
+        <p className="text-sm text-slate-400">Comparando {nomeAtual} com {nomeAnterior}</p>
+      </div>
+      <table className="w-full text-sm min-w-[1100px]">
+        <thead>
+          <tr className="border-b border-amber-500/20 text-left">
+            <th className="py-3 px-2 text-slate-300 font-semibold sticky left-0 bg-slate-900/90 z-10">SKU</th>
+            <th className="py-3 px-2 text-slate-300 font-semibold">Nome</th>
+            <th colSpan="4" className="py-3 px-2 text-center text-cyan-300 font-semibold border-b border-slate-700/50">{nomeAnterior}</th>
+            <th colSpan="4" className="py-3 px-2 text-center text-emerald-300 font-semibold border-b border-slate-700/50">{nomeAtual}</th>
+            <th colSpan="2" className="py-3 px-2 text-center text-slate-300 font-semibold border-b border-slate-700/50">Variação</th>
+            <th colSpan="3" className="py-3 px-2 text-center text-amber-300 font-semibold border-b border-slate-700/50">Decomposição Δ R$</th>
+          </tr>
+          <tr className="border-b border-slate-700/60 text-left">
+            <th className="py-2 px-2"></th>
+            <th className="py-2 px-2"></th>
+            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Qtd</th>
+            <th className="py-2 px-2 text-cyan-300 font-semibold text-center">R$</th>
+            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Unit</th>
+            <th className="py-2 px-2 text-violet-300 font-semibold text-center">Marg%</th>
+            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Qtd</th>
+            <th className="py-2 px-2 text-cyan-300 font-semibold text-center">R$</th>
+            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Unit</th>
+            <th className="py-2 px-2 text-violet-300 font-semibold text-center">Marg%</th>
+            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Δ Qtd</th>
+            <th className="py-2 px-2 text-cyan-300 font-semibold text-center">Δ R$</th>
+            <th className="py-2 px-2 text-amber-300 font-semibold text-center">Volume</th>
+            <th className="py-2 px-2 text-amber-300 font-semibold text-center">Preço</th>
+            <th className="py-2 px-2 text-amber-300 font-semibold text-center">Mix</th>
+          </tr>
+        </thead>
+        <tbody>
+          {analise.map((a) => (
+            <tr key={a.sku.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
+              <td className="py-3 px-2 text-slate-200 font-semibold sticky left-0 bg-slate-900/90 z-10">{a.sku.nome}</td>
+              <td className="py-3 px-2 text-slate-400 text-xs max-w-[160px] truncate">{a.sku.nome}</td>
+              <td className="py-3 px-2 text-center text-slate-400">{formatNumber(a.anterior.qtd)}</td>
+              <td className="py-3 px-2 text-center text-cyan-300">{formatBRL(a.anterior.rob)}</td>
+              <td className="py-3 px-2 text-center text-slate-400">{formatBRL(a.anterior.unit)}</td>
+              <td className="py-3 px-2 text-center text-violet-300">{formatPercent(a.anterior.mcPct)}</td>
+              <td className="py-3 px-2 text-center text-slate-300">{formatNumber(a.atual.qtd)}</td>
+              <td className="py-3 px-2 text-center text-cyan-300 font-semibold">{formatBRL(a.atual.rob)}</td>
+              <td className="py-3 px-2 text-center text-slate-300">{formatBRL(a.atual.unit)}</td>
+              <td className="py-3 px-2 text-center text-violet-300 font-semibold">{formatPercent(a.atual.mcPct)}</td>
+              <td className={`py-3 px-2 text-center font-semibold ${deltaClass(a.deltaQtd)}`}>
+                {deltaSignal(a.deltaQtd)}{formatNumber(a.deltaQtd)}
+              </td>
+              <td className={`py-3 px-2 text-center font-semibold ${deltaClass(a.deltaRob)}`}>
+                {deltaSignal(a.deltaRob)}{formatBRL(a.deltaRob)}
+              </td>
+              <td className={`py-3 px-2 text-center ${deltaClass(a.impactoVolume)}`}>{deltaSignal(a.impactoVolume)}{formatBRL(a.impactoVolume)}</td>
+              <td className={`py-3 px-2 text-center ${deltaClass(a.impactoPreco)}`}>{deltaSignal(a.impactoPreco)}{formatBRL(a.impactoPreco)}</td>
+              <td className={`py-3 px-2 text-center ${deltaClass(a.impactoMix)}`}>{deltaSignal(a.impactoMix)}{formatBRL(a.impactoMix)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export default function StepPmv({ className, back }) {
   const [skus, setSkus] = useState(initialSkus)
   const [periodos, setPeriodos] = useState(initialPeriodos)
@@ -303,6 +420,14 @@ export default function StepPmv({ className, back }) {
         >
           + Período
         </button>
+        {periodos.length > 1 && (
+          <button
+            onClick={() => removePeriodo(periodoAtivo)}
+            className="rounded-2xl px-4 py-2 text-sm font-medium bg-white/5 text-rose-300 hover:bg-rose-500/20 transition"
+          >
+            × Remover {periodoSelecionado.periodo.nome}
+          </button>
+        )}
       </div>
 
       <div className="mt-4 rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg">
@@ -462,51 +587,12 @@ export default function StepPmv({ className, back }) {
         </table>
       </div>
 
-      <div className="mt-6 rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-amber-500/10">
-        <h3 className="text-lg font-bold text-amber-300 mb-4">Tabela PMV comparativa</h3>
-        <table className="w-full text-sm min-w-[900px]">
-          <thead>
-            <tr className="border-b border-amber-500/20 text-left">
-              <th className="py-3 px-3 text-slate-300 font-semibold">Período</th>
-              <th className="py-3 px-3 text-slate-300 font-semibold text-center">Unidades</th>
-              <th className="py-3 px-3 text-cyan-300 font-semibold text-center">ROB</th>
-              <th className="py-3 px-3 text-emerald-300 font-semibold text-center">ROL</th>
-              <th className="py-3 px-3 text-orange-300 font-semibold text-center">CMV</th>
-              <th className="py-3 px-3 text-rose-300 font-semibold text-center">Comissão/Frete + ADD</th>
-              <th className="py-3 px-3 text-violet-300 font-semibold text-center">MC</th>
-              <th className="py-3 px-3 text-violet-300 font-semibold text-center">MC %</th>
-              <th className="py-3 px-3 text-amber-300 font-semibold text-center">PMV</th>
-              <th className="py-3 px-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {resultadoPeriodos.map((r) => (
-              <tr key={r.periodo.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
-                <td className="py-3 px-3 text-slate-200 font-semibold">{r.periodo.nome}</td>
-                <td className="py-3 px-3 text-center text-slate-300">{formatNumber(r.total.qtde)}</td>
-                <td className="py-3 px-3 text-center text-cyan-300">{formatBRL(r.total.rob)}</td>
-                <td className="py-3 px-3 text-center text-emerald-300">{formatBRL(r.total.rol)}</td>
-                <td className="py-3 px-3 text-center text-orange-300">{formatBRL(r.total.cmv)}</td>
-                <td className="py-3 px-3 text-center text-rose-300">{formatBRL(r.total.comissaoFrete + r.total.add)}</td>
-                <td className="py-3 px-3 text-center text-violet-300 font-bold">{formatBRL(r.total.mc)}</td>
-                <td className="py-3 px-3 text-center text-violet-300 font-bold">{formatPercent(r.total.mcPct)}</td>
-                <td className="py-3 px-3 text-center text-amber-300 font-bold">{formatBRL(r.total.pmv)}</td>
-                <td className="py-3 px-3 text-center">
-                  {periodos.length > 1 && (
-                    <button
-                      onClick={() => removePeriodo(r.periodo.id)}
-                      className="text-rose-400 hover:text-rose-300 transition text-lg leading-none"
-                      title="Remover período"
-                    >
-                      ×
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AnalisePmv
+        resultadoPeriodos={resultadoPeriodos}
+        periodoAtivo={periodoAtivo}
+        periodos={periodos}
+        removePeriodo={removePeriodo}
+      />
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-violet-500/10">
