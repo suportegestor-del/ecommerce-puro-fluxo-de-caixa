@@ -1,0 +1,431 @@
+import React, { useMemo, useState } from 'react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+
+function parseNumber(value) {
+  if (value === undefined || value === null || value === '') return 0
+  return Number(String(value).replace(',', '.').replace(/[^0-9.\-]/g, '')) || 0
+}
+
+function formatBRL(value) {
+  return Number(value || 0).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
+}
+
+function formatPercent(value) {
+  return `${Number(value || 0).toFixed(1).replace('.', ',')}%`
+}
+
+function formatNumber(value) {
+  return Number(value || 0).toLocaleString('pt-BR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
+}
+
+function newId() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
+}
+
+const emptySku = () => ({
+  id: newId(),
+  nome: 'SKU A',
+  qtde: 1000,
+  precoUnitario: 150,
+  impostosPct: 12,
+  descontoPct: 0,
+  cpvPct: 50,
+  comissaoFretePct: 23,
+  addPct: 1,
+})
+
+const initialSkus = [
+  { id: '1', nome: 'SKU A', qtde: 1000, precoUnitario: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
+  { id: '2', nome: 'SKU B', qtde: 2200, precoUnitario: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
+  { id: '3', nome: 'SKU C', qtde: 3000, precoUnitario: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
+]
+
+export default function StepDre({ className, back }) {
+  const [skus, setSkus] = useState(initialSkus)
+
+  const linhas = useMemo(() => {
+    return skus.map((sku) => {
+      const qtde = parseNumber(sku.qtde)
+      const preco = parseNumber(sku.precoUnitario)
+      const impostosPct = parseNumber(sku.impostosPct)
+      const descontoPct = parseNumber(sku.descontoPct)
+      const cpvPct = parseNumber(sku.cpvPct)
+      const comissaoFretePct = parseNumber(sku.comissaoFretePct)
+      const addPct = parseNumber(sku.addPct)
+
+      const rob = qtde * preco
+      const impostos = rob * (impostosPct / 100)
+      const desconto = rob * (descontoPct / 100)
+      const rol = rob - impostos - desconto
+      const cmv = -rol * (cpvPct / 100)
+      const mb = rol + cmv
+      const comissaoFrete = rol * (comissaoFretePct / 100)
+      const add = rol * (addPct / 100)
+      const mc = mb - comissaoFrete - add
+      const mcPct = rol > 0 ? (mc / rol) * 100 : 0
+
+      return {
+        ...sku,
+        qtde,
+        preco,
+        rob,
+        impostos,
+        desconto,
+        rol,
+        cmv,
+        mb,
+        comissaoFrete,
+        add,
+        mc,
+        mcPct,
+      }
+    })
+  }, [skus])
+
+  const totais = useMemo(() => {
+    const acc = linhas.reduce(
+      (t, l) => ({
+        rob: t.rob + l.rob,
+        impostos: t.impostos + l.impostos,
+        desconto: t.desconto + l.desconto,
+        rol: t.rol + l.rol,
+        cmv: t.cmv + l.cmv,
+        mb: t.mb + l.mb,
+        comissaoFrete: t.comissaoFrete + l.comissaoFrete,
+        add: t.add + l.add,
+        mc: t.mc + l.mc,
+      }),
+      { rob: 0, impostos: 0, desconto: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
+    )
+    return {
+      ...acc,
+      mcPct: acc.rol > 0 ? (acc.mc / acc.rol) * 100 : 0,
+    }
+  }, [linhas])
+
+  const impactoData = useMemo(() => {
+    const totalMc = totais.mc || 1
+    return linhas.map((l) => ({
+      nome: l.nome,
+      mc: l.mc,
+      pct: (l.mc / totalMc) * 100,
+    }))
+  }, [linhas, totais.mc])
+
+  const updateSku = (id, field, value) => {
+    setSkus((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
+  }
+
+  const addSku = () => {
+    setSkus((prev) => [...prev, emptySku()])
+  }
+
+  const removeSku = (id) => {
+    setSkus((prev) => prev.filter((s) => s.id !== id))
+  }
+
+  const reset = () => setSkus(initialSkus)
+
+  const headerCell = (label, sub = '') => (
+    <div className="flex flex-col leading-tight">
+      <span>{label}</span>
+      {sub && <span className="text-[10px] opacity-70 font-normal">{sub}</span>}
+    </div>
+  )
+
+  const inputClass =
+    'w-full bg-transparent border-b border-slate-600/50 text-center text-slate-100 py-1 outline-none transition focus:border-cyan-400 focus:bg-slate-800/30'
+  const inputPctClass =
+    'w-full bg-transparent border-b border-slate-600/50 text-center text-slate-100 py-1 outline-none transition focus:border-cyan-400 focus:bg-slate-800/30'
+
+  return (
+    <div className={`w-full max-w-[99vw] px-2 ${className}`}>
+      <div className="rounded-[28px] border border-violet-500/20 bg-gradient-to-r from-violet-500/5 via-purple-500/5 to-violet-600/5 p-6 shadow-[0_40px_100px_-40px_rgba(139,92,246,0.15)]">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.32em] text-violet-300/70 font-semibold">DRE Gerencial</p>
+            <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-violet-300 to-purple-300 bg-clip-text text-transparent tracking-tight">
+              Impacto por SKU
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-300">
+              Veja o que cada SKU impacta na margem de contribuição até chegar no resultado operacional.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-purple-500/10 p-5 text-center shadow-lg shadow-violet-500/10">
+            <p className="text-xs uppercase tracking-[0.28em] text-violet-300/80 font-semibold">Margem de Contribuição</p>
+            <p className="mt-3 text-4xl font-bold text-violet-200">{formatBRL(totais.mc)}</p>
+            <p className="text-sm text-violet-300/70">{formatPercent(totais.mcPct)} sobre a ROL</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4 mt-6 xl:grid-cols-4">
+        <div className="rounded-[28px] border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 p-5 shadow-lg shadow-cyan-500/10 hover:border-cyan-500/50 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-cyan-300/80 mb-3 font-semibold">ROB total</p>
+          <p className="text-3xl font-bold text-cyan-300">{formatBRL(totais.rob)}</p>
+          <p className="mt-2 text-sm text-cyan-400/60">Receita operacional bruta</p>
+        </div>
+        <div className="rounded-[28px] border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5 shadow-lg shadow-emerald-500/10 hover:border-emerald-500/50 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-emerald-300/80 mb-3 font-semibold">ROL total</p>
+          <p className="text-3xl font-bold text-emerald-300">{formatBRL(totais.rol)}</p>
+          <p className="mt-2 text-sm text-emerald-400/60">Receita líquida de impostos/descontos</p>
+        </div>
+        <div className="rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-5 shadow-lg shadow-amber-500/10 hover:border-amber-500/50 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-amber-300/80 mb-3 font-semibold">Margem bruta</p>
+          <p className="text-3xl font-bold text-amber-300">{formatBRL(totais.mb)}</p>
+          <p className="mt-2 text-sm text-amber-400/60">ROL - CMV</p>
+        </div>
+        <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-violet-600/5 p-5 shadow-lg shadow-violet-500/10 hover:border-violet-500/50 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-violet-300/80 mb-3 font-semibold">MC total</p>
+          <p className="text-3xl font-bold text-violet-300">{formatBRL(totais.mc)}</p>
+          <p className="mt-2 text-sm text-violet-400/60">Margem de contribuição</p>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-violet-500/5">
+        <h3 className="text-lg font-bold text-slate-200 mb-4">DRE por SKU até a Margem de Contribuição</h3>
+        <table className="w-full text-sm min-w-[1200px]">
+          <thead>
+            <tr className="border-b border-slate-700/60 text-left">
+              <th className="py-3 px-2 text-slate-300 font-semibold sticky left-0 bg-slate-900/90 z-10">SKU</th>
+              <th className="py-3 px-2 text-slate-300 font-semibold text-center">{headerCell('Qtde')}</th>
+              <th className="py-3 px-2 text-slate-300 font-semibold text-center">{headerCell('Unit')}</th>
+              <th className="py-3 px-2 text-cyan-300 font-semibold text-center">{headerCell('ROB')}</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('Impostos', '%')}</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('Desconto', '%')}</th>
+              <th className="py-3 px-2 text-emerald-300 font-semibold text-center">{headerCell('ROL')}</th>
+              <th className="py-3 px-2 text-orange-300 font-semibold text-center">{headerCell('CPV', '%')}</th>
+              <th className="py-3 px-2 text-orange-300 font-semibold text-center">{headerCell('CMV')}</th>
+              <th className="py-3 px-2 text-amber-300 font-semibold text-center">{headerCell('MB')}</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('Comissão/Frete', '%')}</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('ADD', '%')}</th>
+              <th className="py-3 px-2 text-rose-300 font-semibold text-center">{headerCell('ADD')}</th>
+              <th className="py-3 px-2 text-violet-300 font-semibold text-center">{headerCell('MC')}</th>
+              <th className="py-3 px-2 text-violet-300 font-semibold text-center">{headerCell('MC', '%')}</th>
+              <th className="py-3 px-2 text-slate-400 font-semibold text-center"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {linhas.map((l) => (
+              <tr key={l.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
+                <td className="py-2 px-2 sticky left-0 bg-slate-900/90 z-10">
+                  <input
+                    type="text"
+                    value={l.nome}
+                    onChange={(e) => updateSku(l.id, 'nome', e.target.value)}
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={l.qtde}
+                    onChange={(e) => updateSku(l.id, 'qtde', e.target.value)}
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={l.precoUnitario}
+                    onChange={(e) => updateSku(l.id, 'precoUnitario', e.target.value)}
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 px-2 text-center text-cyan-300 font-semibold">{formatBRL(l.rob)}</td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.impostosPct}
+                    onChange={(e) => updateSku(l.id, 'impostosPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.descontoPct}
+                    onChange={(e) => updateSku(l.id, 'descontoPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2 text-center text-emerald-300 font-semibold">{formatBRL(l.rol)}</td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.cpvPct}
+                    onChange={(e) => updateSku(l.id, 'cpvPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2 text-center text-orange-300">{formatBRL(l.cmv)}</td>
+                <td className="py-2 px-2 text-center text-amber-300 font-semibold">{formatBRL(l.mb)}</td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.comissaoFretePct}
+                    onChange={(e) => updateSku(l.id, 'comissaoFretePct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.addPct}
+                    onChange={(e) => updateSku(l.id, 'addPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                </td>
+                <td className="py-2 px-2 text-center text-rose-300">{formatBRL(l.add)}</td>
+                <td className="py-2 px-2 text-center text-violet-300 font-bold">{formatBRL(l.mc)}</td>
+                <td className="py-2 px-2 text-center text-violet-300 font-bold">{formatPercent(l.mcPct)}</td>
+                <td className="py-2 px-2 text-center">
+                  <button
+                    onClick={() => removeSku(l.id)}
+                    className="text-rose-400 hover:text-rose-300 transition text-lg leading-none"
+                    title="Remover SKU"
+                  >
+                    ×
+                  </button>
+                </td>
+              </tr>
+            ))}
+            <tr className="border-t-2 border-slate-600/60 bg-slate-900/60 font-semibold">
+              <td className="py-3 px-2 sticky left-0 bg-slate-900/95 z-10 text-slate-200">TOTAL</td>
+              <td className="py-3 px-2 text-center text-slate-400">-</td>
+              <td className="py-3 px-2 text-center text-slate-400">-</td>
+              <td className="py-3 px-2 text-center text-cyan-300">{formatBRL(totais.rob)}</td>
+              <td className="py-3 px-2 text-center text-rose-300">{formatBRL(totais.impostos)}</td>
+              <td className="py-3 px-2 text-center text-rose-300">{formatBRL(totais.desconto)}</td>
+              <td className="py-3 px-2 text-center text-emerald-300">{formatBRL(totais.rol)}</td>
+              <td className="py-3 px-2 text-center text-slate-400">-</td>
+              <td className="py-3 px-2 text-center text-orange-300">{formatBRL(totais.cmv)}</td>
+              <td className="py-3 px-2 text-center text-amber-300">{formatBRL(totais.mb)}</td>
+              <td className="py-3 px-2 text-center text-rose-300">{formatBRL(totais.comissaoFrete)}</td>
+              <td className="py-3 px-2 text-center text-slate-400">-</td>
+              <td className="py-3 px-2 text-center text-rose-300">{formatBRL(totais.add)}</td>
+              <td className="py-3 px-2 text-center text-violet-300 text-lg">{formatBRL(totais.mc)}</td>
+              <td className="py-3 px-2 text-center text-violet-300">{formatPercent(totais.mcPct)}</td>
+              <td className="py-3 px-2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="grid gap-4 mt-6 lg:grid-cols-2">
+        <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-violet-500/10">
+          <h3 className="text-lg font-bold text-violet-300 mb-2">Participação na MC</h3>
+          <p className="text-sm text-slate-400 mb-4">Quanto cada SKU contribui para a margem total.</p>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={impactoData} margin={{ top: 8, right: 8, bottom: 8, left: -20 }}>
+                <XAxis dataKey="nome" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={{ stroke: '#334155' }} tickLine={false} />
+                <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${formatNumber(v / 1000)}k`} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '16px' }}
+                  itemStyle={{ color: '#c4b5fd' }}
+                  formatter={(value) => [formatBRL(value), 'MC']}
+                />
+                <Bar dataKey="mc" radius={[6, 6, 0, 0]}>
+                  {impactoData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6'][index % 5]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg">
+          <h3 className="text-lg font-bold text-slate-200 mb-4">Resumo da DRE</h3>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between border-b border-slate-800 pb-2">
+              <span className="text-slate-400">ROB</span>
+              <span className="text-cyan-300 font-semibold">{formatBRL(totais.rob)}</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-800 pb-2">
+              <span className="text-slate-400">(-) Impostos</span>
+              <span className="text-rose-300">{formatBRL(totais.impostos)}</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-800 pb-2">
+              <span className="text-slate-400">(-) Descontos</span>
+              <span className="text-rose-300">{formatBRL(totais.desconto)}</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-700 pb-2">
+              <span className="text-slate-200 font-semibold">= ROL</span>
+              <span className="text-emerald-300 font-semibold">{formatBRL(totais.rol)}</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-800 pb-2">
+              <span className="text-slate-400">(-) CMV</span>
+              <span className="text-orange-300">{formatBRL(totais.cmv)}</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-700 pb-2">
+              <span className="text-slate-200 font-semibold">= Margem Bruta</span>
+              <span className="text-amber-300 font-semibold">{formatBRL(totais.mb)}</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-800 pb-2">
+              <span className="text-slate-400">(-) Comissão/Frete</span>
+              <span className="text-rose-300">{formatBRL(totais.comissaoFrete)}</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-800 pb-2">
+              <span className="text-slate-400">(-) ADD</span>
+              <span className="text-rose-300">{formatBRL(totais.add)}</span>
+            </div>
+            <div className="flex justify-between pt-1">
+              <span className="text-violet-200 font-bold">= Margem de Contribuição</span>
+              <span className="text-violet-300 font-bold text-lg">{formatBRL(totais.mc)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 mt-6 sm:flex-row">
+        <button
+          onClick={back}
+          className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-700 text-slate-200 hover:bg-slate-900 transition"
+        >
+          ← Voltar
+        </button>
+        <button
+          onClick={addSku}
+          className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-violet-500 to-purple-500 text-white font-semibold shadow-lg shadow-violet-500/20 hover:brightness-110 transition"
+        >
+          + Adicionar SKU
+        </button>
+        <button
+          onClick={reset}
+          className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold shadow-lg shadow-cyan-500/20 hover:brightness-110 transition"
+        >
+          Reiniciar dados
+        </button>
+      </div>
+    </div>
+  )
+}

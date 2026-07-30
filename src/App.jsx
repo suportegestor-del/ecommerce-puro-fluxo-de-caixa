@@ -8,6 +8,7 @@ import StepOutros from './steps/StepOutros'
 import StepNaoOperacional from './steps/StepNaoOperacional'
 import StepResultado from './steps/StepResultado'
 import StepMargem from './steps/StepMargem'
+import StepDre from './steps/StepDre'
 import ProgressBar from './components/ProgressBar'
 
 const STEPS = [
@@ -107,6 +108,14 @@ export default function App() {
           >
             Simulador de Margens
           </button>
+          <button
+            onClick={() => switchMode('dre')}
+            className={`rounded-xl px-4 py-2 text-sm font-medium transition ${mode === 'dre'
+              ? 'bg-blue-500 text-white'
+              : 'bg-white/5 text-white/70 hover:bg-blue-500/20 hover:text-white'}`}
+          >
+            DRE Gerencial
+          </button>
         </div>
         <div className="relative" ref={qrRef}>
           <button
@@ -151,7 +160,13 @@ export default function App() {
         <ProgressBar current={step} total={STEPS.length - 2} labels={STEPS.slice(1, -1)} />
       )}
       <div className="flex-1 flex items-center justify-center p-4">
-        {mode === 'fluxo' ? stepComponents[step] : <StepMargem key={animKey} className={stepClass} back={() => switchMode('fluxo')} />}
+        {mode === 'fluxo' ? (
+          stepComponents[step]
+        ) : mode === 'dre' ? (
+          <StepDre key={animKey} className={stepClass} back={() => switchMode('fluxo')} />
+        ) : (
+          <StepMargem key={animKey} className={stepClass} back={() => switchMode('fluxo')} />
+        )}
       </div>
     </div>
   )
