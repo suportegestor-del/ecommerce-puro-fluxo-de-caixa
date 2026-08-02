@@ -163,45 +163,45 @@ export default function StepDre({ className, back }) {
 
   return (
     <div className={`w-full max-w-[99vw] px-2 ${className}`}>
-      <div className="rounded-[28px] border border-violet-200 bg-gradient-to-r from-violet-50 via-purple-50 to-violet-100/50 p-6 shadow-[0_40px_100px_-40px_rgba(139,92,246,0.15)]">
+      <div className="rounded-[28px] border border-violet-300 bg-white p-6 shadow-xl shadow-violet-500/10">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-violet-700/70 font-semibold">DRE Gerencial</p>
-            <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-violet-300 to-purple-300 bg-clip-text text-transparent tracking-tight">
+            <p className="text-xs uppercase tracking-[0.32em] text-violet-700 font-semibold">DRE Gerencial</p>
+            <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-violet-700 tracking-tight">
               Impacto por SKU
             </h2>
-            <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-700">
+            <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-600">
               Veja o que cada SKU impacta na margem de contribuição até chegar no resultado operacional.
             </p>
           </div>
-          <div className="rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-50 to-purple-100/50 p-5 text-center shadow-lg shadow-violet-500/5">
-            <p className="text-xs uppercase tracking-[0.28em] text-violet-700/80 font-semibold">Margem de Contribuição</p>
-            <p className="mt-3 text-4xl font-bold text-violet-800">{formatBRL(totais.mc)}</p>
-            <p className="text-sm text-violet-700/70">{formatPercent(totais.mcPct)} sobre a ROL</p>
+          <div className="rounded-3xl bg-violet-600 p-5 text-center shadow-lg shadow-violet-500/20">
+            <p className="text-xs uppercase tracking-[0.28em] text-violet-100 font-semibold">Margem de Contribuição</p>
+            <p className="mt-3 text-4xl font-bold text-white">{formatBRL(totais.mc)}</p>
+            <p className="text-sm text-violet-100">{formatPercent(totais.mcPct)} sobre a ROL</p>
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 mt-6 xl:grid-cols-4">
-        <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100/50 p-5 shadow-lg shadow-cyan-500/5 hover:border-cyan-300 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-cyan-700/80 mb-3 font-semibold">ROB total</p>
-          <p className="text-3xl font-bold text-cyan-700">{formatBRL(totais.rob)}</p>
-          <p className="mt-2 text-sm text-cyan-400/60">Receita operacional bruta</p>
+        <div className="rounded-[28px] border-2 border-cyan-300 bg-white p-5 shadow-md shadow-cyan-500/5 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-cyan-700 mb-2 font-bold">ROB total</p>
+          <p className="text-3xl font-extrabold text-cyan-700">{formatBRL(totais.rob)}</p>
+          <p className="mt-2 text-sm font-medium text-cyan-600/80">Receita operacional bruta</p>
         </div>
-        <div className="rounded-[28px] border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 shadow-lg shadow-emerald-500/5 hover:border-emerald-300 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-emerald-700/80 mb-3 font-semibold">ROL total</p>
-          <p className="text-3xl font-bold text-emerald-700">{formatBRL(totais.rol)}</p>
-          <p className="mt-2 text-sm text-emerald-400/60">Receita líquida de impostos/descontos</p>
+        <div className="rounded-[28px] border-2 border-emerald-300 bg-white p-5 shadow-md shadow-emerald-500/5 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-emerald-700 mb-2 font-bold">ROL total</p>
+          <p className="text-3xl font-extrabold text-emerald-700">{formatBRL(totais.rol)}</p>
+          <p className="mt-2 text-sm font-medium text-emerald-600/80">Receita líquida de impostos/descontos</p>
         </div>
-        <div className="rounded-[28px] border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 shadow-lg shadow-amber-500/5 hover:border-amber-300 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-amber-700/80 mb-3 font-semibold">Margem bruta</p>
-          <p className="text-3xl font-bold text-amber-700">{formatBRL(totais.mb)}</p>
-          <p className="mt-2 text-sm text-amber-400/60">ROL - CMV</p>
+        <div className="rounded-[28px] border-2 border-amber-300 bg-white p-5 shadow-md shadow-amber-500/5 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-amber-700 mb-2 font-bold">Margem bruta</p>
+          <p className="text-3xl font-extrabold text-amber-700">{formatBRL(totais.mb)}</p>
+          <p className="mt-2 text-sm font-medium text-amber-600/80">ROL - CMV</p>
         </div>
-        <div className="rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-50 to-violet-100/50 p-5 shadow-lg shadow-violet-500/5 hover:border-violet-300 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-violet-700/80 mb-3 font-semibold">MC total</p>
-          <p className="text-3xl font-bold text-violet-700">{formatBRL(totais.mc)}</p>
-          <p className="mt-2 text-sm text-violet-400/60">Margem de contribuição</p>
+        <div className="rounded-[28px] border-2 border-violet-300 bg-white p-5 shadow-md shadow-violet-500/5 hover:border-violet-400 hover:shadow-lg hover:shadow-violet-500/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-violet-700 mb-2 font-bold">MC total</p>
+          <p className="text-3xl font-extrabold text-violet-700">{formatBRL(totais.mc)}</p>
+          <p className="mt-2 text-sm font-medium text-violet-600/80">Margem de contribuição</p>
         </div>
       </div>
 

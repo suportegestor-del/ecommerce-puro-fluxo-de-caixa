@@ -355,45 +355,45 @@ export default function StepPmv({ className, back }) {
 
   return (
     <div className={`w-full max-w-[99vw] px-2 ${className}`}>
-      <div className="rounded-[28px] border border-amber-200 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100/50 p-6 shadow-[0_40px_100px_-40px_rgba(245,158,11,0.15)]">
+      <div className="rounded-[28px] border-2 border-amber-300 bg-white p-6 shadow-xl shadow-amber-900/5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-amber-700/70 font-semibold">Simulador PMV</p>
-            <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent tracking-tight">
+            <p className="text-xs uppercase tracking-[0.32em] text-amber-700 font-semibold">Simulador PMV</p>
+            <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-amber-700 tracking-tight">
               Mix por Período
             </h2>
             <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-700">
               Compare períodos com os mesmos SKUs, ajuste quantidade e preço unitário, e veja a evolução do PMV e da margem de contribuição.
             </p>
           </div>
-          <div className="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-100/50 p-5 text-center shadow-lg shadow-amber-500/5">
-            <p className="text-xs uppercase tracking-[0.28em] text-amber-700/80 font-semibold">PMV {periodoSelecionado.periodo.nome}</p>
-            <p className="mt-3 text-4xl font-bold text-amber-700">{formatBRL(periodoSelecionado.total.pmv)}</p>
-            <p className="text-sm text-amber-700/70">preço médio de venda</p>
+          <div className="rounded-3xl bg-amber-600 p-5 text-center shadow-lg shadow-amber-900/10 text-white">
+            <p className="text-xs uppercase tracking-[0.28em] text-amber-100 font-semibold">PMV {periodoSelecionado.periodo.nome}</p>
+            <p className="mt-3 text-4xl font-bold">{formatBRL(periodoSelecionado.total.pmv)}</p>
+            <p className="text-sm text-amber-100">preço médio de venda</p>
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 mt-6 xl:grid-cols-4">
-        <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100/50 p-5 shadow-lg shadow-cyan-500/5 hover:border-cyan-300 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-cyan-700/80 mb-3 font-semibold">Receita bruta</p>
+        <div className="rounded-[28px] border-2 border-cyan-300 bg-white p-5 shadow-md shadow-cyan-900/5 hover:shadow-lg hover:shadow-cyan-900/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-cyan-700 mb-3 font-bold">Receita bruta</p>
           <p className="text-3xl font-bold text-cyan-700">{formatBRL(periodoSelecionado.total.rob)}</p>
-          <p className="mt-2 text-sm text-cyan-700/70">{formatNumber(periodoSelecionado.total.qtde)} unidades</p>
+          <p className="mt-2 text-sm font-medium text-cyan-600/80">{formatNumber(periodoSelecionado.total.qtde)} unidades</p>
         </div>
-        <div className="rounded-[28px] border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 shadow-lg shadow-emerald-500/5 hover:border-emerald-300 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-emerald-700/80 mb-3 font-semibold">ROL</p>
+        <div className="rounded-[28px] border-2 border-emerald-300 bg-white p-5 shadow-md shadow-emerald-900/5 hover:shadow-lg hover:shadow-emerald-900/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-emerald-700 mb-3 font-bold">ROL</p>
           <p className="text-3xl font-bold text-emerald-700">{formatBRL(periodoSelecionado.total.rol)}</p>
-          <p className="mt-2 text-sm text-emerald-700/70">Receita líquida</p>
+          <p className="mt-2 text-sm font-medium text-emerald-600/80">Receita líquida</p>
         </div>
-        <div className="rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-50 to-violet-100/50 p-5 shadow-lg shadow-violet-500/5 hover:border-violet-300 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-violet-700/80 mb-3 font-semibold">MC</p>
+        <div className="rounded-[28px] border-2 border-violet-300 bg-white p-5 shadow-md shadow-violet-900/5 hover:shadow-lg hover:shadow-violet-900/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-violet-700 mb-3 font-bold">MC</p>
           <p className="text-3xl font-bold text-violet-700">{formatBRL(periodoSelecionado.total.mc)}</p>
-          <p className="mt-2 text-sm text-violet-700/80">{formatPercent(periodoSelecionado.total.mcPct)} sobre ROL</p>
+          <p className="mt-2 text-sm font-medium text-violet-600/80">{formatPercent(periodoSelecionado.total.mcPct)} sobre ROL</p>
         </div>
-        <div className="rounded-[28px] border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 shadow-lg shadow-amber-500/5 hover:border-amber-300 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-amber-700/80 mb-3 font-semibold">PMV</p>
+        <div className="rounded-[28px] border-2 border-amber-300 bg-white p-5 shadow-md shadow-amber-900/5 hover:shadow-lg hover:shadow-amber-900/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-amber-700 mb-3 font-bold">PMV</p>
           <p className="text-3xl font-bold text-amber-700">{formatBRL(periodoSelecionado.total.pmv)}</p>
-          <p className="mt-2 text-sm text-amber-700/70">preço médio de venda</p>
+          <p className="mt-2 text-sm font-medium text-amber-600/80">preço médio de venda</p>
         </div>
       </div>
 
