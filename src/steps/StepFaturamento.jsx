@@ -128,31 +128,31 @@ export default function StepFaturamento({ data, updateData, next, back, classNam
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-slate-100 text-slate-700 text-xs">
-              <th className="text-left px-3 py-2.5 font-semibold sticky left-0 bg-slate-100 z-10 min-w-[160px] border-r border-slate-200">
+              <th className="text-left px-3 py-2.5 font-semibold sticky left-0 bg-blue-600 z-10 min-w-[160px] border-r border-blue-500 text-white">
                 Canal
               </th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[72px] border-r border-slate-200">
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[72px] border-r border-blue-500 text-white bg-blue-600">
                 Ded. (%)
               </th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[72px] border-r border-slate-200">
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[72px] border-r border-blue-500 text-white bg-blue-600">
                 Dias p/<br />receber
               </th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[100px] border-r border-slate-200">
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[100px] border-r border-blue-500 text-white bg-blue-600">
                 Base de<br />Cálculo
               </th>
               {visibleMeses.map((i, col) => (
                 <th
                   key={i}
-                  className={`text-center px-1 py-2.5 font-semibold min-w-[130px] ${
+                  className={`text-center px-1 py-2.5 font-semibold min-w-[130px] bg-blue-600 text-white ${
                     i === mesAtual
-                      ? 'bg-blue-100 text-blue-700'
+                      ? 'bg-blue-700'
                       : ''
-                  } ${col < visibleMeses.length - 1 ? 'border-r border-slate-200/50' : ''}`}
+                  } ${col < visibleMeses.length - 1 ? 'border-r border-blue-500' : ''}`}
                 >
                   {MESES_FULL[i]}
                 </th>
               ))}
-              <th className="w-8 bg-slate-100"></th>
+              <th className="w-8 bg-blue-600"></th>
             </tr>
           </thead>
           <tbody>

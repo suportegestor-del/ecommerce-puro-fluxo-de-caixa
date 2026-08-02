@@ -341,14 +341,14 @@ export default function StepMargem({ className, back }) {
             <h3 className="text-lg font-bold text-violet-700 mb-4">Tabela de Descontos — Mesmo lucro</h3>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-violet-200">
-                  <th className="text-left py-3 px-4 text-violet-700 font-semibold">Desconto</th>
-                  <th className="text-left py-3 px-4 text-cyan-700 font-semibold">Preço novo</th>
-                  <th className="text-left py-3 px-4 text-slate-700 font-semibold">Qtd atual</th>
-                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Qtd p/ mesma receita</th>
-                  <th className="text-left py-3 px-4 text-amber-700 font-semibold">Qtd p/ mesmo lucro</th>
-                  <th className="text-left py-3 px-4 text-slate-700 font-semibold">Vender a mais</th>
-                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Lucro mantido</th>
+                <tr className="border-b border-blue-500 bg-blue-600 text-white">
+                  <th className="text-left py-3 px-4 font-semibold">Desconto</th>
+                  <th className="text-left py-3 px-4 font-semibold">Preço novo</th>
+                  <th className="text-left py-3 px-4 font-semibold">Qtd atual</th>
+                  <th className="text-left py-3 px-4 font-semibold">Qtd p/ mesma receita</th>
+                  <th className="text-left py-3 px-4 font-semibold">Qtd p/ mesmo lucro</th>
+                  <th className="text-left py-3 px-4 font-semibold">Vender a mais</th>
+                  <th className="text-left py-3 px-4 font-semibold">Lucro mantido</th>
                 </tr>
               </thead>
               <tbody>
@@ -377,14 +377,14 @@ export default function StepMargem({ className, back }) {
             <h3 className="text-lg font-bold text-emerald-700 mb-4">Tabela de Aumento de Preço — Mesmo lucro</h3>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-emerald-200">
-                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Aumento</th>
-                  <th className="text-left py-3 px-4 text-cyan-700 font-semibold">Preço novo</th>
-                  <th className="text-left py-3 px-4 text-slate-700 font-semibold">Qtd atual</th>
-                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Qtd p/ mesma receita</th>
-                  <th className="text-left py-3 px-4 text-amber-700 font-semibold">Qtd p/ mesmo lucro</th>
-                  <th className="text-left py-3 px-4 text-slate-700 font-semibold">Pode vender a menos</th>
-                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Lucro mantido</th>
+                <tr className="border-b border-blue-500 bg-blue-600 text-white">
+                  <th className="text-left py-3 px-4 font-semibold">Aumento</th>
+                  <th className="text-left py-3 px-4 font-semibold">Preço novo</th>
+                  <th className="text-left py-3 px-4 font-semibold">Qtd atual</th>
+                  <th className="text-left py-3 px-4 font-semibold">Qtd p/ mesma receita</th>
+                  <th className="text-left py-3 px-4 font-semibold">Qtd p/ mesmo lucro</th>
+                  <th className="text-left py-3 px-4 font-semibold">Pode vender a menos</th>
+                  <th className="text-left py-3 px-4 font-semibold">Lucro mantido</th>
                 </tr>
               </thead>
               <tbody>

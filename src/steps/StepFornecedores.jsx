@@ -161,14 +161,14 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-slate-100 text-slate-700 text-xs">
-              <th className="text-left px-3 py-2.5 font-semibold sticky left-0 bg-slate-100 z-10 min-w-[170px] border-r border-slate-200">Fornecedor</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[120px] border-r border-slate-200">Previsto</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[220px] border-r border-slate-200">Prazo</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[68px] border-r border-slate-200">Ato %</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[140px] border-r border-slate-200">Total (R$)</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[130px] border-r border-slate-200">Parcelas</th>
-              <th className="w-8"></th>
+            <tr className="bg-blue-600 text-white text-xs">
+              <th className="text-left px-3 py-2.5 font-semibold sticky left-0 bg-blue-600 z-10 min-w-[170px] border-r border-blue-500">Fornecedor</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[120px] border-r border-blue-500 bg-blue-600">Previsto</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[220px] border-r border-blue-500 bg-blue-600">Prazo</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[68px] border-r border-blue-500 bg-blue-600">Ato %</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[140px] border-r border-blue-500 bg-blue-600">Total (R$)</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[130px] border-r border-blue-500 bg-blue-600">Parcelas</th>
+              <th className="w-8 bg-blue-600"></th>
             </tr>
           </thead>
           <tbody>

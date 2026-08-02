@@ -209,23 +209,23 @@ export default function StepDre({ className, back }) {
         <h3 className="text-lg font-bold text-slate-800 mb-4">DRE por SKU até a Margem de Contribuição</h3>
         <table className="w-full text-sm min-w-[1200px]">
           <thead>
-            <tr className="border-b border-slate-200 text-left">
-              <th className="py-3 px-2 text-slate-700 font-semibold sticky left-0 bg-white z-10">SKU</th>
-              <th className="py-3 px-2 text-slate-700 font-semibold text-center">Qtde</th>
-              <th className="py-3 px-2 text-slate-700 font-semibold text-center">Unit</th>
-              <th className="py-3 px-2 text-cyan-700 font-semibold text-center">ROB</th>
-              <th className="py-3 px-2 text-rose-600 font-semibold text-center">Impostos %</th>
-              <th className="py-3 px-2 text-rose-600 font-semibold text-center">Desc %</th>
-              <th className="py-3 px-2 text-emerald-700 font-semibold text-center">ROL</th>
-              <th className="py-3 px-2 text-orange-700 font-semibold text-center">CPV %</th>
-              <th className="py-3 px-2 text-orange-700 font-semibold text-center">CMV</th>
-              <th className="py-3 px-2 text-amber-700 font-semibold text-center">MB</th>
-              <th className="py-3 px-2 text-rose-600 font-semibold text-center">Comissão/Frete %</th>
-              <th className="py-3 px-2 text-rose-600 font-semibold text-center">ADD %</th>
-              <th className="py-3 px-2 text-rose-600 font-semibold text-center">ADD</th>
-              <th className="py-3 px-2 text-violet-700 font-semibold text-center">MC</th>
-              <th className="py-3 px-2 text-violet-700 font-semibold text-center">MC %</th>
-              <th className="py-3 px-2 text-slate-500 font-semibold text-center"></th>
+            <tr className="border-b border-blue-500 text-left bg-blue-600 text-white">
+              <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
+              <th className="py-3 px-2 font-semibold text-center">Qtde</th>
+              <th className="py-3 px-2 font-semibold text-center">Unit</th>
+              <th className="py-3 px-2 font-semibold text-center">ROB</th>
+              <th className="py-3 px-2 font-semibold text-center">Impostos %</th>
+              <th className="py-3 px-2 font-semibold text-center">Desc %</th>
+              <th className="py-3 px-2 font-semibold text-center">ROL</th>
+              <th className="py-3 px-2 font-semibold text-center">CPV %</th>
+              <th className="py-3 px-2 font-semibold text-center">CMV</th>
+              <th className="py-3 px-2 font-semibold text-center">MB</th>
+              <th className="py-3 px-2 font-semibold text-center">Comissão/Frete %</th>
+              <th className="py-3 px-2 font-semibold text-center">ADD %</th>
+              <th className="py-3 px-2 font-semibold text-center">ADD</th>
+              <th className="py-3 px-2 font-semibold text-center">MC</th>
+              <th className="py-3 px-2 font-semibold text-center">MC %</th>
+              <th className="py-3 px-2 font-semibold text-center"></th>
             </tr>
           </thead>
           <tbody>
