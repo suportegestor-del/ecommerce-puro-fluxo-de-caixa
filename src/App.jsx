@@ -88,40 +88,40 @@ export default function App() {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(160deg, #0a0a0a 0%, #0d0d0d 60%, #00091a 100%)' }}>
-      <header className="flex items-center justify-between py-5 px-6 border-b border-white/5 relative">
+    <div className="min-h-screen flex flex-col" style={{ background: 'linear-gradient(160deg, #f8fafc 0%, #ffffff 60%, #eff6ff 100%)' }}>
+      <header className="flex items-center justify-between py-5 px-6 border-b border-slate-200 relative bg-white/80 backdrop-blur">
         <div className="w-10" />
         <img src="/logo.png" alt="Ecommerce Puro" className="h-20 object-contain" />
         <div className="hidden sm:flex items-center gap-2 mr-4">
           <button
             onClick={() => switchMode('fluxo')}
             className={`rounded-xl px-4 py-2 text-sm font-medium transition ${mode === 'fluxo'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white/5 text-white/70 hover:bg-blue-500/20 hover:text-white'}`}
+              ? 'bg-blue-600 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700'}`}
           >
             Fluxo de Caixa
           </button>
           <button
             onClick={() => switchMode('margem')}
             className={`rounded-xl px-4 py-2 text-sm font-medium transition ${mode === 'margem'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white/5 text-white/70 hover:bg-blue-500/20 hover:text-white'}`}
+              ? 'bg-blue-600 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700'}`}
           >
             Simulador de Margens
           </button>
           <button
             onClick={() => switchMode('dre')}
             className={`rounded-xl px-4 py-2 text-sm font-medium transition ${mode === 'dre'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white/5 text-white/70 hover:bg-blue-500/20 hover:text-white'}`}
+              ? 'bg-blue-600 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700'}`}
           >
             DRE Gerencial
           </button>
           <button
             onClick={() => switchMode('pmv')}
             className={`rounded-xl px-4 py-2 text-sm font-medium transition ${mode === 'pmv'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white/5 text-white/70 hover:bg-blue-500/20 hover:text-white'}`}
+              ? 'bg-blue-600 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700'}`}
           >
             Simulador PMV
           </button>
@@ -130,7 +130,7 @@ export default function App() {
           <button
             onClick={() => setShowQR(v => !v)}
             title="Gerar QR Code"
-            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-blue-500/20 border border-white/10 hover:border-blue-500/50 transition flex items-center justify-center text-white/60 hover:text-blue-400"
+            className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition flex items-center justify-center text-slate-500 hover:text-blue-600"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="7" height="7" rx="1"/>
@@ -143,11 +143,11 @@ export default function App() {
             </svg>
           </button>
           {showQR && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm" onClick={() => setShowQR(false)}>
-              <div className="flex flex-col items-center gap-6 p-10 rounded-3xl bg-[#0f0f0f] border border-white/10 shadow-2xl" onClick={e => e.stopPropagation()}>
-                <p className="text-2xl font-bold text-white tracking-wide">Acesse o Fluxo de Caixa</p>
-                <p className="text-slate-400 text-base -mt-3">Aponte a câmera do celular para o QR Code</p>
-                <div className="bg-white rounded-2xl p-4 shadow-xl">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowQR(false)}>
+              <div className="flex flex-col items-center gap-6 p-10 rounded-3xl bg-white border border-slate-200 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <p className="text-2xl font-bold text-slate-800 tracking-wide">Acesse o Fluxo de Caixa</p>
+                <p className="text-slate-500 text-base -mt-3">Aponte a câmera do celular para o QR Code</p>
+                <div className="bg-white rounded-2xl p-4 shadow-xl border border-slate-100">
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(SITE_URL)}&bgcolor=ffffff&color=000000&margin=8`}
                     alt="QR Code"
@@ -156,8 +156,8 @@ export default function App() {
                     className="rounded-xl"
                   />
                 </div>
-                <p className="text-slate-500 text-sm">{SITE_URL}</p>
-                <button onClick={() => setShowQR(false)} className="mt-2 px-8 py-2.5 rounded-xl border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition text-sm">
+                <p className="text-slate-400 text-sm">{SITE_URL}</p>
+                <button onClick={() => setShowQR(false)} className="mt-2 px-8 py-2.5 rounded-xl border border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-400 transition text-sm">
                   Fechar
                 </button>
               </div>

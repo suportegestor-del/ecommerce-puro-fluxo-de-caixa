@@ -66,14 +66,14 @@ function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
         const height = `${(Math.abs(val) / max) * 100}%`
         return (
           <div key={idx} className="flex-1 flex flex-col items-center justify-end group relative">
-            <div className="opacity-0 group-hover:opacity-100 transition absolute -top-8 text-[10px] text-slate-300 bg-slate-800 px-2 py-1 rounded-lg whitespace-nowrap">
+            <div className="opacity-0 group-hover:opacity-100 transition absolute -top-8 text-[10px] text-slate-100 bg-slate-800 px-2 py-1 rounded-lg whitespace-nowrap">
               {formatBRL(val)}
             </div>
             <div
               style={{ height, backgroundColor: colors[idx % colors.length] || color }}
               className="w-full rounded-t-lg min-h-[4px] transition-all"
             />
-            <div className="text-[10px] text-slate-400 mt-2 truncate max-w-full">{d[labelKey]}</div>
+            <div className="text-[10px] text-slate-500 mt-2 truncate max-w-full">{d[labelKey]}</div>
           </div>
         )
       })}
@@ -109,7 +109,7 @@ function SimpleLineChart({ data, valueKey, labelKey, color = '#fbbf24' }) {
       </svg>
       <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2">
         {data.map((d, idx) => (
-          <div key={idx} className="text-[10px] text-slate-400 truncate max-w-[80px] text-center">{d[labelKey]}</div>
+          <div key={idx} className="text-[10px] text-slate-500 truncate max-w-[80px] text-center">{d[labelKey]}</div>
         ))}
       </div>
     </div>
@@ -156,9 +156,9 @@ function AnalisePmv({ resultadoPeriodos, periodoAtivo, periodos, removePeriodo }
 
   if (!resultadoAnterior) {
     return (
-      <div className="mt-6 rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-amber-500/10">
-        <h3 className="text-lg font-bold text-amber-300 mb-2">Análise PMV</h3>
-        <p className="text-sm text-slate-400">Adicione pelo menos mais um período para comparar SKU a SKU.</p>
+      <div className="mt-6 rounded-[28px] border border-amber-200 bg-white p-6 shadow-lg shadow-amber-500/5">
+        <h3 className="text-lg font-bold text-amber-700 mb-2">Análise PMV</h3>
+        <p className="text-sm text-slate-500">Adicione pelo menos mais um período para comparar SKU a SKU.</p>
       </div>
     )
   }
@@ -166,56 +166,56 @@ function AnalisePmv({ resultadoPeriodos, periodoAtivo, periodos, removePeriodo }
   const nomeAnterior = resultadoAnterior.periodo.nome
   const nomeAtual = resultadoAtual.periodo.nome
 
-  const deltaClass = (v) => (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-slate-400')
+  const deltaClass = (v) => (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-slate-500')
   const deltaSignal = (v) => (v > 0 ? '+' : '')
 
   return (
-    <div className="mt-6 rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-amber-500/10">
+    <div className="mt-6 rounded-[28px] border border-amber-200 bg-white p-6 overflow-x-auto shadow-lg shadow-amber-500/5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <h3 className="text-lg font-bold text-amber-300">Análise PMV</h3>
-        <p className="text-sm text-slate-400">Comparando {nomeAtual} com {nomeAnterior}</p>
+        <h3 className="text-lg font-bold text-amber-700">Análise PMV</h3>
+        <p className="text-sm text-slate-500">Comparando {nomeAtual} com {nomeAnterior}</p>
       </div>
       <table className="w-full text-sm min-w-[1100px]">
         <thead>
-          <tr className="border-b border-amber-500/20 text-left">
-            <th className="py-3 px-2 text-slate-300 font-semibold sticky left-0 bg-slate-900/90 z-10">SKU</th>
-            <th className="py-3 px-2 text-slate-300 font-semibold">Nome</th>
-            <th colSpan="4" className="py-3 px-2 text-center text-cyan-300 font-semibold border-b border-slate-700/50">{nomeAnterior}</th>
-            <th colSpan="4" className="py-3 px-2 text-center text-emerald-300 font-semibold border-b border-slate-700/50">{nomeAtual}</th>
-            <th colSpan="2" className="py-3 px-2 text-center text-slate-300 font-semibold border-b border-slate-700/50">Variação</th>
-            <th colSpan="3" className="py-3 px-2 text-center text-amber-300 font-semibold border-b border-slate-700/50">Decomposição Δ R$</th>
+          <tr className="border-b border-amber-200 text-left">
+            <th className="py-3 px-2 text-slate-700 font-semibold sticky left-0 bg-white z-10">SKU</th>
+            <th className="py-3 px-2 text-slate-700 font-semibold">Nome</th>
+            <th colSpan="4" className="py-3 px-2 text-center text-cyan-700 font-semibold border-b border-slate-200">{nomeAnterior}</th>
+            <th colSpan="4" className="py-3 px-2 text-center text-emerald-700 font-semibold border-b border-slate-200">{nomeAtual}</th>
+            <th colSpan="2" className="py-3 px-2 text-center text-slate-700 font-semibold border-b border-slate-200">Variação</th>
+            <th colSpan="3" className="py-3 px-2 text-center text-amber-700 font-semibold border-b border-slate-200">Decomposição Δ R$</th>
           </tr>
-          <tr className="border-b border-slate-700/60 text-left">
+          <tr className="border-b border-slate-200 text-left">
             <th className="py-2 px-2"></th>
             <th className="py-2 px-2"></th>
-            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Qtd</th>
-            <th className="py-2 px-2 text-cyan-300 font-semibold text-center">R$</th>
-            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Unit</th>
-            <th className="py-2 px-2 text-violet-300 font-semibold text-center">Marg%</th>
-            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Qtd</th>
-            <th className="py-2 px-2 text-cyan-300 font-semibold text-center">R$</th>
-            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Unit</th>
-            <th className="py-2 px-2 text-violet-300 font-semibold text-center">Marg%</th>
-            <th className="py-2 px-2 text-slate-400 font-semibold text-center">Δ Qtd</th>
-            <th className="py-2 px-2 text-cyan-300 font-semibold text-center">Δ R$</th>
-            <th className="py-2 px-2 text-amber-300 font-semibold text-center">Volume</th>
-            <th className="py-2 px-2 text-amber-300 font-semibold text-center">Preço</th>
-            <th className="py-2 px-2 text-amber-300 font-semibold text-center">Mix</th>
+            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Qtd</th>
+            <th className="py-2 px-2 text-cyan-700 font-semibold text-center">R$</th>
+            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Unit</th>
+            <th className="py-2 px-2 text-violet-700 font-semibold text-center">Marg%</th>
+            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Qtd</th>
+            <th className="py-2 px-2 text-cyan-700 font-semibold text-center">R$</th>
+            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Unit</th>
+            <th className="py-2 px-2 text-violet-700 font-semibold text-center">Marg%</th>
+            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Δ Qtd</th>
+            <th className="py-2 px-2 text-cyan-700 font-semibold text-center">Δ R$</th>
+            <th className="py-2 px-2 text-amber-700 font-semibold text-center">Volume</th>
+            <th className="py-2 px-2 text-amber-700 font-semibold text-center">Preço</th>
+            <th className="py-2 px-2 text-amber-700 font-semibold text-center">Mix</th>
           </tr>
         </thead>
         <tbody>
           {analise.map((a) => (
-            <tr key={a.sku.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
-              <td className="py-3 px-2 text-slate-200 font-semibold sticky left-0 bg-slate-900/90 z-10">{a.sku.nome}</td>
-              <td className="py-3 px-2 text-slate-400 text-xs max-w-[160px] truncate">{a.sku.nome}</td>
-              <td className="py-3 px-2 text-center text-slate-400">{formatNumber(a.anterior.qtd)}</td>
-              <td className="py-3 px-2 text-center text-cyan-300">{formatBRL(a.anterior.rob)}</td>
-              <td className="py-3 px-2 text-center text-slate-400">{formatBRL(a.anterior.unit)}</td>
-              <td className="py-3 px-2 text-center text-violet-300">{formatPercent(a.anterior.mcPct)}</td>
-              <td className="py-3 px-2 text-center text-slate-300">{formatNumber(a.atual.qtd)}</td>
-              <td className="py-3 px-2 text-center text-cyan-300 font-semibold">{formatBRL(a.atual.rob)}</td>
-              <td className="py-3 px-2 text-center text-slate-300">{formatBRL(a.atual.unit)}</td>
-              <td className="py-3 px-2 text-center text-violet-300 font-semibold">{formatPercent(a.atual.mcPct)}</td>
+            <tr key={a.sku.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+              <td className="py-3 px-2 text-slate-800 font-semibold sticky left-0 bg-white z-10">{a.sku.nome}</td>
+              <td className="py-3 px-2 text-slate-500 text-xs max-w-[160px] truncate">{a.sku.nome}</td>
+              <td className="py-3 px-2 text-center text-slate-500">{formatNumber(a.anterior.qtd)}</td>
+              <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(a.anterior.rob)}</td>
+              <td className="py-3 px-2 text-center text-slate-500">{formatBRL(a.anterior.unit)}</td>
+              <td className="py-3 px-2 text-center text-violet-700">{formatPercent(a.anterior.mcPct)}</td>
+              <td className="py-3 px-2 text-center text-slate-700">{formatNumber(a.atual.qtd)}</td>
+              <td className="py-3 px-2 text-center text-cyan-700 font-semibold">{formatBRL(a.atual.rob)}</td>
+              <td className="py-3 px-2 text-center text-slate-700">{formatBRL(a.atual.unit)}</td>
+              <td className="py-3 px-2 text-center text-violet-700 font-semibold">{formatPercent(a.atual.mcPct)}</td>
               <td className={`py-3 px-2 text-center font-semibold ${deltaClass(a.deltaQtd)}`}>
                 {deltaSignal(a.deltaQtd)}{formatNumber(a.deltaQtd)}
               </td>
@@ -347,53 +347,53 @@ export default function StepPmv({ className, back }) {
   }
 
   const inputClass =
-    'w-full bg-transparent border-b border-slate-600/50 text-center text-slate-100 py-1 outline-none transition focus:border-cyan-400 focus:bg-slate-800/30'
+    'w-full bg-transparent border-b border-slate-300 text-center text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
   const inputPctClass =
-    'w-full bg-transparent border-b border-slate-600/50 text-center text-slate-100 py-1 outline-none transition focus:border-cyan-400 focus:bg-slate-800/30'
+    'w-full bg-transparent border-b border-slate-300 text-center text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
 
   const chartData = resultadoPeriodos.map((r) => ({ nome: r.periodo.nome, mc: r.total.mc, pmv: r.total.pmv }))
 
   return (
     <div className={`w-full max-w-[99vw] px-2 ${className}`}>
-      <div className="rounded-[28px] border border-amber-500/20 bg-gradient-to-r from-amber-500/5 via-orange-500/5 to-amber-600/5 p-6 shadow-[0_40px_100px_-40px_rgba(245,158,11,0.15)]">
+      <div className="rounded-[28px] border border-amber-200 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100/50 p-6 shadow-[0_40px_100px_-40px_rgba(245,158,11,0.15)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-amber-300/70 font-semibold">Simulador PMV</p>
+            <p className="text-xs uppercase tracking-[0.32em] text-amber-700/70 font-semibold">Simulador PMV</p>
             <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent tracking-tight">
               Mix por Período
             </h2>
-            <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-300">
+            <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-700">
               Compare períodos com os mesmos SKUs, ajuste quantidade e preço unitário, e veja a evolução do PMV e da margem de contribuição.
             </p>
           </div>
-          <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-5 text-center shadow-lg shadow-amber-500/10">
-            <p className="text-xs uppercase tracking-[0.28em] text-amber-300/80 font-semibold">PMV {periodoSelecionado.periodo.nome}</p>
-            <p className="mt-3 text-4xl font-bold text-amber-200">{formatBRL(periodoSelecionado.total.pmv)}</p>
-            <p className="text-sm text-amber-300/70">preço médio de venda</p>
+          <div className="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-100/50 p-5 text-center shadow-lg shadow-amber-500/5">
+            <p className="text-xs uppercase tracking-[0.28em] text-amber-700/80 font-semibold">PMV {periodoSelecionado.periodo.nome}</p>
+            <p className="mt-3 text-4xl font-bold text-amber-700">{formatBRL(periodoSelecionado.total.pmv)}</p>
+            <p className="text-sm text-amber-700/70">preço médio de venda</p>
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 mt-6 xl:grid-cols-4">
-        <div className="rounded-[28px] border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 p-5 shadow-lg shadow-cyan-500/10 hover:border-cyan-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-cyan-300/80 mb-3 font-semibold">Receita bruta</p>
-          <p className="text-3xl font-bold text-cyan-300">{formatBRL(periodoSelecionado.total.rob)}</p>
-          <p className="mt-2 text-sm text-cyan-400/60">{formatNumber(periodoSelecionado.total.qtde)} unidades</p>
+        <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100/50 p-5 shadow-lg shadow-cyan-500/5 hover:border-cyan-300 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-cyan-700/80 mb-3 font-semibold">Receita bruta</p>
+          <p className="text-3xl font-bold text-cyan-700">{formatBRL(periodoSelecionado.total.rob)}</p>
+          <p className="mt-2 text-sm text-cyan-700/70">{formatNumber(periodoSelecionado.total.qtde)} unidades</p>
         </div>
-        <div className="rounded-[28px] border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5 shadow-lg shadow-emerald-500/10 hover:border-emerald-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-emerald-300/80 mb-3 font-semibold">ROL</p>
-          <p className="text-3xl font-bold text-emerald-300">{formatBRL(periodoSelecionado.total.rol)}</p>
-          <p className="mt-2 text-sm text-emerald-400/60">Receita líquida</p>
+        <div className="rounded-[28px] border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 shadow-lg shadow-emerald-500/5 hover:border-emerald-300 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-emerald-700/80 mb-3 font-semibold">ROL</p>
+          <p className="text-3xl font-bold text-emerald-700">{formatBRL(periodoSelecionado.total.rol)}</p>
+          <p className="mt-2 text-sm text-emerald-700/70">Receita líquida</p>
         </div>
-        <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-violet-600/5 p-5 shadow-lg shadow-violet-500/10 hover:border-violet-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-violet-300/80 mb-3 font-semibold">MC</p>
-          <p className="text-3xl font-bold text-violet-300">{formatBRL(periodoSelecionado.total.mc)}</p>
-          <p className="mt-2 text-sm text-violet-400/70">{formatPercent(periodoSelecionado.total.mcPct)} sobre ROL</p>
+        <div className="rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-50 to-violet-100/50 p-5 shadow-lg shadow-violet-500/5 hover:border-violet-300 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-violet-700/80 mb-3 font-semibold">MC</p>
+          <p className="text-3xl font-bold text-violet-700">{formatBRL(periodoSelecionado.total.mc)}</p>
+          <p className="mt-2 text-sm text-violet-700/80">{formatPercent(periodoSelecionado.total.mcPct)} sobre ROL</p>
         </div>
-        <div className="rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-5 shadow-lg shadow-amber-500/10 hover:border-amber-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-amber-300/80 mb-3 font-semibold">PMV</p>
-          <p className="text-3xl font-bold text-amber-300">{formatBRL(periodoSelecionado.total.pmv)}</p>
-          <p className="mt-2 text-sm text-amber-400/60">preço médio de venda</p>
+        <div className="rounded-[28px] border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 shadow-lg shadow-amber-500/5 hover:border-amber-300 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-amber-700/80 mb-3 font-semibold">PMV</p>
+          <p className="text-3xl font-bold text-amber-700">{formatBRL(periodoSelecionado.total.pmv)}</p>
+          <p className="mt-2 text-sm text-amber-700/70">preço médio de venda</p>
         </div>
       </div>
 
@@ -407,7 +407,7 @@ export default function StepPmv({ className, back }) {
               className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
                 ativo
                   ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
-                  : 'bg-white/5 text-white/70 hover:bg-amber-500/20 hover:text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-amber-100 hover:text-amber-700'
               }`}
             >
               {p.nome}
@@ -416,55 +416,55 @@ export default function StepPmv({ className, back }) {
         })}
         <button
           onClick={addPeriodo}
-          className="rounded-2xl px-4 py-2 text-sm font-medium bg-white/5 text-white/70 hover:bg-emerald-500/20 hover:text-white transition"
+          className="rounded-2xl px-4 py-2 text-sm font-medium bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700 transition"
         >
           + Período
         </button>
         {periodos.length > 1 && (
           <button
             onClick={() => removePeriodo(periodoAtivo)}
-            className="rounded-2xl px-4 py-2 text-sm font-medium bg-white/5 text-rose-300 hover:bg-rose-500/20 transition"
+            className="rounded-2xl px-4 py-2 text-sm font-medium bg-slate-100 text-rose-600 hover:bg-rose-100 transition"
           >
             × Remover {periodoSelecionado.periodo.nome}
           </button>
         )}
       </div>
 
-      <div className="mt-4 rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg">
+      <div className="mt-4 rounded-[28px] border border-slate-200 bg-white p-6 overflow-x-auto shadow-lg">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <h3 className="text-lg font-bold text-slate-200">DRE por SKU — {periodoSelecionado.periodo.nome}</h3>
+          <h3 className="text-lg font-bold text-slate-800">DRE por SKU — {periodoSelecionado.periodo.nome}</h3>
           <input
             type="text"
             value={periodoSelecionado.periodo.nome}
             onChange={(e) => updatePeriodoNome(periodoSelecionado.periodo.id, e.target.value)}
-            className="bg-transparent border-b border-slate-600 text-slate-200 text-sm outline-none focus:border-amber-400 px-1"
+            className="bg-transparent border-b border-slate-300 text-slate-800 text-sm outline-none focus:border-amber-400 px-1"
           />
         </div>
         <table className="w-full text-sm min-w-[1200px]">
           <thead>
-            <tr className="border-b border-slate-700/60 text-left">
-              <th className="py-3 px-2 text-slate-300 font-semibold sticky left-0 bg-slate-900/90 z-10">SKU</th>
-              <th className="py-3 px-2 text-slate-300 font-semibold text-center">Qtde</th>
-              <th className="py-3 px-2 text-slate-300 font-semibold text-center">Unit</th>
-              <th className="py-3 px-2 text-cyan-300 font-semibold text-center">ROB</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Impostos %</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Desc %</th>
-              <th className="py-3 px-2 text-emerald-300 font-semibold text-center">ROL</th>
-              <th className="py-3 px-2 text-orange-300 font-semibold text-center">CPV %</th>
-              <th className="py-3 px-2 text-orange-300 font-semibold text-center">CMV</th>
-              <th className="py-3 px-2 text-amber-300 font-semibold text-center">MB</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">Comissão/Frete %</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">ADD %</th>
-              <th className="py-3 px-2 text-rose-300 font-semibold text-center">ADD</th>
-              <th className="py-3 px-2 text-violet-300 font-semibold text-center">MC</th>
-              <th className="py-3 px-2 text-violet-300 font-semibold text-center">MC %</th>
+            <tr className="border-b border-slate-200 text-left">
+              <th className="py-3 px-2 text-slate-700 font-semibold sticky left-0 bg-white z-10">SKU</th>
+              <th className="py-3 px-2 text-slate-700 font-semibold text-center">Qtde</th>
+              <th className="py-3 px-2 text-slate-700 font-semibold text-center">Unit</th>
+              <th className="py-3 px-2 text-cyan-700 font-semibold text-center">ROB</th>
+              <th className="py-3 px-2 text-rose-600 font-semibold text-center">Impostos %</th>
+              <th className="py-3 px-2 text-rose-600 font-semibold text-center">Desc %</th>
+              <th className="py-3 px-2 text-emerald-700 font-semibold text-center">ROL</th>
+              <th className="py-3 px-2 text-orange-700 font-semibold text-center">CPV %</th>
+              <th className="py-3 px-2 text-orange-700 font-semibold text-center">CMV</th>
+              <th className="py-3 px-2 text-amber-700 font-semibold text-center">MB</th>
+              <th className="py-3 px-2 text-rose-600 font-semibold text-center">Comissão/Frete %</th>
+              <th className="py-3 px-2 text-rose-600 font-semibold text-center">ADD %</th>
+              <th className="py-3 px-2 text-rose-600 font-semibold text-center">ADD</th>
+              <th className="py-3 px-2 text-violet-700 font-semibold text-center">MC</th>
+              <th className="py-3 px-2 text-violet-700 font-semibold text-center">MC %</th>
               <th className="py-3 px-2"></th>
             </tr>
           </thead>
           <tbody>
             {periodoSelecionado.skuLinhas.map((l) => (
-              <tr key={l.sku.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
-                <td className="py-2 px-2 sticky left-0 bg-slate-900/90 z-10">
+              <tr key={l.sku.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                <td className="py-2 px-2 sticky left-0 bg-white z-10">
                   <input
                     type="text"
                     value={l.sku.nome}
@@ -492,7 +492,7 @@ export default function StepPmv({ className, back }) {
                     className={inputClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-center text-cyan-300 font-semibold">{formatBRL(l.rob)}</td>
+                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(l.rob)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -515,7 +515,7 @@ export default function StepPmv({ className, back }) {
                     className={inputPctClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-center text-emerald-300 font-semibold">{formatBRL(l.rol)}</td>
+                <td className="py-2 px-2 text-center text-emerald-700 font-semibold">{formatBRL(l.rol)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -527,8 +527,8 @@ export default function StepPmv({ className, back }) {
                     className={inputPctClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-center text-orange-300">{formatBRL(l.cmv)}</td>
-                <td className="py-2 px-2 text-center text-amber-300 font-semibold">{formatBRL(l.mb)}</td>
+                <td className="py-2 px-2 text-center text-orange-700">{formatBRL(l.cmv)}</td>
+                <td className="py-2 px-2 text-center text-amber-700 font-semibold">{formatBRL(l.mb)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -551,13 +551,13 @@ export default function StepPmv({ className, back }) {
                     className={inputPctClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-center text-rose-300">{formatBRL(l.add)}</td>
-                <td className="py-2 px-2 text-center text-violet-300 font-bold">{formatBRL(l.mc)}</td>
-                <td className="py-2 px-2 text-center text-violet-300 font-bold">{formatPercent(l.rol > 0 ? (l.mc / l.rol) * 100 : 0)}</td>
+                <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.add)}</td>
+                <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(l.mc)}</td>
+                <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatPercent(l.rol > 0 ? (l.mc / l.rol) * 100 : 0)}</td>
                 <td className="py-2 px-2 text-center">
                   <button
                     onClick={() => removeSku(l.sku.id)}
-                    className="text-rose-400 hover:text-rose-300 transition text-lg leading-none"
+                    className="text-rose-400 hover:text-rose-600 transition text-lg leading-none"
                     title="Remover SKU"
                   >
                     ×
@@ -565,22 +565,22 @@ export default function StepPmv({ className, back }) {
                 </td>
               </tr>
             ))}
-            <tr className="border-t-2 border-slate-600/60 bg-slate-900/60 font-semibold">
-              <td className="py-3 px-2 sticky left-0 bg-slate-900/95 z-10 text-slate-200">TOTAL</td>
-              <td className="py-3 px-2 text-center text-slate-300">{formatNumber(periodoSelecionado.total.qtde)}</td>
-              <td className="py-3 px-2 text-center text-amber-300">{formatBRL(periodoSelecionado.total.pmv)}</td>
-              <td className="py-3 px-2 text-center text-cyan-300">{formatBRL(periodoSelecionado.total.rob)}</td>
-              <td className="py-3 px-2 text-center text-slate-400">-</td>
-              <td className="py-3 px-2 text-center text-slate-400">-</td>
-              <td className="py-3 px-2 text-center text-emerald-300">{formatBRL(periodoSelecionado.total.rol)}</td>
-              <td className="py-3 px-2 text-center text-slate-400">-</td>
-              <td className="py-3 px-2 text-center text-orange-300">{formatBRL(periodoSelecionado.total.cmv)}</td>
-              <td className="py-3 px-2 text-center text-amber-300">{formatBRL(periodoSelecionado.total.mb)}</td>
-              <td className="py-3 px-2 text-center text-rose-300">{formatBRL(periodoSelecionado.total.comissaoFrete)}</td>
-              <td className="py-3 px-2 text-center text-slate-400">-</td>
-              <td className="py-3 px-2 text-center text-rose-300">{formatBRL(periodoSelecionado.total.add)}</td>
-              <td className="py-3 px-2 text-center text-violet-300 text-lg">{formatBRL(periodoSelecionado.total.mc)}</td>
-              <td className="py-3 px-2 text-center text-violet-300">{formatPercent(periodoSelecionado.total.mcPct)}</td>
+            <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold">
+              <td className="py-3 px-2 sticky left-0 bg-slate-50 z-10 text-slate-800">TOTAL</td>
+              <td className="py-3 px-2 text-center text-slate-700">{formatNumber(periodoSelecionado.total.qtde)}</td>
+              <td className="py-3 px-2 text-center text-amber-700">{formatBRL(periodoSelecionado.total.pmv)}</td>
+              <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(periodoSelecionado.total.rob)}</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
+              <td className="py-3 px-2 text-center text-emerald-700">{formatBRL(periodoSelecionado.total.rol)}</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
+              <td className="py-3 px-2 text-center text-orange-700">{formatBRL(periodoSelecionado.total.cmv)}</td>
+              <td className="py-3 px-2 text-center text-amber-700">{formatBRL(periodoSelecionado.total.mb)}</td>
+              <td className="py-3 px-2 text-center text-rose-600">{formatBRL(periodoSelecionado.total.comissaoFrete)}</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
+              <td className="py-3 px-2 text-center text-rose-600">{formatBRL(periodoSelecionado.total.add)}</td>
+              <td className="py-3 px-2 text-center text-violet-700 text-lg">{formatBRL(periodoSelecionado.total.mc)}</td>
+              <td className="py-3 px-2 text-center text-violet-700">{formatPercent(periodoSelecionado.total.mcPct)}</td>
               <td className="py-3 px-2"></td>
             </tr>
           </tbody>
@@ -595,15 +595,15 @@ export default function StepPmv({ className, back }) {
       />
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
-        <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-violet-500/10">
-          <h3 className="text-lg font-bold text-violet-300 mb-4">Evolução da Margem de Contribuição</h3>
+        <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
+          <h3 className="text-lg font-bold text-violet-700 mb-4">Evolução da Margem de Contribuição</h3>
           <div className="h-64">
             <SimpleBarChart data={chartData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 shadow-lg shadow-amber-500/10">
-          <h3 className="text-lg font-bold text-amber-300 mb-4">Evolução do PMV</h3>
+        <div className="rounded-[28px] border border-amber-200 bg-white p-6 shadow-lg shadow-amber-500/5">
+          <h3 className="text-lg font-bold text-amber-700 mb-4">Evolução do PMV</h3>
           <div className="h-64">
             <SimpleLineChart data={chartData} valueKey="pmv" labelKey="nome" />
           </div>
@@ -613,7 +613,7 @@ export default function StepPmv({ className, back }) {
       <div className="flex flex-col gap-3 mt-6 sm:flex-row">
         <button
           onClick={back}
-          className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-700 text-slate-200 hover:bg-slate-900 transition"
+          className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-300 text-slate-700 hover:bg-slate-100 transition"
         >
           ← Voltar
         </button>

@@ -9,8 +9,9 @@
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: #0a0a0a;
+  background: #f8fafc;
   min-height: 100vh;
+  color: #0f172a;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -40,10 +41,11 @@ input[type="number"] {
   to   { transform: translateX(0);     opacity: 1; }
 }
 
-.cash-positive { color: #4ade80; }
-.cash-negative { color: #f87171; }
-.cash-neutral  { color: #94a3b8; }
+.cash-positive { color: #16a34a; }
+.cash-negative { color: #dc2626; }
+.cash-neutral  { color: #64748b; }
 
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #1e293b; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }

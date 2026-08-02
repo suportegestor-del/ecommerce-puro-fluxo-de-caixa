@@ -138,41 +138,41 @@ export default function StepMargem({ className, back }) {
     <div className={`w-full max-w-[98vw] px-2 ${className}`}>
       {!showTable ? (
         <>
-      <div className="rounded-[28px] border border-cyan-500/20 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-cyan-600/5 p-6 shadow-[0_40px_100px_-40px_rgba(14,165,233,0.15)]">
+      <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-r from-cyan-50 via-blue-50 to-cyan-100/50 p-6 shadow-[0_40px_100px_-40px_rgba(14,165,233,0.15)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-cyan-300/70 font-semibold">Simulador de Margens</p>
+            <p className="text-xs uppercase tracking-[0.32em] text-cyan-700/70 font-semibold">Simulador de Margens</p>
             <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent tracking-tight">Jogo do lucro</h2>
-            <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-300">Foque nas métricas mais importantes e visualize o impacto real do desconto e do preço.</p>
+            <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-700">Foque nas métricas mais importantes e visualize o impacto real do desconto e do preço.</p>
           </div>
-          <div className="rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 p-5 text-center shadow-lg shadow-cyan-500/10">
-            <p className="text-xs uppercase tracking-[0.28em] text-cyan-300/80 font-semibold">Lucro total</p>
-            <p className="mt-3 text-4xl font-bold text-cyan-200">{formatBRL(results.lucroAtual)}</p>
-            <p className="text-sm text-cyan-300/70">{formatPercent(results.margemLiquida)} de margem</p>
+          <div className="rounded-3xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-100/50 p-5 text-center shadow-lg shadow-cyan-500/5">
+            <p className="text-xs uppercase tracking-[0.28em] text-cyan-700/80 font-semibold">Lucro total</p>
+            <p className="mt-3 text-4xl font-bold text-cyan-700">{formatBRL(results.lucroAtual)}</p>
+            <p className="text-sm text-cyan-700/70">{formatPercent(results.margemLiquida)} de margem</p>
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 mt-6 xl:grid-cols-4">
-        <div className="rounded-[28px] border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 p-5 shadow-lg shadow-cyan-500/10 hover:border-cyan-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-cyan-300/80 mb-3 font-semibold">Receita atual</p>
-          <p className="text-3xl font-bold text-cyan-300">{formatBRL(results.receitaAtual)}</p>
-          <p className="mt-2 text-sm text-cyan-400/60">{results.qtd} unidades</p>
+        <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100/50 p-5 shadow-lg shadow-cyan-500/5 hover:border-cyan-300 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-cyan-700/80 mb-3 font-semibold">Receita atual</p>
+          <p className="text-3xl font-bold text-cyan-700">{formatBRL(results.receitaAtual)}</p>
+          <p className="mt-2 text-sm text-cyan-600/70">{results.qtd} unidades</p>
         </div>
-        <div className="rounded-[28px] border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 p-5 shadow-lg shadow-emerald-500/10 hover:border-emerald-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-emerald-300/80 mb-3 font-semibold">Lucro</p>
-          <p className="text-3xl font-bold text-emerald-300">{formatBRL(results.lucroAtual)}</p>
-          <p className="mt-2 text-sm text-emerald-400/60">{formatBRL(results.lucroUnitario)} por item</p>
+        <div className="rounded-[28px] border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 shadow-lg shadow-emerald-500/5 hover:border-emerald-300 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-emerald-700/80 mb-3 font-semibold">Lucro</p>
+          <p className="text-3xl font-bold text-emerald-700">{formatBRL(results.lucroAtual)}</p>
+          <p className="mt-2 text-sm text-emerald-600/60">{formatBRL(results.lucroUnitario)} por item</p>
         </div>
-        <div className="rounded-[28px] border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-600/5 p-5 shadow-lg shadow-amber-500/10 hover:border-amber-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-amber-300/80 mb-3 font-semibold">Margem</p>
-          <p className="text-3xl font-bold text-amber-300">{formatPercent(results.margemLiquida)}</p>
-          <p className="mt-2 text-sm text-amber-400/60">Custo: {formatBRL(results.custoUnitario)}</p>
+        <div className="rounded-[28px] border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 shadow-lg shadow-amber-500/5 hover:border-amber-300 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-amber-700/80 mb-3 font-semibold">Margem</p>
+          <p className="text-3xl font-bold text-amber-700">{formatPercent(results.margemLiquida)}</p>
+          <p className="mt-2 text-sm text-amber-600/70">Custo: {formatBRL(results.custoUnitario)}</p>
         </div>
-        <div className="rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-violet-600/5 p-5 shadow-lg shadow-violet-500/10 hover:border-violet-500/50 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-violet-300/80 mb-3 font-semibold">Ajustes</p>
-          <p className="text-3xl font-bold text-violet-300">{formatPercent(results.desc)} ↓</p>
-          <p className="mt-1 text-3xl font-bold text-violet-400">{formatPercent(results.inc)} ↑</p>
+        <div className="rounded-[28px] border border-violet-200 bg-gradient-to-br from-violet-50 to-violet-100/50 p-5 shadow-lg shadow-violet-500/5 hover:border-violet-300 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-violet-700/80 mb-3 font-semibold">Ajustes</p>
+          <p className="text-3xl font-bold text-violet-700">{formatPercent(results.desc)} ↓</p>
+          <p className="mt-1 text-3xl font-bold text-violet-600">{formatPercent(results.inc)} ↑</p>
         </div>
       </div>
 
@@ -182,8 +182,8 @@ export default function StepMargem({ className, back }) {
           { label: 'Preço unitário', value: price, setter: setPrice, type: 'number', step: '0.01', placeholder: '120' },
           { label: 'Margem (%)', value: margin, setter: setMargin, type: 'number', step: '0.1', placeholder: '30' },
         ].map(({ label, value, setter, type, step, placeholder }) => (
-          <label key={label} className="rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-5 transition hover:border-cyan-500/60 hover:bg-slate-900/70 hover:shadow-lg hover:shadow-cyan-500/10">
-            <span className="text-xs uppercase tracking-[0.32em] text-slate-300 font-semibold">{label}</span>
+          <label key={label} className="rounded-[28px] border border-slate-200 bg-white p-5 transition hover:border-cyan-300 hover:bg-slate-50 hover:shadow-lg hover:shadow-cyan-500/5">
+            <span className="text-xs uppercase tracking-[0.32em] text-slate-700 font-semibold">{label}</span>
             <input
               type={type}
               step={step}
@@ -191,7 +191,7 @@ export default function StepMargem({ className, back }) {
               value={value}
               placeholder={placeholder}
               onChange={(e) => setter(e.target.value)}
-              className="mt-4 w-full bg-slate-950/40 border border-slate-700/40 rounded-3xl px-4 py-4 text-slate-100 text-lg outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:bg-slate-950/60"
+              className="mt-4 w-full bg-white border border-slate-300 rounded-3xl px-4 py-4 text-slate-900 text-lg outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 focus:bg-white"
             />
           </label>
         ))}
@@ -203,8 +203,8 @@ export default function StepMargem({ className, back }) {
           { label: 'Desconto (%)', value: discount, setter: setDiscount, type: 'number', step: '0.1', placeholder: '5' },
           { label: 'Aumento (%)', value: increase, setter: setIncrease, type: 'number', step: '0.1', placeholder: '5' },
         ].map(({ label, value, setter, type, step, placeholder }) => (
-          <label key={label} className="rounded-[28px] border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-5 transition hover:border-cyan-500/60 hover:bg-slate-900/70 hover:shadow-lg hover:shadow-cyan-500/10">
-            <span className="text-xs uppercase tracking-[0.32em] text-slate-300 font-semibold">{label}</span>
+          <label key={label} className="rounded-[28px] border border-slate-200 bg-white p-5 transition hover:border-cyan-300 hover:bg-slate-50 hover:shadow-lg hover:shadow-cyan-500/5">
+            <span className="text-xs uppercase tracking-[0.32em] text-slate-700 font-semibold">{label}</span>
             <input
               type={type}
               step={step}
@@ -212,30 +212,30 @@ export default function StepMargem({ className, back }) {
               value={value}
               placeholder={placeholder}
               onChange={(e) => setter(e.target.value)}
-              className="mt-4 w-full bg-slate-950/40 border border-slate-700/40 rounded-3xl px-4 py-4 text-slate-100 text-lg outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 focus:bg-slate-950/60"
+              className="mt-4 w-full bg-white border border-slate-300 rounded-3xl px-4 py-4 text-slate-900 text-lg outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 focus:bg-white"
             />
           </label>
         ))}
       </div>
 
-      <div className="mt-6 rounded-[36px] border border-amber-500/40 bg-gradient-to-br from-amber-500/5 to-amber-600/5 p-6 shadow-2xl shadow-amber-500/10">
+      <div className="mt-6 rounded-[36px] border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100/50 p-6 shadow-2xl shadow-amber-500/5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-amber-300/80 font-semibold">Impacto do desconto</p>
-            <h3 className="mt-3 text-2xl font-bold text-amber-200">Receber mais com desconto</h3>
+            <p className="text-xs uppercase tracking-[0.28em] text-amber-700/80 font-semibold">Impacto do desconto</p>
+            <h3 className="mt-3 text-2xl font-bold text-amber-700">Receber mais com desconto</h3>
           </div>
-          <span className="rounded-full bg-amber-500/20 px-4 py-2 text-xs uppercase tracking-[0.24em] text-amber-200 font-semibold border border-amber-500/30">{formatPercent(results.desc)}</span>
+          <span className="rounded-full bg-amber-100 px-4 py-2 text-xs uppercase tracking-[0.24em] text-amber-700 font-semibold border border-amber-200">{formatPercent(results.desc)}</span>
         </div>
-        <div className="mt-5 text-sm text-amber-100/80 space-y-3">
-          <p>Preço com desconto: <strong className="text-amber-100">{formatBRL(results.precoDesconto)}</strong></p>
-          <p>Manter receita: <strong className="text-amber-100">{results.qtdReceitaDesc} unidades</strong></p>
-          <p>Manter lucro: <strong className={`text-amber-100 ${results.qtdLucroDesc === null ? 'text-amber-300' : ''}`}>
+        <div className="mt-5 text-sm text-amber-800/80 space-y-3">
+          <p>Preço com desconto: <strong className="text-amber-900">{formatBRL(results.precoDesconto)}</strong></p>
+          <p>Manter receita: <strong className="text-amber-900">{results.qtdReceitaDesc} unidades</strong></p>
+          <p>Manter lucro: <strong className={`text-amber-900 ${results.qtdLucroDesc === null ? 'text-amber-700' : ''}`}>
             {results.qtdLucroDesc === null ? 'não é possível' : `${results.qtdLucroDesc} unidades`}
           </strong></p>
           {results.qtdLucroDesc !== null && (
-            <div className="rounded-3xl bg-slate-900/90 p-4 border border-slate-700/50 flex items-center justify-between">
-              <span className="text-slate-400">Diferença:</span>
-              <div className={`flex items-center gap-2 text-lg font-bold ${results.qtdLucroDesc > results.qtd ? 'text-red-400' : 'text-emerald-400'}`}>
+            <div className="rounded-3xl bg-slate-50 p-4 border border-slate-200 flex items-center justify-between">
+              <span className="text-slate-500">Diferença:</span>
+              <div className={`flex items-center gap-2 text-lg font-bold ${results.qtdLucroDesc > results.qtd ? 'text-red-600' : 'text-emerald-600'}`}>
                 <span>{Math.abs(results.qtdLucroDesc - results.qtd)} unidades</span>
                 <span>{results.qtdLucroDesc > results.qtd ? '↑' : '↓'}</span>
                 <span className="text-sm font-semibold opacity-90">
@@ -244,38 +244,38 @@ export default function StepMargem({ className, back }) {
               </div>
             </div>
           )}
-          <div className="rounded-3xl bg-amber-500/10 p-4 border border-amber-500/30">
+          <div className="rounded-3xl bg-amber-50 p-4 border border-amber-200">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] text-amber-300/70 font-semibold">Novo preço</span>
-              <span className="text-sm font-bold text-amber-200">{formatBRL(results.precoDesconto)}</span>
+              <span className="text-[11px] text-amber-700/70 font-semibold">Novo preço</span>
+              <span className="text-sm font-bold text-amber-700">{formatBRL(results.precoDesconto)}</span>
             </div>
             <div className="mt-2 flex items-center justify-between">
-              <span className="text-[11px] text-amber-300/70 font-semibold">Redução</span>
-              <span className="text-sm font-bold text-amber-300">{formatPercent(results.desc)}</span>
+              <span className="text-[11px] text-amber-700/70 font-semibold">Redução</span>
+              <span className="text-sm font-bold text-amber-700">{formatPercent(results.desc)}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-6 rounded-[36px] border border-emerald-500/40 bg-gradient-to-br from-emerald-500/5 to-emerald-600/5 p-6 shadow-2xl shadow-emerald-500/10">
+      <div className="mt-6 rounded-[36px] border border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-6 shadow-2xl shadow-emerald-500/5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-emerald-300/80 font-semibold">Impacto do aumento</p>
-            <h3 className="mt-3 text-2xl font-bold text-emerald-200">Menos volume, mais valor</h3>
+            <p className="text-xs uppercase tracking-[0.28em] text-emerald-700/80 font-semibold">Impacto do aumento</p>
+            <h3 className="mt-3 text-2xl font-bold text-emerald-700">Menos volume, mais valor</h3>
           </div>
-          <span className="rounded-full bg-emerald-500/20 px-4 py-2 text-xs uppercase tracking-[0.24em] text-emerald-200 font-semibold border border-emerald-500/30">{formatPercent(results.inc)}</span>
+          <span className="rounded-full bg-emerald-100 px-4 py-2 text-xs uppercase tracking-[0.24em] text-emerald-700 font-semibold border border-emerald-200">{formatPercent(results.inc)}</span>
         </div>
-        <div className="mt-5 text-sm text-emerald-100/80 space-y-3">
-          <p>Preço com aumento: <strong className="text-emerald-100">{formatBRL(results.precoAumento)}</strong></p>
-          <p>Manter receita: <strong className="text-emerald-100">{results.qtdReceitaAum} unidades</strong></p>
-          <p>Vender a menos: <strong className="text-emerald-100">{results.menosParaReceita} unidades</strong></p>
-          <p>Manter lucro: <strong className={`text-emerald-100 ${results.qtdLucroAum === null ? 'text-emerald-300' : ''}`}>
+        <div className="mt-5 text-sm text-emerald-800/80 space-y-3">
+          <p>Preço com aumento: <strong className="text-emerald-900">{formatBRL(results.precoAumento)}</strong></p>
+          <p>Manter receita: <strong className="text-emerald-900">{results.qtdReceitaAum} unidades</strong></p>
+          <p>Vender a menos: <strong className="text-emerald-900">{results.menosParaReceita} unidades</strong></p>
+          <p>Manter lucro: <strong className={`text-emerald-900 ${results.qtdLucroAum === null ? 'text-emerald-700' : ''}`}>
             {results.qtdLucroAum === null ? 'não é possível' : `${results.qtdLucroAum} unidades`}
           </strong></p>
           {results.qtdLucroAum !== null && (
-            <div className="rounded-3xl bg-slate-900/90 p-4 border border-slate-700/50 flex items-center justify-between">
-              <span className="text-slate-400">Diferença:</span>
-              <div className={`flex items-center gap-2 text-lg font-bold ${results.qtdLucroAum > results.qtd ? 'text-red-400' : 'text-emerald-400'}`}>
+            <div className="rounded-3xl bg-slate-50 p-4 border border-slate-200 flex items-center justify-between">
+              <span className="text-slate-500">Diferença:</span>
+              <div className={`flex items-center gap-2 text-lg font-bold ${results.qtdLucroAum > results.qtd ? 'text-red-600' : 'text-emerald-600'}`}>
                 <span>{Math.abs(results.qtdLucroAum - results.qtd)} unidades</span>
                 <span>{results.qtdLucroAum > results.qtd ? '↑' : '↓'}</span>
                 <span className="text-sm font-semibold opacity-90">
@@ -284,14 +284,14 @@ export default function StepMargem({ className, back }) {
               </div>
             </div>
           )}
-          <div className="rounded-3xl bg-emerald-500/10 p-4 border border-emerald-500/30">
+          <div className="rounded-3xl bg-emerald-50 p-4 border border-emerald-200">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] text-emerald-300/70 font-semibold">Novo preço</span>
-              <span className="text-sm font-bold text-emerald-200">{formatBRL(results.precoAumento)}</span>
+              <span className="text-[11px] text-emerald-700/70 font-semibold">Novo preço</span>
+              <span className="text-sm font-bold text-emerald-700">{formatBRL(results.precoAumento)}</span>
             </div>
             <div className="mt-2 flex items-center justify-between">
-              <span className="text-[11px] text-emerald-300/70 font-semibold">Aumento</span>
-              <span className="text-sm font-bold text-emerald-300">{formatPercent(results.inc)}</span>
+              <span className="text-[11px] text-emerald-700/70 font-semibold">Aumento</span>
+              <span className="text-sm font-bold text-emerald-700">{formatPercent(results.inc)}</span>
             </div>
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function StepMargem({ className, back }) {
       <div className="flex flex-col gap-3 mt-6 sm:flex-row">
         <button
           onClick={back}
-          className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-700 text-slate-200 hover:bg-slate-900 transition"
+          className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-300 text-slate-700 hover:bg-slate-100 transition"
         >
           ← Voltar
         </button>
@@ -327,82 +327,82 @@ export default function StepMargem({ className, back }) {
         </>
       ) : (
         <div>
-          <div className="rounded-[28px] border border-violet-500/20 bg-gradient-to-r from-violet-500/5 via-purple-500/5 to-violet-600/5 p-6 shadow-[0_40px_100px_-40px_rgba(139,92,246,0.15)]">
+          <div className="rounded-[28px] border border-violet-200 bg-gradient-to-r from-violet-50 via-purple-50 to-violet-100/50 p-6 shadow-[0_40px_100px_-40px_rgba(139,92,246,0.15)]">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.32em] text-violet-300/70 font-semibold">Simulações automáticas</p>
+                <p className="text-xs uppercase tracking-[0.32em] text-violet-700/70 font-semibold">Simulações automáticas</p>
                 <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-violet-300 to-purple-300 bg-clip-text text-transparent tracking-tight">Tabela de Descontos</h2>
-                <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-300">Veja como diferentes descontos afetam sua margem de {parseNumber(margin)}%.</p>
+                <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-700">Veja como diferentes descontos afetam sua margem de {parseNumber(margin)}%.</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 rounded-[28px] border border-violet-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-violet-500/10">
-            <h3 className="text-lg font-bold text-violet-300 mb-4">Tabela de Descontos — Mesmo lucro</h3>
+          <div className="mt-6 rounded-[28px] border border-violet-200 bg-white p-6 overflow-x-auto shadow-lg shadow-violet-500/5">
+            <h3 className="text-lg font-bold text-violet-700 mb-4">Tabela de Descontos — Mesmo lucro</h3>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-violet-500/20">
-                  <th className="text-left py-3 px-4 text-violet-300 font-semibold">Desconto</th>
-                  <th className="text-left py-3 px-4 text-cyan-300 font-semibold">Preço novo</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Qtd atual</th>
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Qtd p/ mesma receita</th>
-                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Qtd p/ mesmo lucro</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Vender a mais</th>
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Lucro mantido</th>
+                <tr className="border-b border-violet-200">
+                  <th className="text-left py-3 px-4 text-violet-700 font-semibold">Desconto</th>
+                  <th className="text-left py-3 px-4 text-cyan-700 font-semibold">Preço novo</th>
+                  <th className="text-left py-3 px-4 text-slate-700 font-semibold">Qtd atual</th>
+                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Qtd p/ mesma receita</th>
+                  <th className="text-left py-3 px-4 text-amber-700 font-semibold">Qtd p/ mesmo lucro</th>
+                  <th className="text-left py-3 px-4 text-slate-700 font-semibold">Vender a mais</th>
+                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Lucro mantido</th>
                 </tr>
               </thead>
               <tbody>
                 {simulations.map((sim, idx) => (
-                  <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
-                    <td className="py-3 px-4 text-violet-300 font-semibold">{sim.desconto}%</td>
-                    <td className="py-3 px-4 text-cyan-300">{formatBRL(sim.precoNovo)}</td>
-                    <td className="py-3 px-4 text-slate-300">{results.qtd}</td>
-                    <td className="py-3 px-4 text-emerald-300">{sim.qtdReceita}</td>
-                    <td className="py-3 px-4 text-amber-300">{sim.qtdLucro === null ? '❌ Impossível' : sim.qtdLucro}</td>
+                  <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                    <td className="py-3 px-4 text-violet-700 font-semibold">{sim.desconto}%</td>
+                    <td className="py-3 px-4 text-cyan-700">{formatBRL(sim.precoNovo)}</td>
+                    <td className="py-3 px-4 text-slate-700">{results.qtd}</td>
+                    <td className="py-3 px-4 text-emerald-700">{sim.qtdReceita}</td>
+                    <td className="py-3 px-4 text-amber-700">{sim.qtdLucro === null ? '❌ Impossível' : sim.qtdLucro}</td>
                     <td className="py-3 px-4">
                       {sim.diferenca !== null ? (
-                        <span className="font-bold text-red-400">↑ {sim.diferenca}</span>
+                        <span className="font-bold text-red-600">↑ {sim.diferenca}</span>
                       ) : (
                         <span className="text-slate-500">-</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-emerald-300 font-semibold">{formatBRL(results.lucroAtual)}</td>
+                    <td className="py-3 px-4 text-emerald-700 font-semibold">{formatBRL(results.lucroAtual)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <div className="mt-8 rounded-[28px] border border-emerald-500/30 bg-gradient-to-br from-slate-900/50 to-slate-950/80 p-6 overflow-x-auto shadow-lg shadow-emerald-500/10">
-            <h3 className="text-lg font-bold text-emerald-300 mb-4">Tabela de Aumento de Preço — Mesmo lucro</h3>
+          <div className="mt-8 rounded-[28px] border border-emerald-200 bg-white p-6 overflow-x-auto shadow-lg shadow-emerald-500/5">
+            <h3 className="text-lg font-bold text-emerald-700 mb-4">Tabela de Aumento de Preço — Mesmo lucro</h3>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-emerald-500/20">
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Aumento</th>
-                  <th className="text-left py-3 px-4 text-cyan-300 font-semibold">Preço novo</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Qtd atual</th>
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Qtd p/ mesma receita</th>
-                  <th className="text-left py-3 px-4 text-amber-300 font-semibold">Qtd p/ mesmo lucro</th>
-                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">Pode vender a menos</th>
-                  <th className="text-left py-3 px-4 text-emerald-300 font-semibold">Lucro mantido</th>
+                <tr className="border-b border-emerald-200">
+                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Aumento</th>
+                  <th className="text-left py-3 px-4 text-cyan-700 font-semibold">Preço novo</th>
+                  <th className="text-left py-3 px-4 text-slate-700 font-semibold">Qtd atual</th>
+                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Qtd p/ mesma receita</th>
+                  <th className="text-left py-3 px-4 text-amber-700 font-semibold">Qtd p/ mesmo lucro</th>
+                  <th className="text-left py-3 px-4 text-slate-700 font-semibold">Pode vender a menos</th>
+                  <th className="text-left py-3 px-4 text-emerald-700 font-semibold">Lucro mantido</th>
                 </tr>
               </thead>
               <tbody>
                 {simulationsAumento.map((sim, idx) => (
-                  <tr key={idx} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition">
-                    <td className="py-3 px-4 text-emerald-300 font-semibold">{sim.aumento}%</td>
-                    <td className="py-3 px-4 text-cyan-300">{formatBRL(sim.precoNovo)}</td>
-                    <td className="py-3 px-4 text-slate-300">{results.qtd}</td>
-                    <td className="py-3 px-4 text-emerald-300">{sim.qtdReceita}</td>
-                    <td className="py-3 px-4 text-amber-300">{sim.qtdLucro === null ? '❌ Impossível' : sim.qtdLucro}</td>
+                  <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                    <td className="py-3 px-4 text-emerald-700 font-semibold">{sim.aumento}%</td>
+                    <td className="py-3 px-4 text-cyan-700">{formatBRL(sim.precoNovo)}</td>
+                    <td className="py-3 px-4 text-slate-700">{results.qtd}</td>
+                    <td className="py-3 px-4 text-emerald-700">{sim.qtdReceita}</td>
+                    <td className="py-3 px-4 text-amber-700">{sim.qtdLucro === null ? '❌ Impossível' : sim.qtdLucro}</td>
                     <td className="py-3 px-4">
                       {sim.diferenca !== null ? (
-                        <span className="font-bold text-emerald-400">↓ {sim.diferenca}</span>
+                        <span className="font-bold text-emerald-600">↓ {sim.diferenca}</span>
                       ) : (
                         <span className="text-slate-500">-</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-emerald-300 font-semibold">{formatBRL(results.lucroAtual)}</td>
+                    <td className="py-3 px-4 text-emerald-700 font-semibold">{formatBRL(results.lucroAtual)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -412,7 +412,7 @@ export default function StepMargem({ className, back }) {
           <div className="flex flex-col gap-3 mt-6 sm:flex-row">
             <button
               onClick={() => setShowTable(false)}
-              className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-700 text-slate-200 hover:bg-slate-900 transition"
+              className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-300 text-slate-700 hover:bg-slate-100 transition"
             >
               ← Voltar ao simulador
             </button>

@@ -95,7 +95,7 @@ function MoneyCell({ value, onChange }) {
       onChange={e => setRaw(e.target.value)}
       onFocus={handleFocus} onBlur={handleBlur}
       placeholder="0,00"
-      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs text-right placeholder-zinc-700 focus:outline-none transition"
+      className="w-full bg-transparent border border-transparent hover:border-slate-200 focus:border-blue-500 focus:bg-slate-100 rounded px-2 py-1 text-slate-900 text-xs text-right placeholder-slate-400 focus:outline-none transition"
     />
   )
 }
@@ -109,12 +109,12 @@ function compact(v) {
 
 function ParcelasPreview({ f }) {
   const parcelas = calcParcelas(f)
-  if (!parcelas.length || !f.total) return <span className="text-zinc-700 text-[10px]">—</span>
+  if (!parcelas.length || !f.total) return <span className="text-slate-300 text-[10px]">—</span>
   const n = parcelas.length
-  if (n === 1 && !f.ato) return <span className="text-zinc-400 text-[10px]">À vista {compact(f.total)}</span>
+  if (n === 1 && !f.ato) return <span className="text-slate-500 text-[10px]">À vista {compact(f.total)}</span>
   return (
-    <div className="text-[10px] text-zinc-300 space-y-0.5">
-      {f.ato > 0 && <div className="text-blue-400">Ato {compact(Number(f.total) * (Number(f.ato)||0)/100)}</div>}
+    <div className="text-[10px] text-slate-700 space-y-0.5">
+      {f.ato > 0 && <div className="text-blue-600">Ato {compact(Number(f.total) * (Number(f.ato)||0)/100)}</div>}
       {n > (f.ato > 0 ? 1 : 0) && (
         <div>{n - (f.ato > 0 ? 1 : 0)}× {compact(parcelas[f.ato > 0 ? 1 : 0]?.valor)}</div>
       )}
@@ -136,8 +136,8 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
     <div className={`w-full max-w-[98vw] px-2 ${className}`}>
       <div className="text-center mb-4">
         <div className="text-3xl mb-2">🏭</div>
-        <h2 className="text-2xl font-bold text-white mb-1">Fornecedores</h2>
-        <p className="text-zinc-400 text-sm">Compras com prazo, ato e parcelamento</p>
+        <h2 className="text-2xl font-bold text-slate-900 mb-1">Fornecedores</h2>
+        <p className="text-slate-500 text-sm">Compras com prazo, ato e parcelamento</p>
       </div>
 
       {/* Quick add */}
@@ -146,94 +146,94 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
           <button key={s} onClick={() => !jaAdicionado(s) && add(s)} disabled={jaAdicionado(s)}
             className={`text-xs px-3 py-1.5 rounded-full border transition font-medium ${
               jaAdicionado(s)
-                ? 'bg-orange-900/30 border-orange-600 text-blue-300 cursor-default'
-                : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-blue-500 hover:text-white'
+                ? 'bg-orange-100 border-orange-300 text-blue-700 cursor-default'
+                : 'bg-slate-100 border-slate-200 text-slate-700 hover:border-blue-500 hover:text-slate-900'
             }`}>
             {s} {jaAdicionado(s) ? '✓' : '+'}
           </button>
         ))}
-        <button onClick={() => add()} className="text-xs px-3 py-1.5 rounded-full border border-dashed border-zinc-600 text-zinc-500 hover:border-blue-500 hover:text-white transition font-medium">
+        <button onClick={() => add()} className="text-xs px-3 py-1.5 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-blue-500 hover:text-slate-900 transition font-medium">
           + Novo
         </button>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/60">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-zinc-800 text-zinc-300 text-xs">
-              <th className="text-left px-3 py-2.5 font-semibold sticky left-0 bg-zinc-800 z-10 min-w-[170px] border-r border-zinc-700">Fornecedor</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[120px] border-r border-zinc-700">Previsto</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[220px] border-r border-zinc-700">Prazo</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[68px] border-r border-zinc-700">Ato %</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[140px] border-r border-zinc-700">Total (R$)</th>
-              <th className="text-center px-2 py-2.5 font-semibold min-w-[130px] border-r border-zinc-700">Parcelas</th>
+            <tr className="bg-slate-100 text-slate-700 text-xs">
+              <th className="text-left px-3 py-2.5 font-semibold sticky left-0 bg-slate-100 z-10 min-w-[170px] border-r border-slate-200">Fornecedor</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[120px] border-r border-slate-200">Previsto</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[220px] border-r border-slate-200">Prazo</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[68px] border-r border-slate-200">Ato %</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[140px] border-r border-slate-200">Total (R$)</th>
+              <th className="text-center px-2 py-2.5 font-semibold min-w-[130px] border-r border-slate-200">Parcelas</th>
               <th className="w-8"></th>
             </tr>
           </thead>
           <tbody>
             {lista.length === 0 && (
-              <tr><td colSpan={7} className="text-center py-10 text-zinc-500 text-sm">Adicione fornecedores usando os botões acima</td></tr>
+              <tr><td colSpan={7} className="text-center py-10 text-slate-400 text-sm">Adicione fornecedores usando os botões acima</td></tr>
             )}
             {lista.map((f, rowIdx) => (
-              <tr key={f.id} className={`border-t border-zinc-800 ${rowIdx % 2 === 0 ? 'bg-zinc-950/30' : 'bg-zinc-900/10'} hover:bg-zinc-800/20 transition`}>
+              <tr key={f.id} className={`border-t border-slate-200 ${rowIdx % 2 === 0 ? 'bg-slate-50/50' : 'bg-slate-50/30'} hover:bg-slate-100/20 transition`}>
 
                 {/* Nome */}
-                <td className="px-2 py-1.5 sticky left-0 bg-inherit z-10 border-r border-zinc-800">
+                <td className="px-2 py-1.5 sticky left-0 bg-inherit z-10 border-r border-slate-200">
                   <input type="text" value={f.nome} onChange={e => change(f.id, 'nome', e.target.value)} placeholder="Nome"
-                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs font-medium placeholder-zinc-600 focus:outline-none transition" />
+                    className="w-full bg-transparent border border-transparent hover:border-slate-200 focus:border-blue-500 focus:bg-slate-100 rounded px-2 py-1 text-slate-900 text-xs font-medium placeholder-slate-400 focus:outline-none transition" />
                 </td>
 
                 {/* Previsto */}
-                <td className="px-2 py-1.5 border-r border-zinc-800">
+                <td className="px-2 py-1.5 border-r border-slate-200">
                   <input type="date" value={f.previsto || ''} onChange={e => change(f.id, 'previsto', e.target.value)}
-                    className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 py-1 text-white text-xs text-center focus:outline-none transition [color-scheme:dark]" />
+                    className="w-full bg-transparent border border-transparent hover:border-slate-200 focus:border-blue-500 focus:bg-slate-100 rounded px-2 py-1 text-slate-900 text-xs text-center focus:outline-none transition" />
                 </td>
 
                 {/* Prazo */}
-                <td className="px-2 py-1.5 border-r border-zinc-800">
+                <td className="px-2 py-1.5 border-r border-slate-200">
                   <div className="flex gap-1 flex-wrap items-center">
                     {PRAZO_RAPIDO.map(p => (
                       <button key={p} onClick={() => change(f.id, 'prazo', p)}
                         className={`text-[10px] px-1.5 py-0.5 rounded font-medium transition whitespace-nowrap ${
-                          f.prazo === p ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                          f.prazo === p ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                         }`}>{p}</button>
                     ))}
                     <input type="text" value={f.prazo || ''} onChange={e => change(f.id, 'prazo', e.target.value)}
-                      placeholder="ex: 30/60" className="w-16 bg-zinc-900 border border-zinc-700 rounded px-1.5 py-0.5 text-white text-[10px] text-center focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                      placeholder="ex: 30/60" className="w-16 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-slate-900 text-[10px] text-center focus:outline-none focus:ring-1 focus:ring-blue-500" />
                   </div>
                 </td>
 
                 {/* Ato % */}
-                <td className="px-2 py-1.5 border-r border-zinc-800">
+                <td className="px-2 py-1.5 border-r border-slate-200">
                   <div className="relative">
                     <input type="number" min="0" max="100" value={f.ato || ''} onChange={e => change(f.id, 'ato', e.target.value)} placeholder="0"
-                      className="w-full bg-transparent border border-transparent hover:border-zinc-700 focus:border-blue-500 focus:bg-zinc-800 rounded px-2 pr-5 py-1 text-white text-xs text-center focus:outline-none transition" />
-                    <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-zinc-600 pointer-events-none">%</span>
+                      className="w-full bg-transparent border border-transparent hover:border-slate-200 focus:border-blue-500 focus:bg-slate-100 rounded px-2 pr-5 py-1 text-slate-900 text-xs text-center focus:outline-none transition" />
+                    <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none">%</span>
                   </div>
                 </td>
 
                 {/* Total */}
-                <td className="px-2 py-1.5 border-r border-zinc-800">
+                <td className="px-2 py-1.5 border-r border-slate-200">
                   <MoneyCell value={f.total} onChange={v => change(f.id, 'total', v)} />
                 </td>
 
                 {/* Parcelas preview */}
-                <td className="px-3 py-1.5 border-r border-zinc-800">
+                <td className="px-3 py-1.5 border-r border-slate-200">
                   <ParcelasPreview f={f} />
                 </td>
 
                 <td className="px-2 py-1.5 text-center">
-                  <button onClick={() => remove(f.id)} className="text-zinc-600 hover:text-red-400 transition text-sm">✕</button>
+                  <button onClick={() => remove(f.id)} className="text-slate-400 hover:text-red-600 transition text-sm">✕</button>
                 </td>
               </tr>
             ))}
 
             {lista.length > 0 && (
-              <tr className="border-t-2 border-zinc-700 bg-zinc-800/40">
-                <td className="sticky left-0 bg-zinc-800/60 px-3 py-2 text-xs font-bold text-zinc-300 border-r border-zinc-700" colSpan={4}>TOTAL</td>
-                <td className="px-2 py-2 text-right border-r border-zinc-700">
-                  <span className="text-xs font-bold text-red-400">{fmtBRL(totalGeral)}</span>
+              <tr className="border-t-2 border-slate-200 bg-slate-50">
+                <td className="sticky left-0 bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 border-r border-slate-200" colSpan={4}>TOTAL</td>
+                <td className="px-2 py-2 text-right border-r border-slate-200">
+                  <span className="text-xs font-bold text-red-600">{fmtBRL(totalGeral)}</span>
                 </td>
                 <td colSpan={2}></td>
               </tr>
@@ -242,13 +242,13 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
         </table>
       </div>
 
-      <div className="mt-2 text-[11px] text-zinc-600 text-center">
-        Prazo ex: <span className="text-zinc-500">30</span> = 30 dias · <span className="text-zinc-500">30/60/90</span> = 3 parcelas · <span className="text-zinc-500">Ato</span> = % pago na entrada
+      <div className="mt-2 text-[11px] text-slate-400 text-center">
+        Prazo ex: <span className="text-slate-400">30</span> = 30 dias · <span className="text-slate-400">30/60/90</span> = 3 parcelas · <span className="text-slate-400">Ato</span> = % pago na entrada
       </div>
 
       <div className="flex gap-3 mt-4 max-w-lg mx-auto">
-        <button onClick={back} className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition font-medium text-sm">← Voltar</button>
-        <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20 text-sm">Próximo →</button>
+        <button onClick={back} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 transition font-medium text-sm">← Voltar</button>
+        <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-slate-900 font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20 text-sm">Próximo →</button>
       </div>
     </div>
   )

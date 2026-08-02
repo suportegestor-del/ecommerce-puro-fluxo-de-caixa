@@ -38,27 +38,27 @@ export default function StepNaoOperacional({ data, updateData, next, back, class
   const jaTemEnt  = (nome) => entradas.some(e => e.nome === nome)
   const jaTemSaid = (nome) => saidas.some(s => s.nome === nome)
 
-  const inputBase = 'w-full bg-zinc-950/70 border border-zinc-700 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2'
+  const inputBase = 'w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:ring-2'
 
   return (
     <div className={`w-full max-w-lg ${className}`}>
       <Card className="p-8">
         <div className="text-4xl mb-4 text-center">🏦</div>
-        <h2 className="text-2xl font-bold text-white text-center mb-2">Atividades Não Operacionais</h2>
-        <p className="text-slate-400 text-sm text-center mb-6">
+        <h2 className="text-2xl font-bold text-slate-900 text-center mb-2">Atividades Não Operacionais</h2>
+        <p className="text-slate-500 text-sm text-center mb-6">
           Empréstimos, investimentos, dividendos, despesas bancárias...
         </p>
 
         {/* ── ENTRADAS ────────────────────────────────── */}
         <div className="mb-5">
-          <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2">Entradas</p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">Entradas</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {SUGEST_ENT.map(s => (
               <button key={s.nome} onClick={() => !jaTemEnt(s.nome) && addEnt(s.nome)} disabled={jaTemEnt(s.nome)}
                 className={`text-xs px-3 py-1.5 rounded-full border transition font-medium flex items-center gap-1 ${
                   jaTemEnt(s.nome)
-                    ? 'bg-emerald-900/30 border-emerald-600 text-emerald-300 cursor-default'
-                    : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-emerald-500 hover:text-white'
+                    ? 'bg-emerald-100 border-emerald-300 text-emerald-700 cursor-default'
+                    : 'bg-slate-100 border-slate-300 text-slate-700 hover:border-emerald-500 hover:text-slate-900'
                 }`}>
                 {s.icone} {s.nome} {jaTemEnt(s.nome) ? '✓' : '+'}
               </button>
@@ -70,12 +70,12 @@ export default function StepNaoOperacional({ data, updateData, next, back, class
               <div className="text-center py-4 text-slate-600 text-xs">Sem entradas não operacionais</div>
             )}
             {entradas.map(e => (
-              <div key={e.id} className="bg-zinc-950/60 border border-zinc-800 rounded-xl p-3 space-y-2">
+              <div key={e.id} className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                 <div className="flex gap-2 items-center">
                   <input type="text" placeholder="Ex: Empréstimo banco" value={e.nome}
                     onChange={ev => changeEnt(e.id, 'nome', ev.target.value)}
-                    className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-                  <button onClick={() => removeEnt(e.id)} className="text-slate-500 hover:text-red-400 transition text-lg w-8 h-8 flex items-center justify-center">✕</button>
+                    className="flex-1 bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                  <button onClick={() => removeEnt(e.id)} className="text-slate-500 hover:text-red-600 transition text-lg w-8 h-8 flex items-center justify-center">✕</button>
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1">
@@ -85,7 +85,7 @@ export default function StepNaoOperacional({ data, updateData, next, back, class
                     <input type="number" min="1" max="31" placeholder="Dia" value={e.diaRecebimento}
                       onChange={ev => changeEnt(e.id, 'diaRecebimento', ev.target.value)}
                       className={`${inputBase} focus:ring-emerald-500`} />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zinc-500">dia</span>
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">dia</span>
                   </div>
                 </div>
               </div>
@@ -93,21 +93,21 @@ export default function StepNaoOperacional({ data, updateData, next, back, class
           </div>
 
           <button onClick={() => addEnt()}
-            className="w-full mt-2 py-2 border border-dashed border-zinc-700 rounded-xl text-zinc-500 hover:text-white hover:border-emerald-500 transition text-sm font-medium flex items-center justify-center gap-2">
+            className="w-full mt-2 py-2 border border-dashed border-slate-300 rounded-xl text-slate-400 hover:text-slate-900 hover:border-emerald-500 transition text-sm font-medium flex items-center justify-center gap-2">
             <span className="text-lg">+</span> Adicionar entrada
           </button>
         </div>
 
         {/* ── SAÍDAS ──────────────────────────────────── */}
         <div>
-          <p className="text-xs font-bold text-red-400 uppercase tracking-widest mb-2">Saídas</p>
+          <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-2">Saídas</p>
           <div className="flex flex-wrap gap-2 mb-3">
             {SUGEST_SAID.map(s => (
               <button key={s.nome} onClick={() => !jaTemSaid(s.nome) && addSaid(s.nome)} disabled={jaTemSaid(s.nome)}
                 className={`text-xs px-3 py-1.5 rounded-full border transition font-medium flex items-center gap-1 ${
                   jaTemSaid(s.nome)
-                    ? 'bg-red-900/30 border-red-600 text-red-300 cursor-default'
-                    : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-red-500 hover:text-white'
+                    ? 'bg-red-100 border-red-300 text-red-700 cursor-default'
+                    : 'bg-slate-100 border-slate-300 text-slate-700 hover:border-red-500 hover:text-slate-900'
                 }`}>
                 {s.icone} {s.nome} {jaTemSaid(s.nome) ? '✓' : '+'}
               </button>
@@ -119,12 +119,12 @@ export default function StepNaoOperacional({ data, updateData, next, back, class
               <div className="text-center py-4 text-slate-600 text-xs">Sem saídas não operacionais</div>
             )}
             {saidas.map(s => (
-              <div key={s.id} className="bg-zinc-950/60 border border-zinc-800 rounded-xl p-3 space-y-2">
+              <div key={s.id} className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                 <div className="flex gap-2 items-center">
                   <input type="text" placeholder="Ex: Despesas Bancárias" value={s.nome}
                     onChange={ev => changeSaid(s.id, 'nome', ev.target.value)}
-                    className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500" />
-                  <button onClick={() => removeSaid(s.id)} className="text-slate-500 hover:text-red-400 transition text-lg w-8 h-8 flex items-center justify-center">✕</button>
+                    className="flex-1 bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500" />
+                  <button onClick={() => removeSaid(s.id)} className="text-slate-500 hover:text-red-600 transition text-lg w-8 h-8 flex items-center justify-center">✕</button>
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1">
@@ -134,7 +134,7 @@ export default function StepNaoOperacional({ data, updateData, next, back, class
                     <input type="number" min="1" max="31" placeholder="Dia" value={s.diaVencimento}
                       onChange={ev => changeSaid(s.id, 'diaVencimento', ev.target.value)}
                       className={`${inputBase} focus:ring-red-500`} />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zinc-500">dia</span>
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">dia</span>
                   </div>
                 </div>
               </div>
@@ -142,14 +142,14 @@ export default function StepNaoOperacional({ data, updateData, next, back, class
           </div>
 
           <button onClick={() => addSaid()}
-            className="w-full mt-2 py-2 border border-dashed border-zinc-700 rounded-xl text-zinc-500 hover:text-white hover:border-red-500 transition text-sm font-medium flex items-center justify-center gap-2">
+            className="w-full mt-2 py-2 border border-dashed border-slate-300 rounded-xl text-slate-400 hover:text-slate-900 hover:border-red-500 transition text-sm font-medium flex items-center justify-center gap-2">
             <span className="text-lg">+</span> Adicionar saída
           </button>
         </div>
 
         <div className="flex gap-3 mt-6">
-          <button onClick={back} className="flex-1 py-3 rounded-xl border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition font-medium">← Voltar</button>
-          <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20">
+          <button onClick={back} className="flex-1 py-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 transition font-medium">← Voltar</button>
+          <button onClick={next} className="flex-[2] bg-blue-500 hover:bg-blue-400 text-slate-900 font-bold py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20">
             Gerar Fluxo de Caixa 🚀
           </button>
         </div>
