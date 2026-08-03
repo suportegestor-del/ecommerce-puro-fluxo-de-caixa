@@ -94,8 +94,8 @@ export default function StepDre({ className, back }) {
       const rol = rob - impostos - desconto
       const cmv = -rob * (cpvPct / 100)
       const mb = rol + cmv
-      const comissaoFrete = rol * (comissaoFretePct / 100)
-      const add = rol * (addPct / 100)
+      const comissaoFrete = rob * (comissaoFretePct / 100)
+      const add = rob * (addPct / 100)
       const mc = mb - comissaoFrete - add
       const mcPct = rol > 0 ? (mc / rol) * 100 : 0
 
