@@ -152,7 +152,7 @@ export default function StepPmv({ className, back }) {
     }
   }, [skus])
 
-  const calculaLinhaSku = (sku, valores, percentuais) => {
+  const calculaLinhaSku = (sku, valores, percentuais, cmvFixo = null) => {
     const pct = percentuais || sku
     const qtde = parseNumber(valores?.qtde ?? 0)
     const unit = parseNumber(valores?.unit ?? 0)
@@ -165,7 +165,7 @@ export default function StepPmv({ className, back }) {
     const impostos = rob * (impostosPct / 100)
     const desconto = rob * (descontoPct / 100)
     const rol = rob - impostos - desconto
-    const cmv = -rob * (cpvPct / 100)
+    const cmv = cmvFixo !== null ? -Math.abs(cmvFixo) : -rob * (cpvPct / 100)
     const mb = rol + cmv
     const comissaoFrete = rol * (comissaoFretePct / 100)
     const add = rol * (addPct / 100)
@@ -175,7 +175,9 @@ export default function StepPmv({ className, back }) {
   }
 
   const resultadoPeriodos = useMemo(() => {
-    return periodos.map((p) => {
+    const r1 = (() => {
+      const p = periodos[0]
+      if (!p) return null
       const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id], p.percentuais?.[sku.id]))
       const total = skuLinhas.reduce(
         (acc, l) => ({
@@ -193,7 +195,33 @@ export default function StepPmv({ className, back }) {
       const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
       const mcPct = total.rol > 0 ? (total.mc / total.rol) * 100 : 0
       return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct } }
-    })
+    })()
+
+    const cmvFixoPorSku = r1 ? Object.fromEntries(r1.skuLinhas.map((l) => [l.sku.id, l.cmv])) : {}
+
+    const r2 = (() => {
+      const p = periodos[1] || r1?.periodo
+      if (!p) return null
+      const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id], p.percentuais?.[sku.id], cmvFixoPorSku[sku.id]))
+      const total = skuLinhas.reduce(
+        (acc, l) => ({
+          qtde: acc.qtde + l.qtde,
+          rob: acc.rob + l.rob,
+          rol: acc.rol + l.rol,
+          cmv: acc.cmv + l.cmv,
+          mb: acc.mb + l.mb,
+          comissaoFrete: acc.comissaoFrete + l.comissaoFrete,
+          add: acc.add + l.add,
+          mc: acc.mc + l.mc,
+        }),
+        { qtde: 0, rob: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
+      )
+      const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
+      const mcPct = total.rol > 0 ? (total.mc / total.rol) * 100 : 0
+      return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct } }
+    })()
+
+    return [r1, r2].filter(Boolean)
   }, [periodos, skus])
 
   const r1 = resultadoPeriodos[0]
