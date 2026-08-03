@@ -187,7 +187,7 @@ export default function App() {
         ) : mode === 'dre' ? (
           <StepDre key={animKey} className={stepClass} back={() => switchMode('fluxo')} onGoToPmv={() => switchMode('pmv')} />
         ) : mode === 'pmv' ? (
-          <StepPmv key={animKey} className={stepClass} back={() => switchMode('fluxo')} />
+          <StepPmv key={animKey} className={stepClass} back={() => switchMode('dre')} />
         ) : (
           <StepMargem key={animKey} className={stepClass} back={() => switchMode('fluxo')} />
         )}

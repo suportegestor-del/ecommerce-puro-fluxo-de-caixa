@@ -545,12 +545,6 @@ export default function StepPmv({ className, back }) {
           ← Voltar
         </button>
         <button
-          onClick={addSku}
-          className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-violet-500 to-purple-500 text-white font-semibold shadow-lg shadow-violet-500/20 hover:brightness-110 transition"
-        >
-          + Adicionar SKU
-        </button>
-        <button
           onClick={reset}
           className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold shadow-lg shadow-cyan-500/20 hover:brightness-110 transition"
         >
