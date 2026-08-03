@@ -115,6 +115,75 @@ function calcularTotais(linhas) {
   }
 }
 
+function variacao(p1, p2) {
+  const diff = p2 - p1
+  const pct = p1 !== 0 ? (diff / Math.abs(p1)) * 100 : 0
+  return { diff, pct }
+}
+
+function formatVar(value) {
+  const prefix = value > 0 ? '+' : ''
+  return `${prefix}${formatBRL(value)}`
+}
+
+function formatVarPct(value) {
+  const prefix = value > 0 ? '+' : ''
+  return `${prefix}${formatPercent(value)}`
+}
+
+function ResumoDre({ totais1, totais2 }) {
+  const rows = [
+    { label: 'ROB', key: 'rob', color: 'text-cyan-700', bold: false },
+    { label: '(-) Impostos', key: 'impostos', color: 'text-rose-600', bold: false },
+    { label: '(-) Descontos', key: 'desconto', color: 'text-rose-600', bold: false },
+    { label: '= ROL', key: 'rol', color: 'text-emerald-700', bold: true },
+    { label: '(-) CMV', key: 'cmv', color: 'text-orange-700', bold: false },
+    { label: '= Margem Bruta', key: 'mb', color: 'text-amber-700', bold: true },
+    { label: '(-) Comissão/Frete', key: 'comissaoFrete', color: 'text-rose-600', bold: false },
+    { label: '(-) ADD', key: 'add', color: 'text-rose-600', bold: false },
+    { label: '= Margem de Contribuição', key: 'mc', color: 'text-violet-700', bold: true },
+  ]
+
+  return (
+    <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-lg">
+      <h3 className="text-lg font-bold text-slate-800 mb-4">Resumo da DRE</h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[360px]">
+          <thead>
+            <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+              <th className="text-left py-2 px-2 font-medium">Item</th>
+              <th className="text-right py-2 px-2 font-medium">Período 1</th>
+              <th className="text-right py-2 px-2 font-medium">Período 2</th>
+              <th className="text-right py-2 px-2 font-medium">Variação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => {
+              const v1 = totais1[row.key] || 0
+              const v2 = totais2[row.key] || 0
+              const { diff, pct } = variacao(v1, v2)
+              const labelClass = row.bold ? 'font-bold text-slate-800' : 'text-slate-500'
+              const valueClass = row.bold ? `font-bold ${row.color}` : row.color
+              const varColor = diff > 0 ? 'text-emerald-600' : diff < 0 ? 'text-rose-600' : 'text-slate-400'
+              return (
+                <tr key={row.key} className="border-b border-slate-100 last:border-0">
+                  <td className={`py-2.5 px-2 ${labelClass}`}>{row.label}</td>
+                  <td className={`py-2.5 px-2 text-right ${valueClass}`}>{formatBRL(v1)}</td>
+                  <td className={`py-2.5 px-2 text-right ${valueClass}`}>{formatBRL(v2)}</td>
+                  <td className={`py-2.5 px-2 text-right ${varColor} font-medium`}>
+                    <span>{formatVar(diff)}</span>
+                    <span className="block text-[10px] opacity-80">{formatVarPct(pct)}</span>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
 function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
   const max = Math.max(...data.map((d) => Math.abs(d[valueKey]) || 0), 1)
   return (
@@ -415,59 +484,7 @@ export default function StepDre({ className, back }) {
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-lg">
-          <h3 className="text-lg font-bold text-slate-800 mb-4">Resumo da DRE</h3>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between border-b border-slate-100 pb-2">
-              <span className="text-slate-500">ROB</span>
-              <span className="text-cyan-700 font-semibold">{formatBRL(totais.rob)}</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-2">
-              <span className="text-slate-500">(-) Impostos</span>
-              <span className="text-rose-600">{formatBRL(totais.impostos)}</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-2">
-              <span className="text-slate-500">(-) Descontos</span>
-              <span className="text-rose-600">{formatBRL(totais.desconto)}</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-200 pb-2">
-              <span className="text-slate-800 font-semibold">= ROL</span>
-              <div className="text-right">
-                <span className="block text-emerald-700 font-semibold">{formatBRL(totais.rol)}</span>
-                <span className="text-xs text-emerald-600/80">{formatPercent(totais.rolPct)} do ROB</span>
-              </div>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-2">
-              <span className="text-slate-500">(-) CMV</span>
-              <div className="text-right">
-                <span className="block text-orange-700">{formatBRL(totais.cmv)}</span>
-                <span className="text-xs text-orange-600/80">{formatPercent(totais.cmvPct)} do ROB</span>
-              </div>
-            </div>
-            <div className="flex justify-between border-b border-slate-200 pb-2">
-              <span className="text-slate-800 font-semibold">= Margem Bruta</span>
-              <div className="text-right">
-                <span className="block text-amber-700 font-semibold">{formatBRL(totais.mb)}</span>
-                <span className="text-xs text-amber-600/80">{formatPercent(totais.mbPct)} do ROB</span>
-              </div>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-2">
-              <span className="text-slate-500">(-) Comissão/Frete</span>
-              <span className="text-rose-600">{formatBRL(totais.comissaoFrete)}</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-2">
-              <span className="text-slate-500">(-) ADD</span>
-              <span className="text-rose-600">{formatBRL(totais.add)}</span>
-            </div>
-            <div className="flex justify-between pt-1">
-              <span className="text-violet-800 font-bold">= Margem de Contribuição</span>
-              <div className="text-right">
-                <span className="block text-violet-700 font-bold">{formatBRL(totais.mc)}</span>
-                <span className="text-xs text-violet-600/80">{formatPercent(totais.mcPctRob)} do ROB · {formatPercent(totais.mcPct)} da ROL</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ResumoDre totais1={totais} totais2={totais2} />
       </div>
 
       <div className="flex flex-col gap-3 mt-6 sm:flex-row">
