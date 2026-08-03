@@ -136,12 +136,12 @@ function ResumoDre({ totais1, totais2 }) {
     { label: 'ROB', key: 'rob', color: 'text-cyan-700', bold: false },
     { label: '(-) Impostos', key: 'impostos', color: 'text-rose-600', bold: false },
     { label: '(-) Descontos', key: 'desconto', color: 'text-rose-600', bold: false },
-    { label: '= ROL', key: 'rol', color: 'text-emerald-700', bold: true },
+    { label: '= ROL', key: 'rol', color: 'text-emerald-700', bold: true, bg: 'bg-emerald-50' },
     { label: '(-) CMV', key: 'cmv', color: 'text-orange-700', bold: false },
-    { label: '= Margem Bruta', key: 'mb', color: 'text-amber-700', bold: true },
+    { label: '= Margem Bruta', key: 'mb', color: 'text-amber-700', bold: true, bg: 'bg-amber-50' },
     { label: '(-) Comissão/Frete', key: 'comissaoFrete', color: 'text-rose-600', bold: false },
     { label: '(-) ADD', key: 'add', color: 'text-rose-600', bold: false },
-    { label: '= Margem de Contribuição', key: 'mc', color: 'text-violet-700', bold: true },
+    { label: '= Margem de Contribuição', key: 'mc', color: 'text-violet-700', bold: true, bg: 'bg-violet-50' },
   ]
 
   return (
@@ -150,11 +150,11 @@ function ResumoDre({ totais1, totais2 }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[360px]">
           <thead>
-            <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
-              <th className="text-left py-2 px-2 font-medium">Item</th>
-              <th className="text-right py-2 px-2 font-medium">Período 1</th>
-              <th className="text-right py-2 px-2 font-medium">Período 2</th>
-              <th className="text-right py-2 px-2 font-medium">Variação</th>
+            <tr className="bg-blue-600 text-white text-xs uppercase tracking-wider">
+              <th className="text-left py-2.5 px-2 font-semibold rounded-tl-lg">Item</th>
+              <th className="text-right py-2.5 px-2 font-semibold">Período 1</th>
+              <th className="text-right py-2.5 px-2 font-semibold">Período 2</th>
+              <th className="text-right py-2.5 px-2 font-semibold rounded-tr-lg">Variação</th>
             </tr>
           </thead>
           <tbody>
@@ -166,7 +166,7 @@ function ResumoDre({ totais1, totais2 }) {
               const valueClass = row.bold ? `font-bold ${row.color}` : row.color
               const varColor = diff > 0 ? 'text-emerald-600' : diff < 0 ? 'text-rose-600' : 'text-slate-400'
               return (
-                <tr key={row.key} className="border-b border-slate-100 last:border-0">
+                <tr key={row.key} className={`border-b border-slate-100 last:border-0 ${row.bg || ''}`}>
                   <td className={`py-2.5 px-2 ${labelClass}`}>{row.label}</td>
                   <td className={`py-2.5 px-2 text-right ${valueClass}`}>{formatBRL(v1)}</td>
                   <td className={`py-2.5 px-2 text-right ${valueClass}`}>{formatBRL(v2)}</td>
