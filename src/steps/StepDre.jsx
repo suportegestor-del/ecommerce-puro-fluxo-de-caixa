@@ -33,6 +33,8 @@ function newId() {
 const emptySku = () => ({
   id: newId(),
   nome: 'SKU A',
+  qtde: '',
+  precoUnitario: '',
   impostosPct: 12,
   descontoPct: 0,
   cpvPct: 50,
@@ -40,11 +42,74 @@ const emptySku = () => ({
   addPct: 1,
 })
 
-const initialSkus = [
-  { id: 'sku-a', nome: 'SKU A', qtde: 1000, precoUnitario: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
-  { id: 'sku-b', nome: 'SKU B', qtde: 2200, precoUnitario: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
-  { id: 'sku-c', nome: 'SKU C', qtde: 3000, precoUnitario: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
+const initialSkusBase = [
+  { nome: 'SKU A', qtde: 1000, precoUnitario: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
+  { nome: 'SKU B', qtde: 2200, precoUnitario: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
+  { nome: 'SKU C', qtde: 3000, precoUnitario: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
 ]
+
+const initialSkus = initialSkusBase.map((s) => ({ ...s, id: newId() }))
+const initialSkus2 = initialSkusBase.map((s) => ({ ...s, id: newId() }))
+
+function calcularLinhas(skus) {
+  return skus.map((sku) => {
+    const qtde = parseNumber(sku.qtde)
+    const preco = parseNumber(sku.precoUnitario)
+    const impostosPct = parseNumber(sku.impostosPct)
+    const descontoPct = parseNumber(sku.descontoPct)
+    const cpvPct = parseNumber(sku.cpvPct)
+    const comissaoFretePct = parseNumber(sku.comissaoFretePct)
+    const addPct = parseNumber(sku.addPct)
+
+    const rob = qtde * preco
+    const impostos = rob * (impostosPct / 100)
+    const desconto = rob * (descontoPct / 100)
+    const rol = rob - impostos - desconto
+    const cmv = -rob * (cpvPct / 100)
+    const mb = rol + cmv
+    const comissaoFrete = rob * (comissaoFretePct / 100)
+    const add = rob * (addPct / 100)
+    const mc = mb - comissaoFrete - add
+    const mcPct = rol > 0 ? (mc / rol) * 100 : 0
+
+    return {
+      ...sku,
+      qtde,
+      preco,
+      rob,
+      impostos,
+      desconto,
+      rol,
+      cmv,
+      mb,
+      comissaoFrete,
+      add,
+      mc,
+      mcPct,
+    }
+  })
+}
+
+function calcularTotais(linhas) {
+  const acc = linhas.reduce(
+    (t, l) => ({
+      rob: t.rob + l.rob,
+      impostos: t.impostos + l.impostos,
+      desconto: t.desconto + l.desconto,
+      rol: t.rol + l.rol,
+      cmv: t.cmv + l.cmv,
+      mb: t.mb + l.mb,
+      comissaoFrete: t.comissaoFrete + l.comissaoFrete,
+      add: t.add + l.add,
+      mc: t.mc + l.mc,
+    }),
+    { rob: 0, impostos: 0, desconto: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
+  )
+  return {
+    ...acc,
+    mcPct: acc.rol > 0 ? (acc.mc / acc.rol) * 100 : 0,
+  }
+}
 
 function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
   const max = Math.max(...data.map((d) => Math.abs(d[valueKey]) || 0), 1)
@@ -71,81 +136,13 @@ function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
   )
 }
 
-export default function StepDre({ className, back }) {
-  const [skus, setSkus] = useState(() => loadStorage('epfc_dre_skus', initialSkus))
-
+function DreTable({ skus, setSkus, title, storageKey }) {
   useEffect(() => {
-    saveStorage('epfc_dre_skus', skus)
-  }, [skus])
+    saveStorage(storageKey, skus)
+  }, [skus, storageKey])
 
-  const linhas = useMemo(() => {
-    return skus.map((sku) => {
-      const qtde = parseNumber(sku.qtde)
-      const preco = parseNumber(sku.precoUnitario)
-      const impostosPct = parseNumber(sku.impostosPct)
-      const descontoPct = parseNumber(sku.descontoPct)
-      const cpvPct = parseNumber(sku.cpvPct)
-      const comissaoFretePct = parseNumber(sku.comissaoFretePct)
-      const addPct = parseNumber(sku.addPct)
-
-      const rob = qtde * preco
-      const impostos = rob * (impostosPct / 100)
-      const desconto = rob * (descontoPct / 100)
-      const rol = rob - impostos - desconto
-      const cmv = -rob * (cpvPct / 100)
-      const mb = rol + cmv
-      const comissaoFrete = rob * (comissaoFretePct / 100)
-      const add = rob * (addPct / 100)
-      const mc = mb - comissaoFrete - add
-      const mcPct = rol > 0 ? (mc / rol) * 100 : 0
-
-      return {
-        ...sku,
-        qtde,
-        preco,
-        rob,
-        impostos,
-        desconto,
-        rol,
-        cmv,
-        mb,
-        comissaoFrete,
-        add,
-        mc,
-        mcPct,
-      }
-    })
-  }, [skus])
-
-  const totais = useMemo(() => {
-    const acc = linhas.reduce(
-      (t, l) => ({
-        rob: t.rob + l.rob,
-        impostos: t.impostos + l.impostos,
-        desconto: t.desconto + l.desconto,
-        rol: t.rol + l.rol,
-        cmv: t.cmv + l.cmv,
-        mb: t.mb + l.mb,
-        comissaoFrete: t.comissaoFrete + l.comissaoFrete,
-        add: t.add + l.add,
-        mc: t.mc + l.mc,
-      }),
-      { rob: 0, impostos: 0, desconto: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
-    )
-    return {
-      ...acc,
-      mcPct: acc.rol > 0 ? (acc.mc / acc.rol) * 100 : 0,
-    }
-  }, [linhas])
-
-  const impactoData = useMemo(() => {
-    const totalMc = totais.mc || 1
-    return linhas.map((l) => ({
-      nome: l.nome,
-      mc: l.mc,
-      pct: (l.mc / totalMc) * 100,
-    }))
-  }, [linhas, totais.mc])
+  const linhas = useMemo(() => calcularLinhas(skus), [skus])
+  const totais = useMemo(() => calcularTotais(linhas), [linhas])
 
   const updateSku = (id, field, value) => {
     setSkus((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
@@ -159,12 +156,202 @@ export default function StepDre({ className, back }) {
     setSkus((prev) => prev.filter((s) => s.id !== id))
   }
 
-  const reset = () => setSkus(initialSkus)
+  const reset = () => {
+    const base = title === 'Período 2' ? initialSkus2 : initialSkus
+    setSkus(base.map((s) => ({ ...s, id: newId() })))
+  }
 
   const inputClass =
     'w-full bg-transparent border-b border-slate-300 text-center text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
   const inputPctClass =
     'w-full bg-transparent border-b border-slate-300 text-center text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
+
+  return (
+    <div className="mt-6 rounded-[28px] border border-slate-200 bg-white p-6 overflow-x-auto shadow-lg shadow-violet-500/5">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+        <div className="flex gap-2">
+          <button
+            onClick={addSku}
+            className="px-4 py-2 rounded-2xl bg-gradient-to-r from-violet-500 to-purple-500 text-white text-xs font-semibold shadow-lg shadow-violet-500/20 hover:brightness-110 transition"
+          >
+            + SKU
+          </button>
+          <button
+            onClick={reset}
+            className="px-4 py-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs font-semibold shadow-lg shadow-cyan-500/20 hover:brightness-110 transition"
+          >
+            Reiniciar
+          </button>
+        </div>
+      </div>
+      <table className="w-full text-sm min-w-[1200px]">
+        <thead>
+          <tr className="border-b border-blue-500 text-left bg-blue-600 text-white">
+            <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
+            <th className="py-3 px-2 font-semibold text-center">Qtde</th>
+            <th className="py-3 px-2 font-semibold text-center">Unit</th>
+            <th className="py-3 px-2 font-semibold text-center">ROB</th>
+            <th className="py-3 px-2 font-semibold text-center">Impostos %</th>
+            <th className="py-3 px-2 font-semibold text-center">Desc %</th>
+            <th className="py-3 px-2 font-semibold text-center">ROL</th>
+            <th className="py-3 px-2 font-semibold text-center">CPV %</th>
+            <th className="py-3 px-2 font-semibold text-center">CMV</th>
+            <th className="py-3 px-2 font-semibold text-center">MB</th>
+            <th className="py-3 px-2 font-semibold text-center">Comissão/Frete %</th>
+            <th className="py-3 px-2 font-semibold text-center">Comissão/Frete</th>
+            <th className="py-3 px-2 font-semibold text-center">ADD %</th>
+            <th className="py-3 px-2 font-semibold text-center">ADD</th>
+            <th className="py-3 px-2 font-semibold text-center">MC</th>
+            <th className="py-3 px-2 font-semibold text-center">MC %</th>
+            <th className="py-3 px-2 font-semibold text-center"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {linhas.map((l) => (
+            <tr key={l.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+              <td className="py-2 px-2 sticky left-0 bg-white z-10">
+                <input
+                  type="text"
+                  value={l.nome}
+                  onChange={(e) => updateSku(l.id, 'nome', e.target.value)}
+                  className={inputClass}
+                />
+              </td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={l.qtde}
+                  onChange={(e) => updateSku(l.id, 'qtde', e.target.value)}
+                  className={inputClass}
+                />
+              </td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={l.preco}
+                  onChange={(e) => updateSku(l.id, 'precoUnitario', e.target.value)}
+                  className={inputClass}
+                />
+              </td>
+              <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(l.rob)}</td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={l.impostosPct}
+                  onChange={(e) => updateSku(l.id, 'impostosPct', e.target.value)}
+                  className={inputPctClass}
+                />
+              </td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={l.descontoPct}
+                  onChange={(e) => updateSku(l.id, 'descontoPct', e.target.value)}
+                  className={inputPctClass}
+                />
+              </td>
+              <td className="py-2 px-2 text-center text-emerald-700 font-semibold">{formatBRL(l.rol)}</td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={l.cpvPct}
+                  onChange={(e) => updateSku(l.id, 'cpvPct', e.target.value)}
+                  className={inputPctClass}
+                />
+              </td>
+              <td className="py-2 px-2 text-center text-orange-700">{formatBRL(l.cmv)}</td>
+              <td className="py-2 px-2 text-center text-amber-700 font-semibold">{formatBRL(l.mb)}</td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={l.comissaoFretePct}
+                  onChange={(e) => updateSku(l.id, 'comissaoFretePct', e.target.value)}
+                  className={inputPctClass}
+                />
+              </td>
+              <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.comissaoFrete)}</td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={l.addPct}
+                  onChange={(e) => updateSku(l.id, 'addPct', e.target.value)}
+                  className={inputPctClass}
+                />
+              </td>
+              <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.add)}</td>
+              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(l.mc)}</td>
+              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatPercent(l.mcPct)}</td>
+              <td className="py-2 px-2 text-center">
+                <button
+                  onClick={() => removeSku(l.id)}
+                  className="text-rose-400 hover:text-rose-600 transition text-lg leading-none"
+                  title="Remover SKU"
+                >
+                  ×
+                </button>
+              </td>
+            </tr>
+          ))}
+          <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold">
+            <td className="py-3 px-2 sticky left-0 bg-slate-50 z-10 text-slate-800">TOTAL</td>
+            <td className="py-3 px-2 text-center text-slate-500">-</td>
+            <td className="py-3 px-2 text-center text-slate-500">-</td>
+            <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(totais.rob)}</td>
+            <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.impostos)}</td>
+            <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.desconto)}</td>
+            <td className="py-3 px-2 text-center text-emerald-700">{formatBRL(totais.rol)}</td>
+            <td className="py-3 px-2 text-center text-slate-500">-</td>
+            <td className="py-3 px-2 text-center text-orange-700">{formatBRL(totais.cmv)}</td>
+            <td className="py-3 px-2 text-center text-amber-700">{formatBRL(totais.mb)}</td>
+            <td className="py-3 px-2 text-center text-slate-500">-</td>
+            <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.comissaoFrete)}</td>
+            <td className="py-3 px-2 text-center text-slate-500">-</td>
+            <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.add)}</td>
+            <td className="py-3 px-2 text-center text-violet-700">{formatBRL(totais.mc)}</td>
+            <td className="py-3 px-2 text-center text-violet-700">{formatPercent(totais.mcPct)}</td>
+            <td className="py-3 px-2"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+export default function StepDre({ className, back }) {
+  const [skus, setSkus] = useState(() => loadStorage('epfc_dre_skus', initialSkus))
+  const [skus2, setSkus2] = useState(() => loadStorage('epfc_dre_skus_2', initialSkus2))
+
+  const linhas = useMemo(() => calcularLinhas(skus), [skus])
+  const totais = useMemo(() => calcularTotais(linhas), [linhas])
+
+  const impactoData = useMemo(() => {
+    const totalMc = totais.mc || 1
+    return linhas.map((l) => ({
+      nome: l.nome,
+      mc: l.mc,
+      pct: (l.mc / totalMc) * 100,
+    }))
+  }, [linhas, totais.mc])
 
   return (
     <div className={`w-full max-w-[99vw] px-2 ${className}`}>
@@ -210,157 +397,8 @@ export default function StepDre({ className, back }) {
         </div>
       </div>
 
-      <div className="mt-6 rounded-[28px] border border-slate-200 bg-white p-6 overflow-x-auto shadow-lg shadow-violet-500/5">
-        <h3 className="text-lg font-bold text-slate-800 mb-4">DRE por SKU até a Margem de Contribuição</h3>
-        <table className="w-full text-sm min-w-[1200px]">
-          <thead>
-            <tr className="border-b border-blue-500 text-left bg-blue-600 text-white">
-              <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
-              <th className="py-3 px-2 font-semibold text-center">Qtde</th>
-              <th className="py-3 px-2 font-semibold text-center">Unit</th>
-              <th className="py-3 px-2 font-semibold text-center">ROB</th>
-              <th className="py-3 px-2 font-semibold text-center">Impostos %</th>
-              <th className="py-3 px-2 font-semibold text-center">Desc %</th>
-              <th className="py-3 px-2 font-semibold text-center">ROL</th>
-              <th className="py-3 px-2 font-semibold text-center">CPV %</th>
-              <th className="py-3 px-2 font-semibold text-center">CMV</th>
-              <th className="py-3 px-2 font-semibold text-center">MB</th>
-              <th className="py-3 px-2 font-semibold text-center">Comissão/Frete %</th>
-              <th className="py-3 px-2 font-semibold text-center">Comissão/Frete</th>
-              <th className="py-3 px-2 font-semibold text-center">ADD %</th>
-              <th className="py-3 px-2 font-semibold text-center">ADD</th>
-              <th className="py-3 px-2 font-semibold text-center">MC</th>
-              <th className="py-3 px-2 font-semibold text-center">MC %</th>
-              <th className="py-3 px-2 font-semibold text-center"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {linhas.map((l) => (
-              <tr key={l.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                <td className="py-2 px-2 sticky left-0 bg-white z-10">
-                  <input
-                    type="text"
-                    value={l.nome}
-                    onChange={(e) => updateSku(l.id, 'nome', e.target.value)}
-                    className={inputClass}
-                  />
-                </td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={l.qtde}
-                    onChange={(e) => updateSku(l.id, 'qtde', e.target.value)}
-                    className={inputClass}
-                  />
-                </td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={l.precoUnitario}
-                    onChange={(e) => updateSku(l.id, 'precoUnitario', e.target.value)}
-                    className={inputClass}
-                  />
-                </td>
-                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(l.rob)}</td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.impostosPct}
-                    onChange={(e) => updateSku(l.id, 'impostosPct', e.target.value)}
-                    className={inputPctClass}
-                  />
-                </td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.descontoPct}
-                    onChange={(e) => updateSku(l.id, 'descontoPct', e.target.value)}
-                    className={inputPctClass}
-                  />
-                </td>
-                <td className="py-2 px-2 text-center text-emerald-700 font-semibold">{formatBRL(l.rol)}</td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.cpvPct}
-                    onChange={(e) => updateSku(l.id, 'cpvPct', e.target.value)}
-                    className={inputPctClass}
-                  />
-                </td>
-                <td className="py-2 px-2 text-center text-orange-700">{formatBRL(l.cmv)}</td>
-                <td className="py-2 px-2 text-center text-amber-700 font-semibold">{formatBRL(l.mb)}</td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.comissaoFretePct}
-                    onChange={(e) => updateSku(l.id, 'comissaoFretePct', e.target.value)}
-                    className={inputPctClass}
-                  />
-                </td>
-                <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.comissaoFrete)}</td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.addPct}
-                    onChange={(e) => updateSku(l.id, 'addPct', e.target.value)}
-                    className={inputPctClass}
-                  />
-                </td>
-                <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.add)}</td>
-                <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(l.mc)}</td>
-                <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatPercent(l.mcPct)}</td>
-                <td className="py-2 px-2 text-center">
-                  <button
-                    onClick={() => removeSku(l.id)}
-                    className="text-rose-400 hover:text-rose-600 transition text-lg leading-none"
-                    title="Remover SKU"
-                  >
-                    ×
-                  </button>
-                </td>
-              </tr>
-            ))}
-            <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold">
-              <td className="py-3 px-2 sticky left-0 bg-slate-50 z-10 text-slate-800">TOTAL</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(totais.rob)}</td>
-              <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.impostos)}</td>
-              <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.desconto)}</td>
-              <td className="py-3 px-2 text-center text-emerald-700">{formatBRL(totais.rol)}</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-orange-700">{formatBRL(totais.cmv)}</td>
-              <td className="py-3 px-2 text-center text-amber-700">{formatBRL(totais.mb)}</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.comissaoFrete)}</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.add)}</td>
-              <td className="py-3 px-2 text-center text-violet-700">{formatBRL(totais.mc)}</td>
-              <td className="py-3 px-2 text-center text-violet-700">{formatPercent(totais.mcPct)}</td>
-              <td className="py-3 px-2"></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <DreTable skus={skus} setSkus={setSkus} title="Período 1" storageKey="epfc_dre_skus" />
+      <DreTable skus={skus2} setSkus={setSkus2} title="Período 2" storageKey="epfc_dre_skus_2" />
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
@@ -408,7 +446,7 @@ export default function StepDre({ className, back }) {
             </div>
             <div className="flex justify-between pt-1">
               <span className="text-violet-800 font-bold">= Margem de Contribuição</span>
-              <span className="text-violet-700 font-bold text-lg">{formatBRL(totais.mc)}</span>
+              <span className="text-violet-700 font-bold">{formatBRL(totais.mc)}</span>
             </div>
           </div>
         </div>
@@ -420,18 +458,6 @@ export default function StepDre({ className, back }) {
           className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-200 text-slate-700 hover:bg-slate-100 transition"
         >
           ← Voltar
-        </button>
-        <button
-          onClick={addSku}
-          className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-violet-500 to-purple-500 text-white font-semibold shadow-lg shadow-violet-500/20 hover:brightness-110 transition"
-        >
-          + Adicionar SKU
-        </button>
-        <button
-          onClick={reset}
-          className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold shadow-lg shadow-cyan-500/20 hover:brightness-110 transition"
-        >
-          Reiniciar dados
         </button>
       </div>
     </div>
