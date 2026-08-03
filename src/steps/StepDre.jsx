@@ -257,12 +257,12 @@ function Legend({ data }) {
   )
 }
 
-function DreTable({ skus, setSkus, title, storageKey }) {
+function DreTable({ skus, setSkus, title, storageKey, baseCustoUnit = {} }) {
   useEffect(() => {
     saveStorage(storageKey, skus)
   }, [skus, storageKey])
 
-  const linhas = useMemo(() => calcularLinhas(skus), [skus])
+  const linhas = useMemo(() => calcularLinhas(skus, baseCustoUnit), [skus, baseCustoUnit])
   const totais = useMemo(() => calcularTotais(linhas), [linhas])
 
   const updateSku = (id, field, value) => {
@@ -592,7 +592,7 @@ export default function StepDre({ className, back, onGoToPmv }) {
       </div>
 
       <DreTable skus={skus} setSkus={setSkus} title="Período 1" storageKey="epfc_dre_skus" />
-      <DreTable skus={skus2} setSkus={setSkus2} title="Período 2" storageKey="epfc_dre_skus_2" />
+      <DreTable skus={skus2} setSkus={setSkus2} title="Período 2" storageKey="epfc_dre_skus_2" baseCustoUnit={baseCustoUnit} />
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <ResumoDre totais1={totais} totais2={totais2} />
