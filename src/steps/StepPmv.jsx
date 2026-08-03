@@ -582,14 +582,14 @@ export default function StepPmv({ className, back }) {
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
           <h3 className="text-lg font-bold text-violet-700 mb-4">Evolução da Margem de Contribuição</h3>
-          <div className="h-80">
+          <div className="h-96">
             <SimpleBarChart data={chartData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
         <div className="rounded-[28px] border border-rose-200 bg-white p-6 shadow-lg shadow-rose-500/5">
           <h3 className="text-lg font-bold text-rose-700 mb-4">Evolução do Capital de Giro Travado</h3>
-          <div className="h-80">
+          <div className="h-96">
             <SimpleBarChart data={chartData} valueKey="capitalGiro" labelKey="nome" color="#fb7185" />
           </div>
         </div>
