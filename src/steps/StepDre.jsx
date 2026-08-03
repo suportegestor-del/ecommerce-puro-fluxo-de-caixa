@@ -354,7 +354,7 @@ export default function StepDre({ className, back }) {
               <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.comissaoFrete)}</td>
               <td className="py-3 px-2 text-center text-slate-500">-</td>
               <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.add)}</td>
-              <td className="py-3 px-2 text-center text-violet-700 text-lg">{formatBRL(totais.mc)}</td>
+              <td className="py-3 px-2 text-center text-violet-700">{formatBRL(totais.mc)}</td>
               <td className="py-3 px-2 text-center text-violet-700">{formatPercent(totais.mcPct)}</td>
               <td className="py-3 px-2"></td>
             </tr>
