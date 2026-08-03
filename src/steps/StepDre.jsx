@@ -309,10 +309,10 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
             <th className="py-3 px-2 font-semibold text-center">Qtde</th>
             <th className="py-3 px-2 font-semibold text-center">Unit</th>
+            <th className="py-3 px-2 font-semibold text-center">Desc %</th>
             <th className="py-3 px-2 font-semibold text-center w-20">Novo Unit</th>
             <th className="py-3 px-2 font-semibold text-center">ROB</th>
             <th className="py-3 px-2 font-semibold text-center">Impostos %</th>
-            <th className="py-3 px-2 font-semibold text-center">Desc %</th>
             <th className="py-3 px-2 font-semibold text-center">ROL</th>
             <th className="py-3 px-2 font-semibold text-center">CPV %</th>
             <th className="py-3 px-2 font-semibold text-center">CMV</th>
@@ -357,6 +357,17 @@ function DreTable({ skus, setSkus, title, storageKey }) {
                   className={inputClass}
                 />
               </td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={l.descontoPct}
+                  onChange={(e) => updateSku(l.id, 'descontoPct', e.target.value)}
+                  className={inputPctClass}
+                />
+              </td>
               <td className="py-2 px-2 text-center text-emerald-600 font-medium text-xs">
                 {formatBRL(l.novoUnit)}
               </td>
@@ -369,17 +380,6 @@ function DreTable({ skus, setSkus, title, storageKey }) {
                   step="0.1"
                   value={l.impostosPct}
                   onChange={(e) => updateSku(l.id, 'impostosPct', e.target.value)}
-                  className={inputPctClass}
-                />
-              </td>
-              <td className="py-2 px-2">
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value={l.descontoPct}
-                  onChange={(e) => updateSku(l.id, 'descontoPct', e.target.value)}
                   className={inputPctClass}
                 />
               </td>
