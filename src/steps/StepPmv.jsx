@@ -517,6 +517,28 @@ export default function StepPmv({ className, back }) {
                 </td>
               </tr>
             ))}
+            <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold">
+              <td className="py-3 px-2 sticky left-0 bg-slate-50 z-10 text-slate-800">TOTAL</td>
+              <td className="py-3 px-2 text-xs text-slate-500 truncate max-w-[160px]"></td>
+              <td className="py-3 px-2 text-center text-slate-600">{formatNumber(r1.total.qtde)}</td>
+              <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(r1.total.rob)}</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
+              <td className="py-3 px-2 text-center text-violet-700">{formatPercent(r1.total.mcPct)}</td>
+              <td className="py-3 px-2 text-center text-violet-700">{formatBRL(r1.total.mc)}</td>
+              <td className="py-3 px-2 text-center text-slate-600 border-l border-slate-200">{formatNumber(r2.total.qtde)}</td>
+              <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(r2.total.rob)}</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
+              <td className="py-3 px-2 text-center text-violet-700">{formatPercent(r2.total.mcPct)}</td>
+              <td className="py-3 px-2 text-center text-violet-700">{formatBRL(r2.total.mc)}</td>
+              <td className={`py-3 px-2 text-center border-l border-slate-200 ${deltaClass(r2.total.qtde - r1.total.qtde)}`}>{deltaSignal(r2.total.qtde - r1.total.qtde)}{formatNumber(r2.total.qtde - r1.total.qtde)}</td>
+              <td className={`py-3 px-2 text-center ${deltaClass(r2.total.rob - r1.total.rob)}`}>{deltaSignal(r2.total.rob - r1.total.rob)}{formatBRL(r2.total.rob - r1.total.rob)}</td>
+              <td className={`py-3 px-2 text-center border-l border-slate-200 ${deltaClass(analise.reduce((s, a) => s + a.impactoVolume, 0))}`}>{deltaSignal(analise.reduce((s, a) => s + a.impactoVolume, 0))}{formatBRL(analise.reduce((s, a) => s + a.impactoVolume, 0))}</td>
+              <td className={`py-3 px-2 text-center ${deltaClass(analise.reduce((s, a) => s + a.impactoPreco, 0))}`}>{deltaSignal(analise.reduce((s, a) => s + a.impactoPreco, 0))}{formatBRL(analise.reduce((s, a) => s + a.impactoPreco, 0))}</td>
+              <td className={`py-3 px-2 text-center ${deltaClass(analise.reduce((s, a) => s + a.impactoMix, 0))}`}>{deltaSignal(analise.reduce((s, a) => s + a.impactoMix, 0))}{formatBRL(analise.reduce((s, a) => s + a.impactoMix, 0))}</td>
+              <td className="py-3 px-2"></td>
+            </tr>
           </tbody>
         </table>
       </div>
