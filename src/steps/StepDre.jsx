@@ -271,12 +271,12 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <th className="py-3 px-2 font-semibold text-center">CPV %</th>
             <th className="py-3 px-2 font-semibold text-center">CMV</th>
             <th className="py-3 px-2 font-semibold text-center">MB</th>
+            <th className="py-3 px-2 font-semibold text-center">MC</th>
+            <th className="py-3 px-2 font-semibold text-center">MC %</th>
             <th className="py-3 px-2 font-semibold text-center">Comissão/Frete %</th>
             <th className="py-3 px-2 font-semibold text-center">Comissão/Frete</th>
             <th className="py-3 px-2 font-semibold text-center">ADD %</th>
             <th className="py-3 px-2 font-semibold text-center">ADD</th>
-            <th className="py-3 px-2 font-semibold text-center">MC</th>
-            <th className="py-3 px-2 font-semibold text-center">MC %</th>
             <th className="py-3 px-2 font-semibold text-center"></th>
           </tr>
         </thead>
@@ -348,6 +348,8 @@ function DreTable({ skus, setSkus, title, storageKey }) {
               </td>
               <td className="py-2 px-2 text-center text-orange-700">{formatBRL(l.cmv)}</td>
               <td className="py-2 px-2 text-center text-amber-700 font-semibold">{formatBRL(l.mb)}</td>
+              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(l.mc)}</td>
+              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatPercent(l.mcPct)}</td>
               <td className="py-2 px-2">
                 <input
                   type="number"
@@ -372,8 +374,6 @@ function DreTable({ skus, setSkus, title, storageKey }) {
                 />
               </td>
               <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.add)}</td>
-              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(l.mc)}</td>
-              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatPercent(l.mcPct)}</td>
               <td className="py-2 px-2 text-center">
                 <button
                   onClick={() => removeSku(l.id)}
@@ -396,12 +396,12 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-orange-700">{formatBRL(totais.cmv)}</td>
             <td className="py-3 px-2 text-center text-amber-700">{formatBRL(totais.mb)}</td>
+            <td className="py-3 px-2 text-center text-violet-700">{formatBRL(totais.mc)}</td>
+            <td className="py-3 px-2 text-center text-violet-700">{formatPercent(totais.mcPct)}</td>
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.comissaoFrete)}</td>
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.add)}</td>
-            <td className="py-3 px-2 text-center text-violet-700">{formatBRL(totais.mc)}</td>
-            <td className="py-3 px-2 text-center text-violet-700">{formatPercent(totais.mcPct)}</td>
             <td className="py-3 px-2"></td>
           </tr>
         </tbody>
@@ -476,6 +476,8 @@ export default function StepDre({ className, back }) {
       <DreTable skus={skus2} setSkus={setSkus2} title="Período 2" storageKey="epfc_dre_skus_2" />
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
+        <ResumoDre totais1={totais} totais2={totais2} />
+
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
           <h3 className="text-lg font-bold text-violet-700 mb-4">Participação na MC</h3>
           <p className="text-sm text-slate-500 mb-4">Quanto cada SKU contribui para a margem total.</p>
@@ -483,8 +485,6 @@ export default function StepDre({ className, back }) {
             <SimpleBarChart data={impactoData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
-
-        <ResumoDre totais1={totais} totais2={totais2} />
       </div>
 
       <div className="flex flex-col gap-3 mt-6 sm:flex-row">
