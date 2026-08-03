@@ -94,22 +94,25 @@ const colors = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c'
 function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
   const numericValues = data.map((d) => Number(d?.[valueKey]) || 0)
   const max = Math.max(...numericValues.map(Math.abs), 1)
+  const min = Math.min(...numericValues.map(Math.abs))
+  const base = min >= 0 ? min * 0.85 : 0
+  const range = max - base
   return (
     <div className="flex items-end gap-4 h-full px-4 pb-2">
       {data.map((d, idx) => {
         const val = Number(d?.[valueKey]) || 0
-        const pct = max > 0 ? (Math.abs(val) / max) * 100 : 0
-        const height = `${Math.max(pct, 5)}%`
+        const pct = range > 0 ? ((Math.abs(val) - base) / range) * 100 : 100
+        const height = `${Math.max(Math.min(pct, 100), 8)}%`
         return (
           <div key={idx} className="flex-1 flex flex-col items-center justify-end group relative">
-            <div className="mb-2 text-[10px] font-semibold text-slate-600 text-center whitespace-nowrap">
+            <div className="mb-2 text-xs font-bold text-slate-700 text-center whitespace-nowrap">
               {formatBRL(val)}
             </div>
             <div
               style={{ height, backgroundColor: colors[idx % colors.length] || color }}
-              className="w-full rounded-t-xl min-h-[16px] transition-all"
+              className="w-full rounded-t-xl min-h-[24px] transition-all"
             />
-            <div className="text-[10px] text-slate-500 mt-2 truncate max-w-full">{d[labelKey]}</div>
+            <div className="text-xs text-slate-600 mt-2 truncate max-w-full font-medium">{d[labelKey]}</div>
           </div>
         )
       })}
@@ -186,35 +189,39 @@ export default function StepPmv({ className, back }) {
     return { sku, qtde, unit, novoUnit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc, mcPct }
   }
 
+  const calcularTotais = (skuLinhas) => {
+    const total = skuLinhas.reduce(
+      (acc, l) => ({
+        qtde: acc.qtde + l.qtde,
+        rob: acc.rob + l.rob,
+        rol: acc.rol + l.rol,
+        cmv: acc.cmv + l.cmv,
+        mb: acc.mb + l.mb,
+        comissaoFrete: acc.comissaoFrete + l.comissaoFrete,
+        add: acc.add + l.add,
+        mc: acc.mc + l.mc,
+      }),
+      { qtde: 0, rob: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
+    )
+    const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
+    const mcPct = total.rob > 0 ? (total.mc / total.rob) * 100 : 0
+    const cmvAbs = Math.abs(total.cmv)
+    const diasPmr = parseNumber(prazos.pmr) || 0
+    const diasPmp = parseNumber(prazos.pmp) || 0
+    const diasCobertura = parseNumber(prazos.coberturaEstoque) || 0
+    const estoque = cmvAbs * (diasCobertura / 30)
+    const contasReceber = total.rob * (diasPmr / 30)
+    const contasPagar = cmvAbs * (diasPmp / 30)
+    const capitalGiro = estoque + contasReceber - contasPagar
+    return { ...total, pmv, mcPct, capitalGiro, estoque, contasReceber, contasPagar }
+  }
+
   const resultadoPeriodos = useMemo(() => {
     const r1 = (() => {
       const p = periodos[0]
       if (!p) return null
       const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id], p.percentuais?.[sku.id]))
-      const total = skuLinhas.reduce(
-        (acc, l) => ({
-          qtde: acc.qtde + l.qtde,
-          rob: acc.rob + l.rob,
-          rol: acc.rol + l.rol,
-          cmv: acc.cmv + l.cmv,
-          mb: acc.mb + l.mb,
-          comissaoFrete: acc.comissaoFrete + l.comissaoFrete,
-          add: acc.add + l.add,
-          mc: acc.mc + l.mc,
-        }),
-        { qtde: 0, rob: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
-      )
-      const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
-      const mcPct = total.rob > 0 ? (total.mc / total.rob) * 100 : 0
-      const cmvAbs = Math.abs(total.cmv)
-      const diasPmr = parseNumber(prazos.pmr) || 0
-      const diasPmp = parseNumber(prazos.pmp) || 0
-      const diasCobertura = parseNumber(prazos.coberturaEstoque) || 0
-      const estoque = cmvAbs * (diasCobertura / 30)
-      const contasReceber = total.rob * (diasPmr / 30)
-      const contasPagar = cmvAbs * (diasPmp / 30)
-      const capitalGiro = estoque + contasReceber - contasPagar
-      return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct, capitalGiro, estoque, contasReceber, contasPagar } }
+      return { periodo: p, skuLinhas, total: calcularTotais(skuLinhas) }
     })()
 
     const custoUnitBasePorSku = r1 ? Object.fromEntries(r1.skuLinhas.map((l) => [l.sku.id, l.qtde > 0 ? Math.abs(l.cmv) / l.qtde : 0])) : {}
@@ -223,37 +230,26 @@ export default function StepPmv({ className, back }) {
       const p = periodos[1] || r1?.periodo
       if (!p) return null
       const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id], p.percentuais?.[sku.id], custoUnitBasePorSku[sku.id]))
-      const total = skuLinhas.reduce(
-        (acc, l) => ({
-          qtde: acc.qtde + l.qtde,
-          rob: acc.rob + l.rob,
-          rol: acc.rol + l.rol,
-          cmv: acc.cmv + l.cmv,
-          mb: acc.mb + l.mb,
-          comissaoFrete: acc.comissaoFrete + l.comissaoFrete,
-          add: acc.add + l.add,
-          mc: acc.mc + l.mc,
-        }),
-        { qtde: 0, rob: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
-      )
-      const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
-      const mcPct = total.rob > 0 ? (total.mc / total.rob) * 100 : 0
-      const cmvAbs = Math.abs(total.cmv)
-      const diasPmr = parseNumber(prazos.pmr) || 0
-      const diasPmp = parseNumber(prazos.pmp) || 0
-      const diasCobertura = parseNumber(prazos.coberturaEstoque) || 0
-      const estoque = cmvAbs * (diasCobertura / 30)
-      const contasReceber = total.rob * (diasPmr / 30)
-      const contasPagar = cmvAbs * (diasPmp / 30)
-      const capitalGiro = estoque + contasReceber - contasPagar
-      return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct, capitalGiro, estoque, contasReceber, contasPagar } }
+      return { periodo: p, skuLinhas, total: calcularTotais(skuLinhas) }
     })()
 
     return [r1, r2].filter(Boolean)
   }, [periodos, skus, prazos])
 
-  const r1 = resultadoPeriodos[0]
-  const r2 = resultadoPeriodos[1] || r1
+  const [skuSelecionado, setSkuSelecionado] = useState('todos')
+
+  const resultadoFiltrado = useMemo(() => {
+    if (skuSelecionado === 'todos') return resultadoPeriodos
+    return resultadoPeriodos.map((r) => {
+      const linha = r.skuLinhas.find((l) => l.sku.id === skuSelecionado)
+      if (!linha) return null
+      const skuLinhas = [linha]
+      return { ...r, skuLinhas, total: calcularTotais(skuLinhas) }
+    }).filter(Boolean)
+  }, [resultadoPeriodos, skuSelecionado])
+
+  const r1 = resultadoFiltrado[0]
+  const r2 = resultadoFiltrado[1] || r1
 
   const analise = useMemo(() => {
     if (!r1 || !r2) return []
@@ -317,6 +313,7 @@ export default function StepPmv({ className, back }) {
         return { ...p, valores, percentuais }
       })
     )
+    if (skuSelecionado === id) setSkuSelecionado('todos')
   }
 
   const updateSku = (id, field, value) => {
@@ -353,7 +350,7 @@ export default function StepPmv({ className, back }) {
   const inputNomeClass =
     'w-full bg-transparent border-b border-slate-300 text-left text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
 
-  const chartData = resultadoPeriodos.map((r) => ({
+  const chartData = resultadoFiltrado.map((r) => ({
     nome: r.periodo.nome,
     mc: r.total.mc,
     capitalGiro: r.total.capitalGiro,
@@ -365,7 +362,7 @@ export default function StepPmv({ className, back }) {
   return (
     <div className={`w-full max-w-[99vw] px-2 ${className}`}>
       <div className="rounded-[28px] border-2 border-amber-300 bg-white p-6 shadow-xl shadow-amber-900/5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.32em] text-amber-700 font-semibold">Simulador PMV</p>
             <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-amber-700 tracking-tight">
@@ -374,6 +371,19 @@ export default function StepPmv({ className, back }) {
             <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-700">
               Compare dois períodos com os mesmos SKUs, ajuste quantidade e preço unitário, e veja a decomposição da variação de receita.
             </p>
+          </div>
+          <div className="flex flex-col items-stretch lg:items-end gap-3">
+            <label className="text-xs text-slate-500 font-medium">Analisar SKU</label>
+            <select
+              value={skuSelecionado}
+              onChange={(e) => setSkuSelecionado(e.target.value)}
+              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition"
+            >
+              <option value="todos">Todos os SKUs</option>
+              {skus.map((sku) => (
+                <option key={sku.id} value={sku.id}>{sku.nome}</option>
+              ))}
+            </select>
           </div>
           <div className="rounded-3xl bg-amber-600 p-5 text-center shadow-lg shadow-amber-900/10 text-white">
             <p className="text-xs uppercase tracking-[0.28em] text-amber-100 font-semibold">PMV {r2.periodo.nome}</p>
