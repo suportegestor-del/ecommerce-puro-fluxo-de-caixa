@@ -407,7 +407,7 @@ export default function StepPmv({ className, back }) {
       </div>
 
       <div className="mt-6 rounded-[28px] border-2 border-rose-300 bg-white p-5 shadow-md shadow-rose-900/5 hover:shadow-lg hover:shadow-rose-900/10 transition">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Capital de Giro Travado</p>
             <p className="text-3xl font-bold text-rose-700">{formatBRL(r2.total.capitalGiro)}</p>
@@ -451,6 +451,40 @@ export default function StepPmv({ className, back }) {
               </div>
             </div>
           </div>
+        </div>
+        <div className="mt-6 rounded-2xl border border-rose-100 bg-rose-50/40 p-4 overflow-x-auto">
+          <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Memória de cálculo — {r2.periodo.nome}</p>
+          <table className="w-full text-sm min-w-[420px]">
+            <thead>
+              <tr className="border-b border-rose-200 text-left text-rose-800 text-xs">
+                <th className="py-2 px-2 font-semibold">Item</th>
+                <th className="py-2 px-2 font-semibold">Cálculo</th>
+                <th className="py-2 px-2 font-semibold text-right">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-rose-100">
+                <td className="py-2 px-2 text-slate-700">Estoque</td>
+                <td className="py-2 px-2 text-slate-500">{formatBRL(Math.abs(r2.total.cmv))} × {prazos.coberturaEstoque}/30</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.estoque)}</td>
+              </tr>
+              <tr className="border-b border-rose-100">
+                <td className="py-2 px-2 text-slate-700">Contas a receber</td>
+                <td className="py-2 px-2 text-slate-500">{formatBRL(r2.total.rob)} × {prazos.pmr}/30</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.contasReceber)}</td>
+              </tr>
+              <tr className="border-b border-rose-100">
+                <td className="py-2 px-2 text-slate-700">Contas a pagar</td>
+                <td className="py-2 px-2 text-slate-500">{formatBRL(Math.abs(r2.total.cmv))} × {prazos.pmp}/30</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.contasPagar)}</td>
+              </tr>
+              <tr className="bg-rose-100/50 font-semibold">
+                <td className="py-2 px-2 text-rose-800">NCG</td>
+                <td className="py-2 px-2 text-rose-700">Estoque + Contas a receber - Contas a pagar</td>
+                <td className={`py-2 px-2 text-right ${r2.total.capitalGiro >= 0 ? 'text-rose-700' : 'text-emerald-600'}`}>{formatBRL(r2.total.capitalGiro)}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
