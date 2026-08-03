@@ -52,7 +52,7 @@ const initialSkusBase = [
 const initialSkus = initialSkusBase.map((s) => ({ ...s, id: newId() }))
 const initialSkus2 = initialSkusBase.map((s) => ({ ...s, id: newId() }))
 
-function calcularLinhas(skus) {
+function calcularLinhas(skus, baseCustoUnit = {}) {
   return skus.map((sku) => {
     const qtde = parseNumber(sku.qtde)
     const preco = parseNumber(sku.precoUnitario)
@@ -67,8 +67,9 @@ function calcularLinhas(skus) {
     const impostos = rob * (impostosPct / 100)
     const desconto = qtde * (preco - novoUnit)
     const rol = rob - impostos
-    const cmv = -rob * (cpvPct / 100)
-    const custoUnit = qtde > 0 ? (rob * (cpvPct / 100)) / qtde : 0
+    const custoUnitCalculado = qtde > 0 ? (rob * (cpvPct / 100)) / qtde : 0
+    const custoUnit = baseCustoUnit[sku.nome] !== undefined ? baseCustoUnit[sku.nome] : custoUnitCalculado
+    const cmv = -(custoUnit * qtde)
     const mb = rol + cmv
     const comissaoFrete = rob * (comissaoFretePct / 100)
     const add = rob * (addPct / 100)
@@ -471,7 +472,15 @@ export default function StepDre({ className, back, onGoToPmv }) {
 
   const linhas = useMemo(() => calcularLinhas(skus), [skus])
   const totais = useMemo(() => calcularTotais(linhas), [linhas])
-  const linhas2 = useMemo(() => calcularLinhas(skus2), [skus2])
+
+  const baseCustoUnit = useMemo(() => {
+    return linhas.reduce((acc, l) => {
+      acc[l.nome] = l.custoUnit
+      return acc
+    }, {})
+  }, [linhas])
+
+  const linhas2 = useMemo(() => calcularLinhas(skus2, baseCustoUnit), [skus2, baseCustoUnit])
   const totais2 = useMemo(() => calcularTotais(linhas2), [linhas2])
 
   const impactoData = useMemo(() => {
