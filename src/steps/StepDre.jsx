@@ -108,6 +108,10 @@ function calcularTotais(linhas) {
   return {
     ...acc,
     mcPct: acc.rol > 0 ? (acc.mc / acc.rol) * 100 : 0,
+    rolPct: acc.rob > 0 ? (acc.rol / acc.rob) * 100 : 0,
+    cmvPct: acc.rob > 0 ? (Math.abs(acc.cmv) / acc.rob) * 100 : 0,
+    mbPct: acc.rob > 0 ? (acc.mb / acc.rob) * 100 : 0,
+    mcPctRob: acc.rob > 0 ? (acc.mc / acc.rob) * 100 : 0,
   }
 }
 
@@ -343,6 +347,8 @@ export default function StepDre({ className, back }) {
 
   const linhas = useMemo(() => calcularLinhas(skus), [skus])
   const totais = useMemo(() => calcularTotais(linhas), [linhas])
+  const linhas2 = useMemo(() => calcularLinhas(skus2), [skus2])
+  const totais2 = useMemo(() => calcularTotais(linhas2), [linhas2])
 
   const impactoData = useMemo(() => {
     const totalMc = totais.mc || 1
@@ -426,15 +432,24 @@ export default function StepDre({ className, back }) {
             </div>
             <div className="flex justify-between border-b border-slate-200 pb-2">
               <span className="text-slate-800 font-semibold">= ROL</span>
-              <span className="text-emerald-700 font-semibold">{formatBRL(totais.rol)}</span>
+              <div className="text-right">
+                <span className="block text-emerald-700 font-semibold">{formatBRL(totais.rol)}</span>
+                <span className="text-xs text-emerald-600/80">{formatPercent(totais.rolPct)} do ROB</span>
+              </div>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-2">
               <span className="text-slate-500">(-) CMV</span>
-              <span className="text-orange-700">{formatBRL(totais.cmv)}</span>
+              <div className="text-right">
+                <span className="block text-orange-700">{formatBRL(totais.cmv)}</span>
+                <span className="text-xs text-orange-600/80">{formatPercent(totais.cmvPct)} do ROB</span>
+              </div>
             </div>
             <div className="flex justify-between border-b border-slate-200 pb-2">
               <span className="text-slate-800 font-semibold">= Margem Bruta</span>
-              <span className="text-amber-700 font-semibold">{formatBRL(totais.mb)}</span>
+              <div className="text-right">
+                <span className="block text-amber-700 font-semibold">{formatBRL(totais.mb)}</span>
+                <span className="text-xs text-amber-600/80">{formatPercent(totais.mbPct)} do ROB</span>
+              </div>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-2">
               <span className="text-slate-500">(-) Comissão/Frete</span>
@@ -446,7 +461,10 @@ export default function StepDre({ className, back }) {
             </div>
             <div className="flex justify-between pt-1">
               <span className="text-violet-800 font-bold">= Margem de Contribuição</span>
-              <span className="text-violet-700 font-bold">{formatBRL(totais.mc)}</span>
+              <div className="text-right">
+                <span className="block text-violet-700 font-bold">{formatBRL(totais.mc)}</span>
+                <span className="text-xs text-violet-600/80">{formatPercent(totais.mcPctRob)} do ROB · {formatPercent(totais.mcPct)} da ROL</span>
+              </div>
             </div>
           </div>
         </div>
