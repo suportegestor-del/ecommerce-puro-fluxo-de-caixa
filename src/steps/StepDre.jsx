@@ -36,6 +36,7 @@ const emptySku = () => ({
   nome: 'SKU A',
   qtde: '',
   precoUnitario: '',
+  novoUnit: '',
   impostosPct: 12,
   descontoPct: 0,
   cpvPct: 50,
@@ -44,9 +45,9 @@ const emptySku = () => ({
 })
 
 const initialSkusBase = [
-  { nome: 'SKU A', qtde: 1000, precoUnitario: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
-  { nome: 'SKU B', qtde: 2200, precoUnitario: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
-  { nome: 'SKU C', qtde: 3000, precoUnitario: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
+  { nome: 'SKU A', qtde: 1000, precoUnitario: 150, novoUnit: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
+  { nome: 'SKU B', qtde: 2200, precoUnitario: 114, novoUnit: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
+  { nome: 'SKU C', qtde: 3000, precoUnitario: 67, novoUnit: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
 ]
 
 const initialSkus = initialSkusBase.map((s) => ({ ...s, id: newId() }))
@@ -307,6 +308,7 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
             <th className="py-3 px-2 font-semibold text-center">Qtde</th>
             <th className="py-3 px-2 font-semibold text-center">Unit</th>
+            <th className="py-3 px-2 font-semibold text-center">Novo Unit</th>
             <th className="py-3 px-2 font-semibold text-center">ROB</th>
             <th className="py-3 px-2 font-semibold text-center">Impostos %</th>
             <th className="py-3 px-2 font-semibold text-center">Desc %</th>
@@ -351,6 +353,16 @@ function DreTable({ skus, setSkus, title, storageKey }) {
                   step="0.01"
                   value={l.preco}
                   onChange={(e) => updateSku(l.id, 'precoUnitario', e.target.value)}
+                  className={inputClass}
+                />
+              </td>
+              <td className="py-2 px-2">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={l.novoUnit}
+                  onChange={(e) => updateSku(l.id, 'novoUnit', e.target.value)}
                   className={inputClass}
                 />
               </td>
@@ -430,6 +442,7 @@ function DreTable({ skus, setSkus, title, storageKey }) {
           ))}
           <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold">
             <td className="py-3 px-2 sticky left-0 bg-slate-50 z-10 text-slate-800">TOTAL</td>
+            <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(totais.rob)}</td>
