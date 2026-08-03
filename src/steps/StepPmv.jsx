@@ -57,6 +57,19 @@ const initialPeriodos = [
   { id: 'p2', nome: 'Período 2', valores: JSON.parse(JSON.stringify(valoresIniciais)) },
 ]
 
+function normalizarPeriodos(skus, periodos) {
+  if (!Array.isArray(periodos) || periodos.length === 0) return initialPeriodos
+  return periodos.slice(0, 2).map((p) => {
+    const valores = { ...(p.valores || {}) }
+    skus.forEach((sku) => {
+      if (!valores[sku.id]) {
+        valores[sku.id] = { qtde: 0, unit: 0 }
+      }
+    })
+    return { ...p, valores }
+  })
+}
+
 const colors = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c']
 
 function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
@@ -86,10 +99,14 @@ function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
 export default function StepPmv({ className, back }) {
   const [skus, setSkus] = useState(() => loadStorage('epfc_pmv_skus', initialSkus))
   const [periodos, setPeriodos] = useState(() => {
+    const savedSkus = loadStorage('epfc_pmv_skus', initialSkus)
     const saved = loadStorage('epfc_pmv_periodos', initialPeriodos)
     if (!Array.isArray(saved) || saved.length === 0) return initialPeriodos
-    if (saved.length === 1) return [saved[0], { ...saved[0], id: 'p2', nome: 'Período 2', valores: JSON.parse(JSON.stringify(saved[0].valores)) }]
-    return [saved[0], saved[1]]
+    if (saved.length === 1) {
+      const p2 = { ...saved[0], id: 'p2', nome: 'Período 2', valores: JSON.parse(JSON.stringify(saved[0].valores || {})) }
+      return normalizarPeriodos(savedSkus, [saved[0], p2])
+    }
+    return normalizarPeriodos(savedSkus, [saved[0], saved[1]])
   })
 
   useEffect(() => {
@@ -111,13 +128,13 @@ export default function StepPmv({ className, back }) {
           ...p1,
           id: 'p2',
           nome: 'Período 2',
-          valores: JSON.parse(JSON.stringify(p1.valores)),
+          valores: JSON.parse(JSON.stringify(p1.valores || {})),
         }
-        setPeriodos([p1, p2])
+        setPeriodos(normalizarPeriodos(importedSkus || skus, [p1, p2]))
       }
       saveStorage('epfc_pmv_imported', false)
     }
-  }, [])
+  }, [skus])
 
   const calculaLinhaSku = (sku, valores) => {
     const qtde = parseNumber(valores?.qtde ?? 0)
@@ -358,7 +375,7 @@ export default function StepPmv({ className, back }) {
                     type="number"
                     min="0"
                     step="1"
-                    value={r1.periodo.valores[a.sku.id].qtde}
+                    value={r1.periodo.valores[a.sku.id]?.qtde ?? ''}
                     onChange={(e) => updateValores(r1.periodo.id, a.sku.id, 'qtde', e.target.value)}
                     className={inputClass}
                   />
@@ -369,7 +386,7 @@ export default function StepPmv({ className, back }) {
                     type="number"
                     min="0"
                     step="0.01"
-                    value={r1.periodo.valores[a.sku.id].unit}
+                    value={r1.periodo.valores[a.sku.id]?.unit ?? ''}
                     onChange={(e) => updateValores(r1.periodo.id, a.sku.id, 'unit', e.target.value)}
                     className={inputClass}
                   />
@@ -380,7 +397,7 @@ export default function StepPmv({ className, back }) {
                     type="number"
                     min="0"
                     step="1"
-                    value={r2.periodo.valores[a.sku.id].qtde}
+                    value={r2.periodo.valores[a.sku.id]?.qtde ?? ''}
                     onChange={(e) => updateValores(r2.periodo.id, a.sku.id, 'qtde', e.target.value)}
                     className={inputClass}
                   />
@@ -391,7 +408,7 @@ export default function StepPmv({ className, back }) {
                     type="number"
                     min="0"
                     step="0.01"
-                    value={r2.periodo.valores[a.sku.id].unit}
+                    value={r2.periodo.valores[a.sku.id]?.unit ?? ''}
                     onChange={(e) => updateValores(r2.periodo.id, a.sku.id, 'unit', e.target.value)}
                     className={inputClass}
                   />
