@@ -10,8 +10,8 @@ function formatBRL(value) {
   return Number(value || 0).toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   })
 }
 
@@ -643,13 +643,14 @@ export default function StepPmv({ className, back }) {
         </div>
         <div className="mt-6 rounded-2xl border border-rose-100 bg-rose-50/40 p-4 overflow-x-auto">
           <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Memória de cálculo comparativa</p>
-          <table className="w-full text-sm min-w-[520px]">
+          <table className="w-full text-sm min-w-[600px]">
             <thead>
               <tr className="border-b border-rose-200 text-left text-rose-800 text-xs">
                 <th className="py-2 px-2 font-semibold">Item</th>
                 <th className="py-2 px-2 font-semibold">Cálculo</th>
                 <th className="py-2 px-2 font-semibold text-right">{r1.periodo.nome}</th>
                 <th className="py-2 px-2 font-semibold text-right">{r2.periodo.nome}</th>
+                <th className="py-2 px-2 font-semibold text-right">Δ</th>
               </tr>
             </thead>
             <tbody>
@@ -658,24 +659,28 @@ export default function StepPmv({ className, back }) {
                 <td className="py-2 px-2 text-slate-500">|CMV| × {prazos.coberturaEstoque}/30</td>
                 <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r1.total.estoque)}</td>
                 <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.estoque)}</td>
+                <td className={`py-2 px-2 text-right font-semibold ${deltaClass(r2.total.estoque - r1.total.estoque)}`}>{deltaSignal(r2.total.estoque - r1.total.estoque)}{formatBRL(r2.total.estoque - r1.total.estoque)}</td>
               </tr>
               <tr className="border-b border-rose-100">
                 <td className="py-2 px-2 text-slate-700">Contas a receber</td>
                 <td className="py-2 px-2 text-slate-500">ROB × {prazos.pmr}/30</td>
                 <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r1.total.contasReceber)}</td>
                 <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.contasReceber)}</td>
+                <td className={`py-2 px-2 text-right font-semibold ${deltaClass(r2.total.contasReceber - r1.total.contasReceber)}`}>{deltaSignal(r2.total.contasReceber - r1.total.contasReceber)}{formatBRL(r2.total.contasReceber - r1.total.contasReceber)}</td>
               </tr>
               <tr className="border-b border-rose-100">
                 <td className="py-2 px-2 text-slate-700">Contas a pagar</td>
                 <td className="py-2 px-2 text-slate-500">|CMV| × {prazos.pmp}/30</td>
                 <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r1.total.contasPagar)}</td>
                 <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.contasPagar)}</td>
+                <td className={`py-2 px-2 text-right font-semibold ${deltaClass(r2.total.contasPagar - r1.total.contasPagar)}`}>{deltaSignal(r2.total.contasPagar - r1.total.contasPagar)}{formatBRL(r2.total.contasPagar - r1.total.contasPagar)}</td>
               </tr>
               <tr className="bg-rose-100/50 font-semibold">
                 <td className="py-2 px-2 text-rose-800">NCG</td>
                 <td className="py-2 px-2 text-rose-700">Estoque + Receber - Pagar</td>
                 <td className={`py-2 px-2 text-right ${r1.total.capitalGiro >= 0 ? 'text-rose-700' : 'text-emerald-600'}`}>{formatBRL(r1.total.capitalGiro)}</td>
                 <td className={`py-2 px-2 text-right ${r2.total.capitalGiro >= 0 ? 'text-rose-700' : 'text-emerald-600'}`}>{formatBRL(r2.total.capitalGiro)}</td>
+                <td className={`py-2 px-2 text-right ${deltaClass(r2.total.capitalGiro - r1.total.capitalGiro)}`}>{deltaSignal(r2.total.capitalGiro - r1.total.capitalGiro)}{formatBRL(r2.total.capitalGiro - r1.total.capitalGiro)}</td>
               </tr>
             </tbody>
           </table>
