@@ -155,7 +155,7 @@ export default function StepPmv({ className, back }) {
     }
   }, [skus])
 
-  const calculaLinhaSku = (sku, valores, percentuais, cmvFixo = null) => {
+  const calculaLinhaSku = (sku, valores, percentuais, custoUnitFixo = null) => {
     const pct = percentuais || sku
     const qtde = parseNumber(valores?.qtde ?? 0)
     const unit = parseNumber(valores?.unit ?? 0)
@@ -168,7 +168,8 @@ export default function StepPmv({ className, back }) {
     const impostos = rob * (impostosPct / 100)
     const desconto = qtde * (unit - novoUnit)
     const rol = rob - impostos
-    const cmv = cmvFixo !== null ? -Math.abs(cmvFixo) : -rob * (cpvPct / 100)
+    const custoUnit = custoUnitFixo !== null ? parseNumber(custoUnitFixo) : (rob * (cpvPct / 100)) / qtde
+    const cmv = -(custoUnit * qtde)
     const mb = rol + cmv
     const comissaoFrete = rob * (comissaoFretePct / 100)
     const add = rob * (addPct / 100)
@@ -200,12 +201,12 @@ export default function StepPmv({ className, back }) {
       return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct } }
     })()
 
-    const cmvFixoPorSku = r1 ? Object.fromEntries(r1.skuLinhas.map((l) => [l.sku.id, l.cmv])) : {}
+    const custoUnitBasePorSku = r1 ? Object.fromEntries(r1.skuLinhas.map((l) => [l.sku.id, l.qtde > 0 ? Math.abs(l.cmv) / l.qtde : 0])) : {}
 
     const r2 = (() => {
       const p = periodos[1] || r1?.periodo
       if (!p) return null
-      const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id], p.percentuais?.[sku.id], cmvFixoPorSku[sku.id]))
+      const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id], p.percentuais?.[sku.id], custoUnitBasePorSku[sku.id]))
       const total = skuLinhas.reduce(
         (acc, l) => ({
           qtde: acc.qtde + l.qtde,
