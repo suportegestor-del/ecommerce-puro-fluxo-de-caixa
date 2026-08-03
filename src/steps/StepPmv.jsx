@@ -173,7 +173,7 @@ export default function StepPmv({ className, back }) {
     const comissaoFrete = rob * (comissaoFretePct / 100)
     const add = rob * (addPct / 100)
     const mc = mb - comissaoFrete - add
-    const mcPct = rol > 0 ? (mc / rol) * 100 : 0
+    const mcPct = rob > 0 ? (mc / rob) * 100 : 0
     return { sku, qtde, unit, novoUnit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc, mcPct }
   }
 
@@ -196,7 +196,7 @@ export default function StepPmv({ className, back }) {
         { qtde: 0, rob: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
       )
       const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
-      const mcPct = total.rol > 0 ? (total.mc / total.rol) * 100 : 0
+      const mcPct = total.rob > 0 ? (total.mc / total.rob) * 100 : 0
       return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct } }
     })()
 
@@ -220,7 +220,7 @@ export default function StepPmv({ className, back }) {
         { qtde: 0, rob: 0, rol: 0, cmv: 0, mb: 0, comissaoFrete: 0, add: 0, mc: 0 }
       )
       const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
-      const mcPct = total.rol > 0 ? (total.mc / total.rol) * 100 : 0
+      const mcPct = total.rob > 0 ? (total.mc / total.rob) * 100 : 0
       return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct } }
     })()
 
@@ -238,23 +238,24 @@ export default function StepPmv({ className, back }) {
 
       const qtdAnt = linhaAnterior.qtde
       const qtdAtu = linhaAtual.qtde
-      const unitLiqAnt = qtdAnt > 0 ? linhaAnterior.rol / qtdAnt : 0
-      const unitLiqAtu = qtdAtu > 0 ? linhaAtual.rol / qtdAtu : 0
-      const rolAnt = linhaAnterior.rol
-      const rolAtu = linhaAtual.rol
+      const unitAnt = linhaAnterior.unit
+      const novoUnitAnt = linhaAnterior.novoUnit
+      const novoUnitAtu = linhaAtual.novoUnit
+      const robAnt = linhaAnterior.rob
+      const robAtu = linhaAtual.rob
 
       const deltaQtd = qtdAtu - qtdAnt
-      const deltaRol = rolAtu - rolAnt
-      const impactoVolume = deltaQtd * unitLiqAnt
-      const impactoPreco = (unitLiqAtu - unitLiqAnt) * qtdAtu
-      const impactoMix = deltaRol - impactoVolume - impactoPreco
+      const deltaRob = robAtu - robAnt
+      const impactoVolume = deltaQtd * unitAnt
+      const impactoPreco = (novoUnitAtu - novoUnitAnt) * qtdAtu
+      const impactoMix = deltaRob - impactoVolume - impactoPreco
 
       return {
         sku: linhaAtual.sku,
         anterior: linhaAnterior,
         atual: linhaAtual,
         deltaQtd,
-        deltaRol,
+        deltaRob,
         impactoVolume,
         impactoPreco,
         impactoMix,
@@ -323,7 +324,7 @@ export default function StepPmv({ className, back }) {
   const inputNomeClass =
     'w-full bg-transparent border-b border-slate-300 text-left text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
 
-  const chartData = resultadoPeriodos.map((r) => ({ nome: r.periodo.nome, mc: r.total.mc, pmv: r.total.qtde > 0 ? r.total.rol / r.total.qtde : 0 }))
+  const chartData = resultadoPeriodos.map((r) => ({ nome: r.periodo.nome, mc: r.total.mc, pmv: r.total.qtde > 0 ? r.total.rob / r.total.qtde : 0 }))
 
   const deltaClass = (v) => (v > 0 ? 'text-emerald-600' : v < 0 ? 'text-rose-600' : 'text-slate-500')
   const deltaSignal = (v) => (v > 0 ? '+' : '')
@@ -343,16 +344,16 @@ export default function StepPmv({ className, back }) {
           </div>
           <div className="rounded-3xl bg-amber-600 p-5 text-center shadow-lg shadow-amber-900/10 text-white">
             <p className="text-xs uppercase tracking-[0.28em] text-amber-100 font-semibold">PMV {r2.periodo.nome}</p>
-            <p className="mt-3 text-4xl font-bold">{formatBRL(r2.total.qtde > 0 ? r2.total.rol / r2.total.qtde : 0)}</p>
-            <p className="text-sm text-amber-100">preço médio líquido</p>
+            <p className="mt-3 text-4xl font-bold">{formatBRL(r2.total.qtde > 0 ? r2.total.rob / r2.total.qtde : 0)}</p>
+            <p className="text-sm text-amber-100">preço médio bruto</p>
           </div>
         </div>
       </div>
 
       <div className="grid gap-4 mt-6 xl:grid-cols-4">
         <div className="rounded-[28px] border-2 border-cyan-300 bg-white p-5 shadow-md shadow-cyan-900/5 hover:shadow-lg hover:shadow-cyan-900/10 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-cyan-700 mb-3 font-bold">Receita líquida</p>
-          <p className="text-3xl font-bold text-cyan-700">{formatBRL(r2.total.rol)}</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-cyan-700 mb-3 font-bold">Receita bruta</p>
+          <p className="text-3xl font-bold text-cyan-700">{formatBRL(r2.total.rob)}</p>
           <p className="mt-2 text-sm font-medium text-cyan-600/80">{formatNumber(r2.total.qtde)} unidades</p>
         </div>
         <div className="rounded-[28px] border-2 border-emerald-300 bg-white p-5 shadow-md shadow-emerald-900/5 hover:shadow-lg hover:shadow-emerald-900/10 transition">
@@ -363,7 +364,7 @@ export default function StepPmv({ className, back }) {
         <div className="rounded-[28px] border-2 border-violet-300 bg-white p-5 shadow-md shadow-violet-900/5 hover:shadow-lg hover:shadow-violet-900/10 transition">
           <p className="text-xs uppercase tracking-[0.28em] text-violet-700 mb-3 font-bold">MC</p>
           <p className="text-3xl font-bold text-violet-700">{formatBRL(r2.total.mc)}</p>
-          <p className="mt-2 text-sm font-medium text-violet-600/80">{formatPercent(r2.total.mcPct)} sobre ROL</p>
+          <p className="mt-2 text-sm font-medium text-violet-600/80">{formatPercent(r2.total.mcPct)} sobre ROB</p>
         </div>
         <div className="rounded-[28px] border-2 border-amber-300 bg-white p-5 shadow-md shadow-amber-900/5 hover:shadow-lg hover:shadow-amber-900/10 transition">
           <p className="text-xs uppercase tracking-[0.28em] text-amber-700 mb-3 font-bold">PMV</p>
@@ -389,7 +390,7 @@ export default function StepPmv({ className, back }) {
                   className="bg-transparent border-b border-white/40 text-white text-center text-sm outline-none focus:border-white px-1"
                 />
               </th>
-              <th colSpan="6" className="py-3 px-2 text-center border-b border-white/20">
+              <th colSpan="7" className="py-3 px-2 text-center border-b border-white/20">
                 <input
                   type="text"
                   value={r2.periodo.nome}
@@ -412,6 +413,7 @@ export default function StepPmv({ className, back }) {
               <th className="py-2 px-2 text-center font-semibold">Qtd</th>
               <th className="py-2 px-2 text-center font-semibold">R$</th>
               <th className="py-2 px-2 text-center font-semibold">Unit</th>
+              <th className="py-2 px-2 text-center font-semibold">Desc %</th>
               <th className="py-2 px-2 text-center font-semibold">Novo Unit</th>
               <th className="py-2 px-2 text-center font-semibold">Marg%</th>
               <th className="py-2 px-2 text-center font-semibold">MC</th>
@@ -445,7 +447,7 @@ export default function StepPmv({ className, back }) {
                     className={inputClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(a.anterior.rol)}</td>
+                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(a.anterior.rob)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -468,7 +470,7 @@ export default function StepPmv({ className, back }) {
                     className={inputClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(a.atual.rol)}</td>
+                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(a.atual.rob)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -479,6 +481,7 @@ export default function StepPmv({ className, back }) {
                     className={inputClass}
                   />
                 </td>
+                <td className="py-2 px-2 text-center text-slate-600">{formatPercent(a.atual.unit > 0 ? ((a.atual.unit - a.atual.novoUnit) / a.atual.unit) * 100 : 0)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -494,8 +497,8 @@ export default function StepPmv({ className, back }) {
                 <td className={`py-2 px-2 text-center font-semibold ${deltaClass(a.deltaQtd)}`}>
                   {deltaSignal(a.deltaQtd)}{formatNumber(a.deltaQtd)}
                 </td>
-                <td className={`py-2 px-2 text-center font-semibold ${deltaClass(a.deltaRol)}`}>
-                  {deltaSignal(a.deltaRol)}{formatBRL(a.deltaRol)}
+                <td className={`py-2 px-2 text-center font-semibold ${deltaClass(a.deltaRob)}`}>
+                  {deltaSignal(a.deltaRob)}{formatBRL(a.deltaRob)}
                 </td>
                 <td className={`py-2 px-2 text-center ${deltaClass(a.impactoVolume)}`}>{deltaSignal(a.impactoVolume)}{formatBRL(a.impactoVolume)}</td>
                 <td className={`py-2 px-2 text-center ${deltaClass(a.impactoPreco)}`}>{deltaSignal(a.impactoPreco)}{formatBRL(a.impactoPreco)}</td>
@@ -524,7 +527,7 @@ export default function StepPmv({ className, back }) {
         </div>
 
         <div className="rounded-[28px] border border-amber-200 bg-white p-6 shadow-lg shadow-amber-500/5">
-          <h3 className="text-lg font-bold text-amber-700 mb-4">Evolução do PMV Líquido</h3>
+          <h3 className="text-lg font-bold text-amber-700 mb-4">Evolução do PMV Bruto</h3>
           <div className="h-64">
             <SimpleBarChart data={chartData} valueKey="pmv" labelKey="nome" color="#fbbf24" />
           </div>
