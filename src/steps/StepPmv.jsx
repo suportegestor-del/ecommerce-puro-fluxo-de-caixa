@@ -162,17 +162,16 @@ export default function StepPmv({ className, back }) {
     const novoUnit = parseNumber(valores?.novoUnit ?? unit)
     const rob = qtde * novoUnit
     const impostosPct = parseNumber(pct?.impostosPct ?? sku?.impostosPct ?? 0)
-    const descontoPct = parseNumber(pct?.descontoPct ?? sku?.descontoPct ?? 0)
-    const cpvPct = parseNumber(pct?.cpvPct ?? sku?.cpvPct ?? 0)
     const comissaoFretePct = parseNumber(pct?.comissaoFretePct ?? sku?.comissaoFretePct ?? 0)
     const addPct = parseNumber(pct?.addPct ?? sku?.addPct ?? 0)
+    const cpvPct = parseNumber(pct?.cpvPct ?? sku?.cpvPct ?? 0)
     const impostos = rob * (impostosPct / 100)
-    const desconto = (rob - impostos) * (descontoPct / 100)
-    const rol = rob - impostos - desconto
+    const desconto = qtde * (unit - novoUnit)
+    const rol = rob - impostos
     const cmv = cmvFixo !== null ? -Math.abs(cmvFixo) : -rob * (cpvPct / 100)
     const mb = rol + cmv
-    const comissaoFrete = rol * (comissaoFretePct / 100)
-    const add = rol * (addPct / 100)
+    const comissaoFrete = rob * (comissaoFretePct / 100)
+    const add = rob * (addPct / 100)
     const mc = mb - comissaoFrete - add
     const mcPct = rol > 0 ? (mc / rol) * 100 : 0
     return { sku, qtde, unit, novoUnit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc, mcPct }

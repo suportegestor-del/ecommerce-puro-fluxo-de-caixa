@@ -62,11 +62,11 @@ function calcularLinhas(skus) {
     const comissaoFretePct = parseNumber(sku.comissaoFretePct)
     const addPct = parseNumber(sku.addPct)
 
-    const rob = qtde * preco
     const novoUnit = preco * (1 - descontoPct / 100)
+    const rob = qtde * novoUnit
     const impostos = rob * (impostosPct / 100)
-    const desconto = (rob - impostos) * (descontoPct / 100)
-    const rol = rob - impostos - desconto
+    const desconto = qtde * (preco - novoUnit)
+    const rol = rob - impostos
     const cmv = -rob * (cpvPct / 100)
     const mb = rol + cmv
     const comissaoFrete = rob * (comissaoFretePct / 100)
@@ -485,7 +485,8 @@ export default function StepDre({ className, back, onGoToPmv }) {
     }))
 
     const valoresP1 = skus.reduce((acc, sku) => {
-      acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario, novoUnit: sku.precoUnitario }
+      const novoUnit = sku.precoUnitario * (1 - (sku.descontoPct ?? 0) / 100)
+      acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario, novoUnit }
       return acc
     }, {})
 
@@ -503,7 +504,8 @@ export default function StepDre({ className, back, onGoToPmv }) {
     const valoresP2 = skus.reduce((acc, sku, idx) => {
       const sku2 = skus2[idx] || skus2.find((s) => s.nome === sku.nome) || {}
       const unit2 = sku2.precoUnitario ?? sku.precoUnitario
-      acc[sku.id] = { qtde: sku2.qtde ?? 0, unit: unit2, novoUnit: unit2 }
+      const novoUnit2 = unit2 * (1 - (sku2.descontoPct ?? 0) / 100)
+      acc[sku.id] = { qtde: sku2.qtde ?? 0, unit: unit2, novoUnit: novoUnit2 }
       return acc
     }, {})
 
