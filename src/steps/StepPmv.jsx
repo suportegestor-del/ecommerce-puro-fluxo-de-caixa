@@ -382,7 +382,7 @@ export default function StepPmv({ className, back }) {
             <tr className="border-b border-blue-500 text-left bg-blue-600 text-white">
               <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
               <th className="py-3 px-2 font-semibold">Nome</th>
-              <th colSpan="4" className="py-3 px-2 text-center border-b border-white/20">
+              <th colSpan="5" className="py-3 px-2 text-center border-b border-white/20">
                 <input
                   type="text"
                   value={r1.periodo.nome}
@@ -390,7 +390,7 @@ export default function StepPmv({ className, back }) {
                   className="bg-transparent border-b border-white/40 text-white text-center text-sm outline-none focus:border-white px-1"
                 />
               </th>
-              <th colSpan="5" className="py-3 px-2 text-center border-b border-white/20">
+              <th colSpan="6" className="py-3 px-2 text-center border-b border-white/20">
                 <input
                   type="text"
                   value={r2.periodo.nome}
@@ -409,11 +409,13 @@ export default function StepPmv({ className, back }) {
               <th className="py-2 px-2 text-center font-semibold">R$</th>
               <th className="py-2 px-2 text-center font-semibold">Unit</th>
               <th className="py-2 px-2 text-center font-semibold">Marg%</th>
+              <th className="py-2 px-2 text-center font-semibold">MC</th>
               <th className="py-2 px-2 text-center font-semibold">Qtd</th>
               <th className="py-2 px-2 text-center font-semibold">R$</th>
               <th className="py-2 px-2 text-center font-semibold">Unit</th>
               <th className="py-2 px-2 text-center font-semibold">Novo Unit</th>
               <th className="py-2 px-2 text-center font-semibold">Marg%</th>
+              <th className="py-2 px-2 text-center font-semibold">MC</th>
               <th className="py-2 px-2 text-center font-semibold">Δ Qtd</th>
               <th className="py-2 px-2 text-center font-semibold">Δ R$</th>
               <th className="py-2 px-2 text-center font-semibold">Volume</th>
@@ -456,6 +458,7 @@ export default function StepPmv({ className, back }) {
                   />
                 </td>
                 <td className="py-2 px-2 text-center text-violet-700">{formatPercent(a.anterior.mcPct)}</td>
+                <td className="py-2 px-2 text-center text-violet-700 font-semibold">{formatBRL(a.anterior.mc)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -488,6 +491,7 @@ export default function StepPmv({ className, back }) {
                   />
                 </td>
                 <td className="py-2 px-2 text-center text-violet-700 font-semibold">{formatPercent(a.atual.mcPct)}</td>
+                <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(a.atual.mc)}</td>
                 <td className={`py-2 px-2 text-center font-semibold ${deltaClass(a.deltaQtd)}`}>
                   {deltaSignal(a.deltaQtd)}{formatNumber(a.deltaQtd)}
                 </td>
