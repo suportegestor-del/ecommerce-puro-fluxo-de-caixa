@@ -92,20 +92,22 @@ function normalizarPeriodos(skus, periodos) {
 const colors = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c']
 
 function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
-  const max = Math.max(...data.map((d) => Math.abs(d[valueKey]) || 0), 1)
+  const numericValues = data.map((d) => Number(d?.[valueKey]) || 0)
+  const max = Math.max(...numericValues.map(Math.abs), 1)
   return (
-    <div className="flex items-end gap-3 h-full px-2">
+    <div className="flex items-end gap-4 h-full px-4 pb-2">
       {data.map((d, idx) => {
-        const val = d[valueKey] || 0
-        const height = `${(Math.abs(val) / max) * 100}%`
+        const val = Number(d?.[valueKey]) || 0
+        const pct = max > 0 ? (Math.abs(val) / max) * 100 : 0
+        const height = `${Math.max(pct, 5)}%`
         return (
           <div key={idx} className="flex-1 flex flex-col items-center justify-end group relative">
-            <div className="opacity-0 group-hover:opacity-100 transition absolute -top-8 text-[10px] text-slate-100 bg-slate-800 px-2 py-1 rounded-lg whitespace-nowrap">
+            <div className="mb-2 text-[10px] font-semibold text-slate-600 text-center whitespace-nowrap">
               {formatBRL(val)}
             </div>
             <div
               style={{ height, backgroundColor: colors[idx % colors.length] || color }}
-              className="w-full rounded-t-lg min-h-[4px] transition-all"
+              className="w-full rounded-t-xl min-h-[16px] transition-all"
             />
             <div className="text-[10px] text-slate-500 mt-2 truncate max-w-full">{d[labelKey]}</div>
           </div>
@@ -522,14 +524,14 @@ export default function StepPmv({ className, back }) {
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
           <h3 className="text-lg font-bold text-violet-700 mb-4">Evolução da Margem de Contribuição</h3>
-          <div className="h-64">
+          <div className="h-80">
             <SimpleBarChart data={chartData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
         <div className="rounded-[28px] border border-amber-200 bg-white p-6 shadow-lg shadow-amber-500/5">
           <h3 className="text-lg font-bold text-amber-700 mb-4">Evolução do PMV Bruto</h3>
-          <div className="h-64">
+          <div className="h-80">
             <SimpleBarChart data={chartData} valueKey="pmv" labelKey="nome" color="#fbbf24" />
           </div>
         </div>
