@@ -36,7 +36,6 @@ const emptySku = () => ({
   nome: 'SKU A',
   qtde: '',
   precoUnitario: '',
-  novoUnit: '',
   impostosPct: 12,
   descontoPct: 0,
   cpvPct: 50,
@@ -45,9 +44,9 @@ const emptySku = () => ({
 })
 
 const initialSkusBase = [
-  { nome: 'SKU A', qtde: 1000, precoUnitario: 150, novoUnit: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
-  { nome: 'SKU B', qtde: 2200, precoUnitario: 114, novoUnit: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
-  { nome: 'SKU C', qtde: 3000, precoUnitario: 67, novoUnit: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
+  { nome: 'SKU A', qtde: 1000, precoUnitario: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
+  { nome: 'SKU B', qtde: 2200, precoUnitario: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
+  { nome: 'SKU C', qtde: 3000, precoUnitario: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
 ]
 
 const initialSkus = initialSkusBase.map((s) => ({ ...s, id: newId() }))
@@ -64,6 +63,7 @@ function calcularLinhas(skus) {
     const addPct = parseNumber(sku.addPct)
 
     const rob = qtde * preco
+    const novoUnit = preco * (1 - descontoPct / 100)
     const impostos = rob * (impostosPct / 100)
     const desconto = rob * (descontoPct / 100)
     const rol = rob - impostos - desconto
@@ -78,6 +78,7 @@ function calcularLinhas(skus) {
       ...sku,
       qtde,
       preco,
+      novoUnit,
       rob,
       impostos,
       desconto,
@@ -308,7 +309,7 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
             <th className="py-3 px-2 font-semibold text-center">Qtde</th>
             <th className="py-3 px-2 font-semibold text-center">Unit</th>
-            <th className="py-3 px-2 font-semibold text-center">Novo Unit</th>
+            <th className="py-3 px-2 font-semibold text-center w-20">Novo Unit</th>
             <th className="py-3 px-2 font-semibold text-center">ROB</th>
             <th className="py-3 px-2 font-semibold text-center">Impostos %</th>
             <th className="py-3 px-2 font-semibold text-center">Desc %</th>
@@ -356,15 +357,8 @@ function DreTable({ skus, setSkus, title, storageKey }) {
                   className={inputClass}
                 />
               </td>
-              <td className="py-2 px-2">
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={l.novoUnit}
-                  onChange={(e) => updateSku(l.id, 'novoUnit', e.target.value)}
-                  className={inputClass}
-                />
+              <td className="py-2 px-2 text-center text-emerald-600 font-medium text-xs">
+                {formatBRL(l.novoUnit)}
               </td>
               <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(l.rob)}</td>
               <td className="py-2 px-2">
