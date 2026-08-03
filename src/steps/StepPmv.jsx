@@ -391,7 +391,7 @@ export default function StepPmv({ className, back }) {
                   className="bg-transparent border-b border-white/40 text-white text-center text-sm outline-none focus:border-white px-1"
                 />
               </th>
-              <th colSpan="7" className="py-3 px-2 text-center border-b border-white/20">
+              <th colSpan="7" className="py-3 px-2 text-center border-l-2 border-b border-white/20 bg-blue-700/50">
                 <input
                   type="text"
                   value={r2.periodo.nome}
@@ -399,8 +399,8 @@ export default function StepPmv({ className, back }) {
                   className="bg-transparent border-b border-white/40 text-white text-center text-sm outline-none focus:border-white px-1"
                 />
               </th>
-              <th colSpan="2" className="py-3 px-2 text-center">Variação</th>
-              <th colSpan="3" className="py-3 px-2 text-center">Análise PMV</th>
+              <th colSpan="2" className="py-3 px-2 text-center border-l-2 border-b border-white/20 bg-blue-700/50">Variação</th>
+              <th colSpan="3" className="py-3 px-2 text-center border-l-2 border-b border-white/20 bg-blue-700/50">Análise PMV</th>
               <th className="py-3 px-2"></th>
             </tr>
             <tr className="border-b border-blue-500 text-left bg-blue-600 text-white text-xs">
@@ -411,18 +411,18 @@ export default function StepPmv({ className, back }) {
               <th className="py-2 px-2 text-center font-semibold">Unit</th>
               <th className="py-2 px-2 text-center font-semibold">Marg%</th>
               <th className="py-2 px-2 text-center font-semibold">MC</th>
-              <th className="py-2 px-2 text-center font-semibold">Qtd</th>
-              <th className="py-2 px-2 text-center font-semibold">R$</th>
-              <th className="py-2 px-2 text-center font-semibold">Unit</th>
-              <th className="py-2 px-2 text-center font-semibold">Desc %</th>
-              <th className="py-2 px-2 text-center font-semibold">Novo Unit</th>
-              <th className="py-2 px-2 text-center font-semibold">Marg%</th>
-              <th className="py-2 px-2 text-center font-semibold">MC</th>
-              <th className="py-2 px-2 text-center font-semibold">Δ Qtd</th>
-              <th className="py-2 px-2 text-center font-semibold">Δ R$</th>
-              <th className="py-2 px-2 text-center font-semibold">Volume</th>
-              <th className="py-2 px-2 text-center font-semibold">Preço</th>
-              <th className="py-2 px-2 text-center font-semibold">Mix</th>
+              <th className="py-2 px-2 text-center font-semibold border-l border-white/30 bg-blue-700/30">Qtd</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">R$</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">Unit</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">Desc %</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">Novo Unit</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">Marg%</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">MC</th>
+              <th className="py-2 px-2 text-center font-semibold border-l border-white/30 bg-blue-700/30">Δ Qtd</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">Δ R$</th>
+              <th className="py-2 px-2 text-center font-semibold border-l border-white/30 bg-blue-700/30">Volume</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">Preço</th>
+              <th className="py-2 px-2 text-center font-semibold bg-blue-700/30">Mix</th>
               <th className="py-2 px-2"></th>
             </tr>
           </thead>
@@ -461,7 +461,7 @@ export default function StepPmv({ className, back }) {
                 </td>
                 <td className="py-2 px-2 text-center text-violet-700">{formatPercent(a.anterior.mcPct)}</td>
                 <td className="py-2 px-2 text-center text-violet-700 font-semibold">{formatBRL(a.anterior.mc)}</td>
-                <td className="py-2 px-2">
+                <td className="py-2 px-2 border-l border-slate-200">
                   <input
                     type="number"
                     min="0"
@@ -495,13 +495,13 @@ export default function StepPmv({ className, back }) {
                 </td>
                 <td className="py-2 px-2 text-center text-violet-700 font-semibold">{formatPercent(a.atual.mcPct)}</td>
                 <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(a.atual.mc)}</td>
-                <td className={`py-2 px-2 text-center font-semibold ${deltaClass(a.deltaQtd)}`}>
+                <td className={`py-2 px-2 text-center font-semibold border-l border-slate-200 ${deltaClass(a.deltaQtd)}`}>
                   {deltaSignal(a.deltaQtd)}{formatNumber(a.deltaQtd)}
                 </td>
                 <td className={`py-2 px-2 text-center font-semibold ${deltaClass(a.deltaRob)}`}>
                   {deltaSignal(a.deltaRob)}{formatBRL(a.deltaRob)}
                 </td>
-                <td className={`py-2 px-2 text-center ${deltaClass(a.impactoVolume)}`}>{deltaSignal(a.impactoVolume)}{formatBRL(a.impactoVolume)}</td>
+                <td className={`py-2 px-2 text-center border-l border-slate-200 ${deltaClass(a.impactoVolume)}`}>{deltaSignal(a.impactoVolume)}{formatBRL(a.impactoVolume)}</td>
                 <td className={`py-2 px-2 text-center ${deltaClass(a.impactoPreco)}`}>{deltaSignal(a.impactoPreco)}{formatBRL(a.impactoPreco)}</td>
                 <td className={`py-2 px-2 text-center ${deltaClass(a.impactoMix)}`}>{deltaSignal(a.impactoMix)}{formatBRL(a.impactoMix)}</td>
                 <td className="py-2 px-2 text-center">
