@@ -10,8 +10,8 @@ function formatBRL(value) {
   return Number(value || 0).toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   })
 }
 
@@ -54,6 +54,7 @@ const valoresIniciais = {
 
 const initialPeriodos = [
   { id: 'p1', nome: 'Período 1', valores: JSON.parse(JSON.stringify(valoresIniciais)) },
+  { id: 'p2', nome: 'Período 2', valores: JSON.parse(JSON.stringify(valoresIniciais)) },
 ]
 
 const colors = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c']
@@ -86,11 +87,9 @@ export default function StepPmv({ className, back }) {
   const [skus, setSkus] = useState(() => loadStorage('epfc_pmv_skus', initialSkus))
   const [periodos, setPeriodos] = useState(() => {
     const saved = loadStorage('epfc_pmv_periodos', initialPeriodos)
-    return Array.isArray(saved) && saved.length > 0 ? [saved[0]] : initialPeriodos
-  })
-  const [periodoAtivo, setPeriodoAtivo] = useState(() => {
-    const saved = loadStorage('epfc_pmv_periodos', initialPeriodos)
-    return Array.isArray(saved) && saved.length > 0 ? saved[0].id : initialPeriodos[0].id
+    if (!Array.isArray(saved) || saved.length === 0) return initialPeriodos
+    if (saved.length === 1) return [saved[0], { ...saved[0], id: 'p2', nome: 'Período 2', valores: JSON.parse(JSON.stringify(saved[0].valores)) }]
+    return [saved[0], saved[1]]
   })
 
   useEffect(() => {
@@ -102,18 +101,19 @@ export default function StepPmv({ className, back }) {
   }, [periodos])
 
   useEffect(() => {
-    saveStorage('epfc_pmv_periodoAtivo', periodoAtivo)
-  }, [periodoAtivo])
-
-  useEffect(() => {
     if (loadStorage('epfc_pmv_imported', false)) {
       const importedSkus = loadStorage('epfc_pmv_skus', null)
       const importedPeriodos = loadStorage('epfc_pmv_periodos', null)
       if (importedSkus) setSkus(importedSkus)
       if (Array.isArray(importedPeriodos) && importedPeriodos.length > 0) {
-        const primeiro = importedPeriodos[0]
-        setPeriodos([primeiro])
-        setPeriodoAtivo(primeiro.id)
+        const p1 = importedPeriodos[0]
+        const p2 = importedPeriodos.length > 1 ? importedPeriodos[1] : {
+          ...p1,
+          id: 'p2',
+          nome: 'Período 2',
+          valores: JSON.parse(JSON.stringify(p1.valores)),
+        }
+        setPeriodos([p1, p2])
       }
       saveStorage('epfc_pmv_imported', false)
     }
@@ -131,7 +131,8 @@ export default function StepPmv({ className, back }) {
     const comissaoFrete = rol * (parseNumber(sku.comissaoFretePct) / 100)
     const add = rol * (parseNumber(sku.addPct) / 100)
     const mc = mb - comissaoFrete - add
-    return { sku, qtde, unit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc }
+    const mcPct = rol > 0 ? (mc / rol) * 100 : 0
+    return { sku, qtde, unit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc, mcPct }
   }
 
   const resultadoPeriodos = useMemo(() => {
@@ -156,74 +157,97 @@ export default function StepPmv({ className, back }) {
     })
   }, [periodos, skus])
 
-  const periodoSelecionado = useMemo(
-    () => resultadoPeriodos.find((r) => r.periodo.id === periodoAtivo) || resultadoPeriodos[0],
-    [resultadoPeriodos, periodoAtivo]
-  )
+  const r1 = resultadoPeriodos[0]
+  const r2 = resultadoPeriodos[1] || r1
+
+  const analise = useMemo(() => {
+    if (!r1 || !r2) return []
+    return r2.skuLinhas.map((linhaAtual) => {
+      const linhaAnterior = r1.skuLinhas.find((l) => l.sku.id === linhaAtual.sku.id)
+      if (!linhaAnterior) return null
+
+      const qtdAnt = linhaAnterior.qtde
+      const qtdAtu = linhaAtual.qtde
+      const unitAnt = linhaAnterior.unit
+      const unitAtu = linhaAtual.unit
+      const robAnt = linhaAnterior.rob
+      const robAtu = linhaAtual.rob
+
+      const deltaQtd = qtdAtu - qtdAnt
+      const deltaRob = robAtu - robAnt
+      const impactoVolume = deltaQtd * unitAnt
+      const impactoPreco = (unitAtu - unitAnt) * qtdAtu
+      const impactoMix = deltaRob - impactoVolume - impactoPreco
+
+      return {
+        sku: linhaAtual.sku,
+        anterior: linhaAnterior,
+        atual: linhaAtual,
+        deltaQtd,
+        deltaRob,
+        impactoVolume,
+        impactoPreco,
+        impactoMix,
+      }
+    }).filter(Boolean)
+  }, [r1, r2])
 
   const addSku = () => {
     const novo = emptySku()
     setSkus((prev) => [...prev, novo])
-    setPeriodos((prev) => {
-      if (prev.length === 0) return prev
-      const primeiro = prev[0]
-      return [
-        {
-          ...primeiro,
-          valores: { ...primeiro.valores, [novo.id]: { qtde: 1000, unit: 150 } },
-        },
-        ...prev.slice(1),
-      ]
-    })
+    setPeriodos((prev) =>
+      prev.map((p) => ({
+        ...p,
+        valores: { ...p.valores, [novo.id]: { qtde: 1000, unit: 150 } },
+      }))
+    )
   }
 
   const removeSku = (id) => {
     setSkus((prev) => prev.filter((s) => s.id !== id))
-    setPeriodos((prev) => {
-      if (prev.length === 0) return prev
-      const primeiro = prev[0]
-      const valores = { ...primeiro.valores }
-      delete valores[id]
-      return [{ ...primeiro, valores }, ...prev.slice(1)]
-    })
+    setPeriodos((prev) =>
+      prev.map((p) => {
+        const valores = { ...p.valores }
+        delete valores[id]
+        return { ...p, valores }
+      })
+    )
   }
 
   const updateSku = (id, field, value) => {
     setSkus((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
   }
 
-  const updateValores = (skuId, field, value) => {
-    setPeriodos((prev) => {
-      if (prev.length === 0) return prev
-      const primeiro = prev[0]
-      return [
-        {
-          ...primeiro,
-          valores: { ...primeiro.valores, [skuId]: { ...primeiro.valores[skuId], [field]: value } },
-        },
-        ...prev.slice(1),
-      ]
-    })
+  const updateValores = (periodoId, skuId, field, value) => {
+    setPeriodos((prev) =>
+      prev.map((p) =>
+        p.id === periodoId
+          ? { ...p, valores: { ...p.valores, [skuId]: { ...p.valores[skuId], [field]: value } } }
+          : p
+      )
+    )
+  }
+
+  const updatePeriodoNome = (id, nome) => {
+    setPeriodos((prev) => prev.map((p) => (p.id === id ? { ...p, nome } : p)))
   }
 
   const reset = () => {
     setSkus(initialSkus)
     setPeriodos(initialPeriodos)
-    setPeriodoAtivo(initialPeriodos[0].id)
   }
 
   const inputClass =
     'w-full bg-transparent border-b border-slate-300 text-center text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
   const inputPctClass =
     'w-full bg-transparent border-b border-slate-300 text-center text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
+  const inputNomeClass =
+    'w-full bg-transparent border-b border-slate-300 text-left text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
 
-  const skuChartData = useMemo(() => {
-    return (periodoSelecionado?.skuLinhas || []).map((l) => ({
-      nome: l.sku.nome,
-      mc: l.mc,
-      pmv: l.unit,
-    }))
-  }, [periodoSelecionado])
+  const chartData = resultadoPeriodos.map((r) => ({ nome: r.periodo.nome, mc: r.total.mc, pmv: r.total.pmv }))
+
+  const deltaClass = (v) => (v > 0 ? 'text-emerald-600' : v < 0 ? 'text-rose-600' : 'text-slate-500')
+  const deltaSignal = (v) => (v > 0 ? '+' : '')
 
   return (
     <div className={`w-full max-w-[99vw] px-2 ${className}`}>
@@ -232,15 +256,15 @@ export default function StepPmv({ className, back }) {
           <div>
             <p className="text-xs uppercase tracking-[0.32em] text-amber-700 font-semibold">Simulador PMV</p>
             <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-amber-700 tracking-tight">
-              PMV
+              Análise PMV
             </h2>
             <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-700">
-              Ajuste quantidade e preço unitário por SKU e veja o preço médio de venda e a margem de contribuição.
+              Compare dois períodos com os mesmos SKUs, ajuste quantidade e preço unitário, e veja a decomposição da variação de receita.
             </p>
           </div>
           <div className="rounded-3xl bg-amber-600 p-5 text-center shadow-lg shadow-amber-900/10 text-white">
-            <p className="text-xs uppercase tracking-[0.28em] text-amber-100 font-semibold">PMV</p>
-            <p className="mt-3 text-4xl font-bold">{formatBRL(periodoSelecionado.total.pmv)}</p>
+            <p className="text-xs uppercase tracking-[0.28em] text-amber-100 font-semibold">PMV {r2.periodo.nome}</p>
+            <p className="mt-3 text-4xl font-bold">{formatBRL(r2.total.pmv)}</p>
             <p className="text-sm text-amber-100">preço médio de venda</p>
           </div>
         </div>
@@ -249,22 +273,22 @@ export default function StepPmv({ className, back }) {
       <div className="grid gap-4 mt-6 xl:grid-cols-4">
         <div className="rounded-[28px] border-2 border-cyan-300 bg-white p-5 shadow-md shadow-cyan-900/5 hover:shadow-lg hover:shadow-cyan-900/10 transition">
           <p className="text-xs uppercase tracking-[0.28em] text-cyan-700 mb-3 font-bold">Receita bruta</p>
-          <p className="text-3xl font-bold text-cyan-700">{formatBRL(periodoSelecionado.total.rob)}</p>
-          <p className="mt-2 text-sm font-medium text-cyan-600/80">{formatNumber(periodoSelecionado.total.qtde)} unidades</p>
+          <p className="text-3xl font-bold text-cyan-700">{formatBRL(r2.total.rob)}</p>
+          <p className="mt-2 text-sm font-medium text-cyan-600/80">{formatNumber(r2.total.qtde)} unidades</p>
         </div>
         <div className="rounded-[28px] border-2 border-emerald-300 bg-white p-5 shadow-md shadow-emerald-900/5 hover:shadow-lg hover:shadow-emerald-900/10 transition">
           <p className="text-xs uppercase tracking-[0.28em] text-emerald-700 mb-3 font-bold">ROL</p>
-          <p className="text-3xl font-bold text-emerald-700">{formatBRL(periodoSelecionado.total.rol)}</p>
+          <p className="text-3xl font-bold text-emerald-700">{formatBRL(r2.total.rol)}</p>
           <p className="mt-2 text-sm font-medium text-emerald-600/80">Receita líquida</p>
         </div>
         <div className="rounded-[28px] border-2 border-violet-300 bg-white p-5 shadow-md shadow-violet-900/5 hover:shadow-lg hover:shadow-violet-900/10 transition">
           <p className="text-xs uppercase tracking-[0.28em] text-violet-700 mb-3 font-bold">MC</p>
-          <p className="text-3xl font-bold text-violet-700">{formatBRL(periodoSelecionado.total.mc)}</p>
-          <p className="mt-2 text-sm font-medium text-violet-600/80">{formatPercent(periodoSelecionado.total.mcPct)} sobre ROL</p>
+          <p className="text-3xl font-bold text-violet-700">{formatBRL(r2.total.mc)}</p>
+          <p className="mt-2 text-sm font-medium text-violet-600/80">{formatPercent(r2.total.mcPct)} sobre ROL</p>
         </div>
         <div className="rounded-[28px] border-2 border-amber-300 bg-white p-5 shadow-md shadow-amber-900/5 hover:shadow-lg hover:shadow-amber-900/10 transition">
           <p className="text-xs uppercase tracking-[0.28em] text-amber-700 mb-3 font-bold">PMV</p>
-          <p className="text-3xl font-bold text-amber-700">{formatBRL(periodoSelecionado.total.pmv)}</p>
+          <p className="text-3xl font-bold text-amber-700">{formatBRL(r2.total.pmv)}</p>
           <p className="mt-2 text-sm font-medium text-amber-600/80">preço médio de venda</p>
         </div>
       </div>
@@ -273,123 +297,118 @@ export default function StepPmv({ className, back }) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <h3 className="text-lg font-bold text-slate-800">DRE por SKU</h3>
         </div>
-        <table className="w-full text-sm min-w-[1200px]">
+        <table className="w-full text-sm min-w-[1400px]">
           <thead>
             <tr className="border-b border-blue-500 text-left bg-blue-600 text-white">
               <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
-              <th className="py-3 px-2 font-semibold text-center">Qtde</th>
-              <th className="py-3 px-2 font-semibold text-center">Unit</th>
-              <th className="py-3 px-2 font-semibold text-center">ROB</th>
-              <th className="py-3 px-2 font-semibold text-center">Impostos %</th>
-              <th className="py-3 px-2 font-semibold text-center">Desc %</th>
-              <th className="py-3 px-2 font-semibold text-center">ROL</th>
-              <th className="py-3 px-2 font-semibold text-center">CPV %</th>
-              <th className="py-3 px-2 font-semibold text-center">CMV</th>
-              <th className="py-3 px-2 font-semibold text-center">MB</th>
-              <th className="py-3 px-2 font-semibold text-center">Comissão/Frete %</th>
-              <th className="py-3 px-2 font-semibold text-center">ADD %</th>
-              <th className="py-3 px-2 font-semibold text-center">ADD</th>
-              <th className="py-3 px-2 font-semibold text-center">MC</th>
-              <th className="py-3 px-2 font-semibold text-center">MC %</th>
+              <th className="py-3 px-2 font-semibold">Nome</th>
+              <th colSpan="4" className="py-3 px-2 text-center border-b border-white/20">
+                <input
+                  type="text"
+                  value={r1.periodo.nome}
+                  onChange={(e) => updatePeriodoNome(r1.periodo.id, e.target.value)}
+                  className="bg-transparent border-b border-white/40 text-white text-center text-sm outline-none focus:border-white px-1"
+                />
+              </th>
+              <th colSpan="4" className="py-3 px-2 text-center border-b border-white/20">
+                <input
+                  type="text"
+                  value={r2.periodo.nome}
+                  onChange={(e) => updatePeriodoNome(r2.periodo.id, e.target.value)}
+                  className="bg-transparent border-b border-white/40 text-white text-center text-sm outline-none focus:border-white px-1"
+                />
+              </th>
+              <th colSpan="2" className="py-3 px-2 text-center">Variação</th>
+              <th colSpan="3" className="py-3 px-2 text-center">Análise PMV</th>
               <th className="py-3 px-2"></th>
+            </tr>
+            <tr className="border-b border-blue-500 text-left bg-blue-600 text-white text-xs">
+              <th className="py-2 px-2 sticky left-0 bg-blue-600 z-10"></th>
+              <th className="py-2 px-2"></th>
+              <th className="py-2 px-2 text-center font-semibold">Qtd</th>
+              <th className="py-2 px-2 text-center font-semibold">R$</th>
+              <th className="py-2 px-2 text-center font-semibold">Unit</th>
+              <th className="py-2 px-2 text-center font-semibold">Marg%</th>
+              <th className="py-2 px-2 text-center font-semibold">Qtd</th>
+              <th className="py-2 px-2 text-center font-semibold">R$</th>
+              <th className="py-2 px-2 text-center font-semibold">Unit</th>
+              <th className="py-2 px-2 text-center font-semibold">Marg%</th>
+              <th className="py-2 px-2 text-center font-semibold">Δ Qtd</th>
+              <th className="py-2 px-2 text-center font-semibold">Δ R$</th>
+              <th className="py-2 px-2 text-center font-semibold">Volume</th>
+              <th className="py-2 px-2 text-center font-semibold">Preço</th>
+              <th className="py-2 px-2 text-center font-semibold">Mix</th>
+              <th className="py-2 px-2"></th>
             </tr>
           </thead>
           <tbody>
-            {periodoSelecionado.skuLinhas.map((l) => (
-              <tr key={l.sku.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+            {analise.map((a) => (
+              <tr key={a.sku.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
                 <td className="py-2 px-2 sticky left-0 bg-white z-10">
                   <input
                     type="text"
-                    value={l.sku.nome}
-                    onChange={(e) => updateSku(l.sku.id, 'nome', e.target.value)}
-                    className={inputClass}
+                    value={a.sku.nome}
+                    onChange={(e) => updateSku(a.sku.id, 'nome', e.target.value)}
+                    className={inputNomeClass}
                   />
                 </td>
+                <td className="py-2 px-2 text-xs text-slate-500 truncate max-w-[160px]">{a.sku.nome}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
                     min="0"
                     step="1"
-                    value={periodoSelecionado.periodo.valores[l.sku.id].qtde}
-                    onChange={(e) => updateValores(l.sku.id, 'qtde', e.target.value)}
+                    value={r1.periodo.valores[a.sku.id].qtde}
+                    onChange={(e) => updateValores(r1.periodo.id, a.sku.id, 'qtde', e.target.value)}
                     className={inputClass}
                   />
                 </td>
+                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(a.anterior.rob)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
                     min="0"
                     step="0.01"
-                    value={periodoSelecionado.periodo.valores[l.sku.id].unit}
-                    onChange={(e) => updateValores(l.sku.id, 'unit', e.target.value)}
+                    value={r1.periodo.valores[a.sku.id].unit}
+                    onChange={(e) => updateValores(r1.periodo.id, a.sku.id, 'unit', e.target.value)}
                     className={inputClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(l.rob)}</td>
+                <td className="py-2 px-2 text-center text-violet-700">{formatPercent(a.anterior.mcPct)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
                     min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.sku.impostosPct}
-                    onChange={(e) => updateSku(l.sku.id, 'impostosPct', e.target.value)}
-                    className={inputPctClass}
+                    step="1"
+                    value={r2.periodo.valores[a.sku.id].qtde}
+                    onChange={(e) => updateValores(r2.periodo.id, a.sku.id, 'qtde', e.target.value)}
+                    className={inputClass}
                   />
                 </td>
+                <td className="py-2 px-2 text-center text-cyan-700 font-semibold">{formatBRL(a.atual.rob)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
                     min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.sku.descontoPct}
-                    onChange={(e) => updateSku(l.sku.id, 'descontoPct', e.target.value)}
-                    className={inputPctClass}
+                    step="0.01"
+                    value={r2.periodo.valores[a.sku.id].unit}
+                    onChange={(e) => updateValores(r2.periodo.id, a.sku.id, 'unit', e.target.value)}
+                    className={inputClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-center text-emerald-700 font-semibold">{formatBRL(l.rol)}</td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.sku.cpvPct}
-                    onChange={(e) => updateSku(l.sku.id, 'cpvPct', e.target.value)}
-                    className={inputPctClass}
-                  />
+                <td className="py-2 px-2 text-center text-violet-700 font-semibold">{formatPercent(a.atual.mcPct)}</td>
+                <td className={`py-2 px-2 text-center font-semibold ${deltaClass(a.deltaQtd)}`}>
+                  {deltaSignal(a.deltaQtd)}{formatNumber(a.deltaQtd)}
                 </td>
-                <td className="py-2 px-2 text-center text-orange-700">{formatBRL(l.cmv)}</td>
-                <td className="py-2 px-2 text-center text-amber-700 font-semibold">{formatBRL(l.mb)}</td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.sku.comissaoFretePct}
-                    onChange={(e) => updateSku(l.sku.id, 'comissaoFretePct', e.target.value)}
-                    className={inputPctClass}
-                  />
+                <td className={`py-2 px-2 text-center font-semibold ${deltaClass(a.deltaRob)}`}>
+                  {deltaSignal(a.deltaRob)}{formatBRL(a.deltaRob)}
                 </td>
-                <td className="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={l.sku.addPct}
-                    onChange={(e) => updateSku(l.sku.id, 'addPct', e.target.value)}
-                    className={inputPctClass}
-                  />
-                </td>
-                <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.add)}</td>
-                <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(l.mc)}</td>
-                <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatPercent(l.rol > 0 ? (l.mc / l.rol) * 100 : 0)}</td>
+                <td className={`py-2 px-2 text-center ${deltaClass(a.impactoVolume)}`}>{deltaSignal(a.impactoVolume)}{formatBRL(a.impactoVolume)}</td>
+                <td className={`py-2 px-2 text-center ${deltaClass(a.impactoPreco)}`}>{deltaSignal(a.impactoPreco)}{formatBRL(a.impactoPreco)}</td>
+                <td className={`py-2 px-2 text-center ${deltaClass(a.impactoMix)}`}>{deltaSignal(a.impactoMix)}{formatBRL(a.impactoMix)}</td>
                 <td className="py-2 px-2 text-center">
                   <button
-                    onClick={() => removeSku(l.sku.id)}
+                    onClick={() => removeSku(a.sku.id)}
                     className="text-rose-400 hover:text-rose-600 transition text-lg leading-none"
                     title="Remover SKU"
                   >
@@ -398,40 +417,22 @@ export default function StepPmv({ className, back }) {
                 </td>
               </tr>
             ))}
-            <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold">
-              <td className="py-3 px-2 sticky left-0 bg-slate-50 z-10 text-slate-800">TOTAL</td>
-              <td className="py-3 px-2 text-center text-slate-700">{formatNumber(periodoSelecionado.total.qtde)}</td>
-              <td className="py-3 px-2 text-center text-amber-700">{formatBRL(periodoSelecionado.total.pmv)}</td>
-              <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(periodoSelecionado.total.rob)}</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-emerald-700">{formatBRL(periodoSelecionado.total.rol)}</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-orange-700">{formatBRL(periodoSelecionado.total.cmv)}</td>
-              <td className="py-3 px-2 text-center text-amber-700">{formatBRL(periodoSelecionado.total.mb)}</td>
-              <td className="py-3 px-2 text-center text-rose-600">{formatBRL(periodoSelecionado.total.comissaoFrete)}</td>
-              <td className="py-3 px-2 text-center text-slate-500">-</td>
-              <td className="py-3 px-2 text-center text-rose-600">{formatBRL(periodoSelecionado.total.add)}</td>
-              <td className="py-3 px-2 text-center text-violet-700 text-lg">{formatBRL(periodoSelecionado.total.mc)}</td>
-              <td className="py-3 px-2 text-center text-violet-700">{formatPercent(periodoSelecionado.total.mcPct)}</td>
-              <td className="py-3 px-2"></td>
-            </tr>
           </tbody>
         </table>
       </div>
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
-          <h3 className="text-lg font-bold text-violet-700 mb-4">Participação na MC</h3>
+          <h3 className="text-lg font-bold text-violet-700 mb-4">Evolução da Margem de Contribuição</h3>
           <div className="h-64">
-            <SimpleBarChart data={skuChartData} valueKey="mc" labelKey="nome" />
+            <SimpleBarChart data={chartData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
         <div className="rounded-[28px] border border-amber-200 bg-white p-6 shadow-lg shadow-amber-500/5">
-          <h3 className="text-lg font-bold text-amber-700 mb-4">PMV por SKU</h3>
+          <h3 className="text-lg font-bold text-amber-700 mb-4">Evolução do PMV</h3>
           <div className="h-64">
-            <SimpleBarChart data={skuChartData} valueKey="pmv" labelKey="nome" color="#fbbf24" />
+            <SimpleBarChart data={chartData} valueKey="pmv" labelKey="nome" color="#fbbf24" />
           </div>
         </div>
       </div>
