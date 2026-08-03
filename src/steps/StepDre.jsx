@@ -226,6 +226,7 @@ export default function StepDre({ className, back }) {
               <th className="py-3 px-2 font-semibold text-center">CMV</th>
               <th className="py-3 px-2 font-semibold text-center">MB</th>
               <th className="py-3 px-2 font-semibold text-center">Comissão/Frete %</th>
+              <th className="py-3 px-2 font-semibold text-center">Comissão/Frete</th>
               <th className="py-3 px-2 font-semibold text-center">ADD %</th>
               <th className="py-3 px-2 font-semibold text-center">ADD</th>
               <th className="py-3 px-2 font-semibold text-center">MC</th>
@@ -312,6 +313,7 @@ export default function StepDre({ className, back }) {
                     className={inputPctClass}
                   />
                 </td>
+                <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.comissaoFrete)}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -348,6 +350,7 @@ export default function StepDre({ className, back }) {
               <td className="py-3 px-2 text-center text-slate-500">-</td>
               <td className="py-3 px-2 text-center text-orange-700">{formatBRL(totais.cmv)}</td>
               <td className="py-3 px-2 text-center text-amber-700">{formatBRL(totais.mb)}</td>
+              <td className="py-3 px-2 text-center text-slate-500">-</td>
               <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.comissaoFrete)}</td>
               <td className="py-3 px-2 text-center text-slate-500">-</td>
               <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.add)}</td>
