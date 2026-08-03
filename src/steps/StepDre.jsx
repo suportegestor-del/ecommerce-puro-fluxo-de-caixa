@@ -314,12 +314,12 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <th className="py-3 px-2 font-semibold text-center">CPV %</th>
             <th className="py-3 px-2 font-semibold text-center">CMV</th>
             <th className="py-3 px-2 font-semibold text-center">MB</th>
-            <th className="py-3 px-2 font-semibold text-center">MC</th>
-            <th className="py-3 px-2 font-semibold text-center">MC %</th>
             <th className="py-3 px-2 font-semibold text-center">Comissão/Frete %</th>
             <th className="py-3 px-2 font-semibold text-center">Comissão/Frete</th>
             <th className="py-3 px-2 font-semibold text-center">ADD %</th>
             <th className="py-3 px-2 font-semibold text-center">ADD</th>
+            <th className="py-3 px-2 font-semibold text-center">MC</th>
+            <th className="py-3 px-2 font-semibold text-center">MC %</th>
             <th className="py-3 px-2 font-semibold text-center"></th>
           </tr>
         </thead>
@@ -391,8 +391,6 @@ function DreTable({ skus, setSkus, title, storageKey }) {
               </td>
               <td className="py-2 px-2 text-center text-orange-700">{formatBRL(l.cmv)}</td>
               <td className="py-2 px-2 text-center text-amber-700 font-semibold">{formatBRL(l.mb)}</td>
-              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(l.mc)}</td>
-              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatPercent(l.mcPct)}</td>
               <td className="py-2 px-2">
                 <input
                   type="number"
@@ -417,6 +415,8 @@ function DreTable({ skus, setSkus, title, storageKey }) {
                 />
               </td>
               <td className="py-2 px-2 text-center text-rose-600">{formatBRL(l.add)}</td>
+              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatBRL(l.mc)}</td>
+              <td className="py-2 px-2 text-center text-violet-700 font-bold">{formatPercent(l.mcPct)}</td>
               <td className="py-2 px-2 text-center">
                 <button
                   onClick={() => removeSku(l.id)}
@@ -439,12 +439,12 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-orange-700">{formatBRL(totais.cmv)}</td>
             <td className="py-3 px-2 text-center text-amber-700">{formatBRL(totais.mb)}</td>
-            <td className="py-3 px-2 text-center text-violet-700">{formatBRL(totais.mc)}</td>
-            <td className="py-3 px-2 text-center text-violet-700">{formatPercent(totais.mcPct)}</td>
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.comissaoFrete)}</td>
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.add)}</td>
+            <td className="py-3 px-2 text-center text-violet-700">{formatBRL(totais.mc)}</td>
+            <td className="py-3 px-2 text-center text-violet-700">{formatPercent(totais.mcPct)}</td>
             <td className="py-3 px-2"></td>
           </tr>
         </tbody>
@@ -453,7 +453,7 @@ function DreTable({ skus, setSkus, title, storageKey }) {
   )
 }
 
-export default function StepDre({ className, back }) {
+export default function StepDre({ className, back, setMode }) {
   const [skus, setSkus] = useState(() => loadStorage('epfc_dre_skus', initialSkus))
   const [skus2, setSkus2] = useState(() => loadStorage('epfc_dre_skus_2', initialSkus2))
 
@@ -470,6 +470,43 @@ export default function StepDre({ className, back }) {
       pct: (l.mc / totalMc) * 100,
     }))
   }, [linhas, totais.mc])
+
+  const exportarParaPmv = () => {
+    const pmvSkus = skus.map((sku) => ({
+      id: sku.id,
+      nome: sku.nome,
+      impostosPct: sku.impostosPct,
+      descontoPct: sku.descontoPct,
+      cpvPct: sku.cpvPct,
+      comissaoFretePct: sku.comissaoFretePct,
+      addPct: sku.addPct,
+    }))
+
+    const pmvPeriodos = [
+      {
+        id: 'p1',
+        nome: 'Período 1',
+        valores: skus.reduce((acc, sku) => {
+          acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario }
+          return acc
+        }, {}),
+      },
+      {
+        id: 'p2',
+        nome: 'Período 2',
+        valores: skus2.reduce((acc, sku) => {
+          acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario }
+          return acc
+        }, {}),
+      },
+    ]
+
+    saveStorage('epfc_pmv_skus', pmvSkus)
+    saveStorage('epfc_pmv_periodos', pmvPeriodos)
+    saveStorage('epfc_pmv_periodoAtivo', 'p1')
+    saveStorage('epfc_pmv_imported', true)
+    if (setMode) setMode('pmv')
+  }
 
   return (
     <div className={`w-full max-w-[99vw] px-2 ${className}`}>
@@ -537,6 +574,12 @@ export default function StepDre({ className, back }) {
           className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-200 text-slate-700 hover:bg-slate-100 transition"
         >
           ← Voltar
+        </button>
+        <button
+          onClick={exportarParaPmv}
+          className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-violet-500 to-purple-500 text-white font-semibold shadow-lg shadow-violet-500/20 hover:brightness-110 transition"
+        >
+          Ir para PMV →
         </button>
       </div>
     </div>
