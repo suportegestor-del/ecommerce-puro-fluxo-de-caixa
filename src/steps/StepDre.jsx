@@ -485,7 +485,7 @@ export default function StepDre({ className, back, onGoToPmv }) {
     }))
 
     const valoresP1 = skus.reduce((acc, sku) => {
-      acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario }
+      acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario, novoUnit: sku.precoUnitario }
       return acc
     }, {})
 
@@ -502,7 +502,8 @@ export default function StepDre({ className, back, onGoToPmv }) {
 
     const valoresP2 = skus.reduce((acc, sku, idx) => {
       const sku2 = skus2[idx] || skus2.find((s) => s.nome === sku.nome) || {}
-      acc[sku.id] = { qtde: sku2.qtde ?? 0, unit: sku2.precoUnitario ?? 0 }
+      const unit2 = sku2.precoUnitario ?? sku.precoUnitario
+      acc[sku.id] = { qtde: sku2.qtde ?? 0, unit: unit2, novoUnit: unit2 }
       return acc
     }, {})
 

@@ -47,9 +47,9 @@ const initialSkus = [
 ]
 
 const valoresIniciais = {
-  'sku-a': { qtde: 1000, unit: 150 },
-  'sku-b': { qtde: 2200, unit: 114 },
-  'sku-c': { qtde: 3000, unit: 67 },
+  'sku-a': { qtde: 1000, unit: 150, novoUnit: 150 },
+  'sku-b': { qtde: 2200, unit: 114, novoUnit: 114 },
+  'sku-c': { qtde: 3000, unit: 67, novoUnit: 67 },
 }
 
 const percentuaisIniciais = {
@@ -70,7 +70,10 @@ function normalizarPeriodos(skus, periodos) {
     const percentuais = { ...(p.percentuais || {}) }
     skus.forEach((sku) => {
       if (!valores[sku.id]) {
-        valores[sku.id] = { qtde: 0, unit: 0 }
+        valores[sku.id] = { qtde: 0, unit: 0, novoUnit: 0 }
+      }
+      if (valores[sku.id].novoUnit === undefined) {
+        valores[sku.id].novoUnit = valores[sku.id].unit
       }
       if (!percentuais[sku.id]) {
         percentuais[sku.id] = {
@@ -156,7 +159,8 @@ export default function StepPmv({ className, back }) {
     const pct = percentuais || sku
     const qtde = parseNumber(valores?.qtde ?? 0)
     const unit = parseNumber(valores?.unit ?? 0)
-    const rob = qtde * unit
+    const novoUnit = parseNumber(valores?.novoUnit ?? unit)
+    const rob = qtde * novoUnit
     const impostosPct = parseNumber(pct?.impostosPct ?? sku?.impostosPct ?? 0)
     const descontoPct = parseNumber(pct?.descontoPct ?? sku?.descontoPct ?? 0)
     const cpvPct = parseNumber(pct?.cpvPct ?? sku?.cpvPct ?? 0)
@@ -171,7 +175,7 @@ export default function StepPmv({ className, back }) {
     const add = rol * (addPct / 100)
     const mc = mb - comissaoFrete - add
     const mcPct = rol > 0 ? (mc / rol) * 100 : 0
-    return { sku, qtde, unit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc, mcPct }
+    return { sku, qtde, unit, novoUnit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc, mcPct }
   }
 
   const resultadoPeriodos = useMemo(() => {
@@ -236,7 +240,7 @@ export default function StepPmv({ className, back }) {
       const qtdAnt = linhaAnterior.qtde
       const qtdAtu = linhaAtual.qtde
       const unitAnt = linhaAnterior.unit
-      const unitAtu = linhaAtual.unit
+      const unitAtu = linhaAtual.novoUnit
       const robAnt = linhaAnterior.rob
       const robAtu = linhaAtual.rob
 
@@ -265,7 +269,7 @@ export default function StepPmv({ className, back }) {
     setPeriodos((prev) =>
       prev.map((p) => ({
         ...p,
-        valores: { ...p.valores, [novo.id]: { qtde: 1000, unit: 150 } },
+        valores: { ...p.valores, [novo.id]: { qtde: 1000, unit: 150, novoUnit: 150 } },
         percentuais: { ...p.percentuais, [novo.id]: {
           impostosPct: novo.impostosPct,
           descontoPct: novo.descontoPct,
@@ -386,7 +390,7 @@ export default function StepPmv({ className, back }) {
                   className="bg-transparent border-b border-white/40 text-white text-center text-sm outline-none focus:border-white px-1"
                 />
               </th>
-              <th colSpan="4" className="py-3 px-2 text-center border-b border-white/20">
+              <th colSpan="5" className="py-3 px-2 text-center border-b border-white/20">
                 <input
                   type="text"
                   value={r2.periodo.nome}
@@ -408,6 +412,7 @@ export default function StepPmv({ className, back }) {
               <th className="py-2 px-2 text-center font-semibold">Qtd</th>
               <th className="py-2 px-2 text-center font-semibold">R$</th>
               <th className="py-2 px-2 text-center font-semibold">Unit</th>
+              <th className="py-2 px-2 text-center font-semibold">Novo Unit</th>
               <th className="py-2 px-2 text-center font-semibold">Marg%</th>
               <th className="py-2 px-2 text-center font-semibold">Δ Qtd</th>
               <th className="py-2 px-2 text-center font-semibold">Δ R$</th>
@@ -469,6 +474,16 @@ export default function StepPmv({ className, back }) {
                     step="0.01"
                     value={r2.periodo.valores[a.sku.id]?.unit ?? ''}
                     onChange={(e) => updateValores(r2.periodo.id, a.sku.id, 'unit', e.target.value)}
+                    className={inputClass}
+                  />
+                </td>
+                <td className="py-2 px-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={r2.periodo.valores[a.sku.id]?.novoUnit ?? ''}
+                    onChange={(e) => updateValores(r2.periodo.id, a.sku.id, 'novoUnit', e.target.value)}
                     className={inputClass}
                   />
                 </td>
