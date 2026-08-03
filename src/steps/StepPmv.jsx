@@ -95,14 +95,15 @@ function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
   const numericValues = data.map((d) => Number(d?.[valueKey]) || 0)
   const max = Math.max(...numericValues.map(Math.abs), 1)
   const min = Math.min(...numericValues.map(Math.abs))
-  const base = min >= 0 ? min * 0.85 : 0
-  const range = max - base
+  const base = min
+  const range = max - min
   return (
     <div className="flex items-end gap-4 h-full px-4 pb-2">
       {data.map((d, idx) => {
         const val = Number(d?.[valueKey]) || 0
-        const pct = range > 0 ? ((Math.abs(val) - base) / range) * 100 : 100
-        const height = `${Math.max(Math.min(pct, 100), 8)}%`
+        const rawPct = range > 0 ? ((Math.abs(val) - base) / range) * 100 : 100
+        const pct = Math.max(Math.min(rawPct, 100), 0)
+        const height = `${Math.max(pct, 3)}%`
         return (
           <div key={idx} className="flex-1 flex flex-col items-center justify-end group relative">
             <div className="mb-2 text-xs font-bold text-slate-700 text-center whitespace-nowrap">
@@ -110,7 +111,7 @@ function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
             </div>
             <div
               style={{ height, backgroundColor: colors[idx % colors.length] || color }}
-              className="w-full rounded-t-xl min-h-[24px] transition-all"
+              className="w-full rounded-t-xl min-h-[28px] transition-all"
             />
             <div className="text-xs text-slate-600 mt-2 truncate max-w-full font-medium">{d[labelKey]}</div>
           </div>
@@ -582,14 +583,14 @@ export default function StepPmv({ className, back }) {
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
           <h3 className="text-lg font-bold text-violet-700 mb-4">Evolução da Margem de Contribuição</h3>
-          <div className="h-96">
+          <div className="h-[28rem]">
             <SimpleBarChart data={chartData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
         <div className="rounded-[28px] border border-rose-200 bg-white p-6 shadow-lg shadow-rose-500/5">
           <h3 className="text-lg font-bold text-rose-700 mb-4">Evolução do Capital de Giro Travado</h3>
-          <div className="h-96">
+          <div className="h-[28rem]">
             <SimpleBarChart data={chartData} valueKey="capitalGiro" labelKey="nome" color="#fb7185" />
           </div>
         </div>
