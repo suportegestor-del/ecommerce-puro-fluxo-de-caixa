@@ -245,7 +245,7 @@ export default function StepPmv({ className, back }) {
     const impostos = rob * (parseNumber(sku.impostosPct) / 100)
     const desconto = rob * (parseNumber(sku.descontoPct) / 100)
     const rol = rob - impostos - desconto
-    const cmv = -rol * (parseNumber(sku.cpvPct) / 100)
+    const cmv = -rob * (parseNumber(sku.cpvPct) / 100)
     const mb = rol + cmv
     const comissaoFrete = rol * (parseNumber(sku.comissaoFretePct) / 100)
     const add = rol * (parseNumber(sku.addPct) / 100)
