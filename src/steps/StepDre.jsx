@@ -489,6 +489,12 @@ export default function StepDre({ className, back, onGoToPmv }) {
       addPct: sku.addPct,
     }))
 
+    const valoresP2 = skus.reduce((acc, sku, idx) => {
+      const sku2 = skus2[idx] || skus2.find((s) => s.nome === sku.nome) || {}
+      acc[sku.id] = { qtde: sku2.qtde ?? 0, unit: sku2.precoUnitario ?? 0 }
+      return acc
+    }, {})
+
     const pmvPeriodos = [
       {
         id: 'p1',
@@ -501,10 +507,7 @@ export default function StepDre({ className, back, onGoToPmv }) {
       {
         id: 'p2',
         nome: 'Período 2',
-        valores: skus2.reduce((acc, sku) => {
-          acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario }
-          return acc
-        }, {}),
+        valores: valoresP2,
       },
     ]
 
