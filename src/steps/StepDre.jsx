@@ -65,7 +65,7 @@ function calcularLinhas(skus) {
     const rob = qtde * preco
     const novoUnit = preco * (1 - descontoPct / 100)
     const impostos = rob * (impostosPct / 100)
-    const desconto = rob * (descontoPct / 100)
+    const desconto = (rob - impostos) * (descontoPct / 100)
     const rol = rob - impostos - desconto
     const cmv = -rob * (cpvPct / 100)
     const mb = rol + cmv
