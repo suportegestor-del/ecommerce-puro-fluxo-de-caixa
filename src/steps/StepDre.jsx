@@ -68,6 +68,7 @@ function calcularLinhas(skus) {
     const desconto = qtde * (preco - novoUnit)
     const rol = rob - impostos
     const cmv = -rob * (cpvPct / 100)
+    const custoUnit = qtde > 0 ? (rob * (cpvPct / 100)) / qtde : 0
     const mb = rol + cmv
     const comissaoFrete = rob * (comissaoFretePct / 100)
     const add = rob * (addPct / 100)
@@ -84,6 +85,7 @@ function calcularLinhas(skus) {
       desconto,
       rol,
       cmv,
+      custoUnit,
       mb,
       comissaoFrete,
       add,
@@ -315,6 +317,7 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <th className="py-3 px-2 font-semibold text-center">Impostos %</th>
             <th className="py-3 px-2 font-semibold text-center">ROL</th>
             <th className="py-3 px-2 font-semibold text-center">CPV %</th>
+            <th className="py-3 px-2 font-semibold text-center">Custo Unit</th>
             <th className="py-3 px-2 font-semibold text-center">CMV</th>
             <th className="py-3 px-2 font-semibold text-center">MB</th>
             <th className="py-3 px-2 font-semibold text-center">Comissão/Frete %</th>
@@ -395,6 +398,7 @@ function DreTable({ skus, setSkus, title, storageKey }) {
                   className={inputPctClass}
                 />
               </td>
+              <td className="py-2 px-2 text-center text-orange-600 text-xs">{formatBRL(l.custoUnit)}</td>
               <td className="py-2 px-2 text-center text-orange-700">{formatBRL(l.cmv)}</td>
               <td className="py-2 px-2 text-center text-amber-700 font-semibold">{formatBRL(l.mb)}</td>
               <td className="py-2 px-2">
@@ -443,6 +447,7 @@ function DreTable({ skus, setSkus, title, storageKey }) {
             <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.impostos)}</td>
             <td className="py-3 px-2 text-center text-rose-600">{formatBRL(totais.desconto)}</td>
             <td className="py-3 px-2 text-center text-emerald-700">{formatBRL(totais.rol)}</td>
+            <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-slate-500">-</td>
             <td className="py-3 px-2 text-center text-orange-700">{formatBRL(totais.cmv)}</td>
             <td className="py-3 px-2 text-center text-amber-700">{formatBRL(totais.mb)}</td>
