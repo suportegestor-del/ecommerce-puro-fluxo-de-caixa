@@ -482,12 +482,23 @@ export default function StepDre({ className, back, onGoToPmv }) {
     const pmvSkus = skus.map((sku) => ({
       id: sku.id,
       nome: sku.nome,
-      impostosPct: sku.impostosPct,
-      descontoPct: sku.descontoPct,
-      cpvPct: sku.cpvPct,
-      comissaoFretePct: sku.comissaoFretePct,
-      addPct: sku.addPct,
     }))
+
+    const valoresP1 = skus.reduce((acc, sku) => {
+      acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario }
+      return acc
+    }, {})
+
+    const percentuaisP1 = skus.reduce((acc, sku) => {
+      acc[sku.id] = {
+        impostosPct: sku.impostosPct,
+        descontoPct: sku.descontoPct,
+        cpvPct: sku.cpvPct,
+        comissaoFretePct: sku.comissaoFretePct,
+        addPct: sku.addPct,
+      }
+      return acc
+    }, {})
 
     const valoresP2 = skus.reduce((acc, sku, idx) => {
       const sku2 = skus2[idx] || skus2.find((s) => s.nome === sku.nome) || {}
@@ -495,20 +506,21 @@ export default function StepDre({ className, back, onGoToPmv }) {
       return acc
     }, {})
 
+    const percentuaisP2 = skus.reduce((acc, sku, idx) => {
+      const sku2 = skus2[idx] || skus2.find((s) => s.nome === sku.nome) || {}
+      acc[sku.id] = {
+        impostosPct: sku2.impostosPct ?? sku.impostosPct,
+        descontoPct: sku2.descontoPct ?? sku.descontoPct,
+        cpvPct: sku2.cpvPct ?? sku.cpvPct,
+        comissaoFretePct: sku2.comissaoFretePct ?? sku.comissaoFretePct,
+        addPct: sku2.addPct ?? sku.addPct,
+      }
+      return acc
+    }, {})
+
     const pmvPeriodos = [
-      {
-        id: 'p1',
-        nome: 'Período 1',
-        valores: skus.reduce((acc, sku) => {
-          acc[sku.id] = { qtde: sku.qtde, unit: sku.precoUnitario }
-          return acc
-        }, {}),
-      },
-      {
-        id: 'p2',
-        nome: 'Período 2',
-        valores: valoresP2,
-      },
+      { id: 'p1', nome: 'Período 1', valores: valoresP1, percentuais: percentuaisP1 },
+      { id: 'p2', nome: 'Período 2', valores: valoresP2, percentuais: percentuaisP2 },
     ]
 
     saveStorage('epfc_pmv_skus', pmvSkus)

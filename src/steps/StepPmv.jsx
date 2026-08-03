@@ -52,21 +52,37 @@ const valoresIniciais = {
   'sku-c': { qtde: 3000, unit: 67 },
 }
 
+const percentuaisIniciais = {
+  'sku-a': { impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
+  'sku-b': { impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
+  'sku-c': { impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
+}
+
 const initialPeriodos = [
-  { id: 'p1', nome: 'Período 1', valores: JSON.parse(JSON.stringify(valoresIniciais)) },
-  { id: 'p2', nome: 'Período 2', valores: JSON.parse(JSON.stringify(valoresIniciais)) },
+  { id: 'p1', nome: 'Período 1', valores: JSON.parse(JSON.stringify(valoresIniciais)), percentuais: JSON.parse(JSON.stringify(percentuaisIniciais)) },
+  { id: 'p2', nome: 'Período 2', valores: JSON.parse(JSON.stringify(valoresIniciais)), percentuais: JSON.parse(JSON.stringify(percentuaisIniciais)) },
 ]
 
 function normalizarPeriodos(skus, periodos) {
   if (!Array.isArray(periodos) || periodos.length === 0) return initialPeriodos
   return periodos.slice(0, 2).map((p) => {
     const valores = { ...(p.valores || {}) }
+    const percentuais = { ...(p.percentuais || {}) }
     skus.forEach((sku) => {
       if (!valores[sku.id]) {
         valores[sku.id] = { qtde: 0, unit: 0 }
       }
+      if (!percentuais[sku.id]) {
+        percentuais[sku.id] = {
+          impostosPct: sku.impostosPct,
+          descontoPct: sku.descontoPct,
+          cpvPct: sku.cpvPct,
+          comissaoFretePct: sku.comissaoFretePct,
+          addPct: sku.addPct,
+        }
+      }
     })
-    return { ...p, valores }
+    return { ...p, valores, percentuais }
   })
 }
 
@@ -136,17 +152,23 @@ export default function StepPmv({ className, back }) {
     }
   }, [skus])
 
-  const calculaLinhaSku = (sku, valores) => {
+  const calculaLinhaSku = (sku, valores, percentuais) => {
+    const pct = percentuais || sku
     const qtde = parseNumber(valores?.qtde ?? 0)
     const unit = parseNumber(valores?.unit ?? 0)
     const rob = qtde * unit
-    const impostos = rob * (parseNumber(sku.impostosPct) / 100)
-    const desconto = rob * (parseNumber(sku.descontoPct) / 100)
+    const impostosPct = parseNumber(pct?.impostosPct ?? sku?.impostosPct ?? 0)
+    const descontoPct = parseNumber(pct?.descontoPct ?? sku?.descontoPct ?? 0)
+    const cpvPct = parseNumber(pct?.cpvPct ?? sku?.cpvPct ?? 0)
+    const comissaoFretePct = parseNumber(pct?.comissaoFretePct ?? sku?.comissaoFretePct ?? 0)
+    const addPct = parseNumber(pct?.addPct ?? sku?.addPct ?? 0)
+    const impostos = rob * (impostosPct / 100)
+    const desconto = rob * (descontoPct / 100)
     const rol = rob - impostos - desconto
-    const cmv = -rob * (parseNumber(sku.cpvPct) / 100)
+    const cmv = -rob * (cpvPct / 100)
     const mb = rol + cmv
-    const comissaoFrete = rol * (parseNumber(sku.comissaoFretePct) / 100)
-    const add = rol * (parseNumber(sku.addPct) / 100)
+    const comissaoFrete = rol * (comissaoFretePct / 100)
+    const add = rol * (addPct / 100)
     const mc = mb - comissaoFrete - add
     const mcPct = rol > 0 ? (mc / rol) * 100 : 0
     return { sku, qtde, unit, rob, impostos, desconto, rol, cmv, mb, comissaoFrete, add, mc, mcPct }
@@ -154,7 +176,7 @@ export default function StepPmv({ className, back }) {
 
   const resultadoPeriodos = useMemo(() => {
     return periodos.map((p) => {
-      const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id]))
+      const skuLinhas = skus.map((sku) => calculaLinhaSku(sku, p.valores[sku.id], p.percentuais?.[sku.id]))
       const total = skuLinhas.reduce(
         (acc, l) => ({
           qtde: acc.qtde + l.qtde,
@@ -216,6 +238,13 @@ export default function StepPmv({ className, back }) {
       prev.map((p) => ({
         ...p,
         valores: { ...p.valores, [novo.id]: { qtde: 1000, unit: 150 } },
+        percentuais: { ...p.percentuais, [novo.id]: {
+          impostosPct: novo.impostosPct,
+          descontoPct: novo.descontoPct,
+          cpvPct: novo.cpvPct,
+          comissaoFretePct: novo.comissaoFretePct,
+          addPct: novo.addPct,
+        } },
       }))
     )
   }
@@ -225,8 +254,10 @@ export default function StepPmv({ className, back }) {
     setPeriodos((prev) =>
       prev.map((p) => {
         const valores = { ...p.valores }
+        const percentuais = { ...p.percentuais }
         delete valores[id]
-        return { ...p, valores }
+        delete percentuais[id]
+        return { ...p, valores, percentuais }
       })
     )
   }
