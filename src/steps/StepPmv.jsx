@@ -496,7 +496,6 @@ export default function StepPmv({ className, back }) {
           <thead>
             <tr className="border-b border-blue-500 text-left bg-blue-600 text-white">
               <th className="py-3 px-2 font-semibold sticky left-0 bg-blue-600 z-10">SKU</th>
-              <th className="py-3 px-2 font-semibold">Nome</th>
               <th colSpan="5" className="py-3 px-2 text-center border-b border-white/20">
                 <input
                   type="text"
@@ -519,7 +518,6 @@ export default function StepPmv({ className, back }) {
             </tr>
             <tr className="border-b border-blue-500 text-left bg-blue-600 text-white text-xs">
               <th className="py-2 px-2 sticky left-0 bg-blue-600 z-10"></th>
-              <th className="py-2 px-2"></th>
               <th className="py-2 px-2 text-center font-semibold">Qtd</th>
               <th className="py-2 px-2 text-center font-semibold">R$</th>
               <th className="py-2 px-2 text-center font-semibold">Unit</th>
@@ -551,7 +549,6 @@ export default function StepPmv({ className, back }) {
                     className={inputNomeClass}
                   />
                 </td>
-                <td className="py-2 px-2 text-xs text-slate-500 truncate max-w-[160px]">{a.sku.nome}</td>
                 <td className="py-2 px-2">
                   <input
                     type="number"
@@ -631,7 +628,6 @@ export default function StepPmv({ className, back }) {
             ))}
             <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold">
               <td className="py-3 px-2 sticky left-0 bg-slate-50 z-10 text-slate-800">TOTAL</td>
-              <td className="py-3 px-2 text-xs text-slate-500 truncate max-w-[160px]"></td>
               <td className="py-3 px-2 text-center text-slate-600">{formatNumber(r1.total.qtde)}</td>
               <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(r1.total.rob)}</td>
               <td className="py-3 px-2 text-center text-slate-500">-</td>
