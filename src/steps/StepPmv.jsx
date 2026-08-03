@@ -406,88 +406,6 @@ export default function StepPmv({ className, back }) {
         </div>
       </div>
 
-      <div className="mt-6 rounded-[28px] border-2 border-rose-300 bg-white p-5 shadow-md shadow-rose-900/5 hover:shadow-lg hover:shadow-rose-900/10 transition">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-          <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Capital de Giro Travado</p>
-            <p className="text-3xl font-bold text-rose-700">{formatBRL(r2.total.capitalGiro)}</p>
-            <p className="mt-2 text-sm font-medium text-rose-600/80">NCG estimada no {r2.periodo.nome}</p>
-          </div>
-          <div className="lg:col-span-3">
-            <p className="text-xs uppercase tracking-[0.28em] text-slate-500 mb-4 font-bold">Prazos operacionais (dias)</p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs text-slate-500 mb-1">Prazo médio de recebimento</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={prazos.pmr}
-                  onChange={(e) => updatePrazo('pmr', e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-500 mb-1">Prazo médio de pagamento</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={prazos.pmp}
-                  onChange={(e) => updatePrazo('pmp', e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-500 mb-1">Cobertura de estoque</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={prazos.coberturaEstoque}
-                  onChange={(e) => updatePrazo('coberturaEstoque', e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 rounded-2xl border border-rose-100 bg-rose-50/40 p-4 overflow-x-auto">
-          <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Memória de cálculo — {r2.periodo.nome}</p>
-          <table className="w-full text-sm min-w-[420px]">
-            <thead>
-              <tr className="border-b border-rose-200 text-left text-rose-800 text-xs">
-                <th className="py-2 px-2 font-semibold">Item</th>
-                <th className="py-2 px-2 font-semibold">Cálculo</th>
-                <th className="py-2 px-2 font-semibold text-right">Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-rose-100">
-                <td className="py-2 px-2 text-slate-700">Estoque</td>
-                <td className="py-2 px-2 text-slate-500">{formatBRL(Math.abs(r2.total.cmv))} × {prazos.coberturaEstoque}/30</td>
-                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.estoque)}</td>
-              </tr>
-              <tr className="border-b border-rose-100">
-                <td className="py-2 px-2 text-slate-700">Contas a receber</td>
-                <td className="py-2 px-2 text-slate-500">{formatBRL(r2.total.rob)} × {prazos.pmr}/30</td>
-                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.contasReceber)}</td>
-              </tr>
-              <tr className="border-b border-rose-100">
-                <td className="py-2 px-2 text-slate-700">Contas a pagar</td>
-                <td className="py-2 px-2 text-slate-500">{formatBRL(Math.abs(r2.total.cmv))} × {prazos.pmp}/30</td>
-                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.contasPagar)}</td>
-              </tr>
-              <tr className="bg-rose-100/50 font-semibold">
-                <td className="py-2 px-2 text-rose-800">NCG</td>
-                <td className="py-2 px-2 text-rose-700">Estoque + Contas a receber - Contas a pagar</td>
-                <td className={`py-2 px-2 text-right ${r2.total.capitalGiro >= 0 ? 'text-rose-700' : 'text-emerald-600'}`}>{formatBRL(r2.total.capitalGiro)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       <div className="mt-4 rounded-[28px] border border-slate-200 bg-white p-6 overflow-x-auto shadow-lg">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <h3 className="text-lg font-bold text-slate-800">DRE por SKU</h3>
@@ -664,6 +582,93 @@ export default function StepPmv({ className, back }) {
           <div className="h-80">
             <SimpleBarChart data={chartData} valueKey="capitalGiro" labelKey="nome" color="#fb7185" />
           </div>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-[28px] border-2 border-rose-300 bg-white p-5 shadow-md shadow-rose-900/5 hover:shadow-lg hover:shadow-rose-900/10 transition">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+          <div>
+            <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Capital de Giro Travado</p>
+            <p className="text-3xl font-bold text-rose-700">{formatBRL(r2.total.capitalGiro)}</p>
+            <p className="mt-2 text-sm font-medium text-rose-600/80">NCG estimada no {r2.periodo.nome}</p>
+          </div>
+          <div className="lg:col-span-3">
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-500 mb-4 font-bold">Prazos operacionais (dias)</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Prazo médio de recebimento</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={prazos.pmr}
+                  onChange={(e) => updatePrazo('pmr', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Prazo médio de pagamento</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={prazos.pmp}
+                  onChange={(e) => updatePrazo('pmp', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Cobertura de estoque</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={prazos.coberturaEstoque}
+                  onChange={(e) => updatePrazo('coberturaEstoque', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="mt-6 rounded-2xl border border-rose-100 bg-rose-50/40 p-4 overflow-x-auto">
+          <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Memória de cálculo comparativa</p>
+          <table className="w-full text-sm min-w-[520px]">
+            <thead>
+              <tr className="border-b border-rose-200 text-left text-rose-800 text-xs">
+                <th className="py-2 px-2 font-semibold">Item</th>
+                <th className="py-2 px-2 font-semibold">Cálculo</th>
+                <th className="py-2 px-2 font-semibold text-right">{r1.periodo.nome}</th>
+                <th className="py-2 px-2 font-semibold text-right">{r2.periodo.nome}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-rose-100">
+                <td className="py-2 px-2 text-slate-700">Estoque</td>
+                <td className="py-2 px-2 text-slate-500">|CMV| × {prazos.coberturaEstoque}/30</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r1.total.estoque)}</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.estoque)}</td>
+              </tr>
+              <tr className="border-b border-rose-100">
+                <td className="py-2 px-2 text-slate-700">Contas a receber</td>
+                <td className="py-2 px-2 text-slate-500">ROB × {prazos.pmr}/30</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r1.total.contasReceber)}</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.contasReceber)}</td>
+              </tr>
+              <tr className="border-b border-rose-100">
+                <td className="py-2 px-2 text-slate-700">Contas a pagar</td>
+                <td className="py-2 px-2 text-slate-500">|CMV| × {prazos.pmp}/30</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r1.total.contasPagar)}</td>
+                <td className="py-2 px-2 text-right font-semibold text-slate-700">{formatBRL(r2.total.contasPagar)}</td>
+              </tr>
+              <tr className="bg-rose-100/50 font-semibold">
+                <td className="py-2 px-2 text-rose-800">NCG</td>
+                <td className="py-2 px-2 text-rose-700">Estoque + Receber - Pagar</td>
+                <td className={`py-2 px-2 text-right ${r1.total.capitalGiro >= 0 ? 'text-rose-700' : 'text-emerald-600'}`}>{formatBRL(r1.total.capitalGiro)}</td>
+                <td className={`py-2 px-2 text-right ${r2.total.capitalGiro >= 0 ? 'text-rose-700' : 'text-emerald-600'}`}>{formatBRL(r2.total.capitalGiro)}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
