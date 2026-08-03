@@ -453,7 +453,7 @@ function DreTable({ skus, setSkus, title, storageKey }) {
   )
 }
 
-export default function StepDre({ className, back, setMode }) {
+export default function StepDre({ className, back, onGoToPmv }) {
   const [skus, setSkus] = useState(() => loadStorage('epfc_dre_skus', initialSkus))
   const [skus2, setSkus2] = useState(() => loadStorage('epfc_dre_skus_2', initialSkus2))
 
@@ -505,7 +505,7 @@ export default function StepDre({ className, back, setMode }) {
     saveStorage('epfc_pmv_periodos', pmvPeriodos)
     saveStorage('epfc_pmv_periodoAtivo', 'p1')
     saveStorage('epfc_pmv_imported', true)
-    if (setMode) setMode('pmv')
+    if (typeof onGoToPmv === 'function') onGoToPmv()
   }
 
   return (
