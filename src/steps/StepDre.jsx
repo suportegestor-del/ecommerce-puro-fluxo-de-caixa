@@ -52,13 +52,13 @@ const initialSkusBase = [
 const initialSkus = initialSkusBase.map((s) => ({ ...s, id: newId() }))
 const initialSkus2 = initialSkusBase.map((s) => ({ ...s, id: newId() }))
 
-function calcularLinhas(skus, baseCustoUnit = {}) {
+function calcularLinhas(skus, baseCustoUnit = {}, calculaCpv = false) {
   return skus.map((sku) => {
     const qtde = parseNumber(sku.qtde)
     const preco = parseNumber(sku.precoUnitario)
     const impostosPct = parseNumber(sku.impostosPct)
     const descontoPct = parseNumber(sku.descontoPct)
-    const cpvPct = parseNumber(sku.cpvPct)
+    let cpvPct = parseNumber(sku.cpvPct)
     const comissaoFretePct = parseNumber(sku.comissaoFretePct)
     const addPct = parseNumber(sku.addPct)
 
@@ -69,6 +69,11 @@ function calcularLinhas(skus, baseCustoUnit = {}) {
     const rol = rob - impostos
     const custoUnitCalculado = qtde > 0 ? (rob * (cpvPct / 100)) / qtde : 0
     const custoUnit = baseCustoUnit[sku.nome] !== undefined ? baseCustoUnit[sku.nome] : custoUnitCalculado
+
+    if (calculaCpv && baseCustoUnit[sku.nome] !== undefined && novoUnit > 0) {
+      cpvPct = (custoUnit / novoUnit) * 100
+    }
+
     const cmv = -(custoUnit * qtde)
     const mb = rol + cmv
     const comissaoFrete = rob * (comissaoFretePct / 100)
@@ -87,6 +92,7 @@ function calcularLinhas(skus, baseCustoUnit = {}) {
       rol,
       cmv,
       custoUnit,
+      cpvPct,
       mb,
       comissaoFrete,
       add,
@@ -257,12 +263,12 @@ function Legend({ data }) {
   )
 }
 
-function DreTable({ skus, setSkus, title, storageKey, baseCustoUnit = {} }) {
+function DreTable({ skus, setSkus, title, storageKey, baseCustoUnit = {}, calculaCpv = false }) {
   useEffect(() => {
     saveStorage(storageKey, skus)
   }, [skus, storageKey])
 
-  const linhas = useMemo(() => calcularLinhas(skus, baseCustoUnit), [skus, baseCustoUnit])
+  const linhas = useMemo(() => calcularLinhas(skus, baseCustoUnit, calculaCpv), [skus, baseCustoUnit, calculaCpv])
   const totais = useMemo(() => calcularTotais(linhas), [linhas])
 
   const updateSku = (id, field, value) => {
@@ -389,15 +395,19 @@ function DreTable({ skus, setSkus, title, storageKey, baseCustoUnit = {} }) {
               </td>
               <td className="py-2 px-2 text-center text-emerald-700 font-semibold">{formatBRL(l.rol)}</td>
               <td className="py-2 px-2">
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value={l.cpvPct}
-                  onChange={(e) => updateSku(l.id, 'cpvPct', e.target.value)}
-                  className={inputPctClass}
-                />
+                {calculaCpv ? (
+                  <div className="text-center text-orange-700 font-medium text-xs">{formatPercent(l.cpvPct)}</div>
+                ) : (
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={l.cpvPct}
+                    onChange={(e) => updateSku(l.id, 'cpvPct', e.target.value)}
+                    className={inputPctClass}
+                  />
+                )}
               </td>
               <td className="py-2 px-2 text-center text-orange-600 text-xs">{formatBRL(l.custoUnit)}</td>
               <td className="py-2 px-2 text-center text-orange-700">{formatBRL(l.cmv)}</td>
@@ -592,7 +602,7 @@ export default function StepDre({ className, back, onGoToPmv }) {
       </div>
 
       <DreTable skus={skus} setSkus={setSkus} title="Período 1" storageKey="epfc_dre_skus" />
-      <DreTable skus={skus2} setSkus={setSkus2} title="Período 2" storageKey="epfc_dre_skus_2" baseCustoUnit={baseCustoUnit} />
+      <DreTable skus={skus2} setSkus={setSkus2} title="Período 2" storageKey="epfc_dre_skus_2" baseCustoUnit={baseCustoUnit} calculaCpv />
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <ResumoDre totais1={totais} totais2={totais2} />
