@@ -210,10 +210,12 @@ function DonutChart({ data }) {
           nameKey="name"
           cx="50%"
           cy="50%"
-          innerRadius={60}
-          outerRadius={90}
+          innerRadius={90}
+          outerRadius={130}
           paddingAngle={3}
-          cornerRadius={6}
+          cornerRadius={8}
+          labelLine={false}
+          label={({ name, pct }) => `${formatPercent(pct)}`}
         >
           {chartData.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} stroke="none" />
@@ -232,17 +234,17 @@ function DonutChart({ data }) {
 function Legend({ data }) {
   const total = data.reduce((sum, d) => sum + (d.mc || 0), 0)
   return (
-    <div className="flex flex-wrap justify-center gap-3 mt-4">
+    <div className="flex flex-wrap justify-center gap-4 mt-4">
       {data.map((d, idx) => {
         const pct = total > 0 ? (d.mc / total) * 100 : 0
         return (
-          <div key={d.nome} className="flex items-center gap-1.5 text-xs text-slate-600">
+          <div key={d.nome} className="flex items-center gap-2 text-sm text-slate-700">
             <span
-              className="w-3 h-3 rounded-full"
+              className="w-4 h-4 rounded-full"
               style={{ backgroundColor: PIE_COLORS[idx % PIE_COLORS.length] }}
             />
             <span className="font-medium">{d.nome}</span>
-            <span className="text-slate-400">{formatPercent(pct)}</span>
+            <span className="text-slate-500 font-semibold">{formatPercent(pct)}</span>
           </div>
         )
       })}
@@ -522,7 +524,7 @@ export default function StepDre({ className, back }) {
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
           <h3 className="text-lg font-bold text-violet-700 mb-2">Participação na MC</h3>
           <p className="text-sm text-slate-500 mb-4">Quanto cada SKU contribui para a margem total.</p>
-          <div className="h-56">
+          <div className="h-80">
             <DonutChart data={impactoData} />
           </div>
           <Legend data={impactoData} />
