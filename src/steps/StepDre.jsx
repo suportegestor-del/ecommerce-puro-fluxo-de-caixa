@@ -40,9 +40,9 @@ const emptySku = () => ({
 })
 
 const initialSkus = [
-  { id: 'sku-a', nome: 'SKU A', impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
-  { id: 'sku-b', nome: 'SKU B', impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
-  { id: 'sku-c', nome: 'SKU C', impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
+  { id: 'sku-a', nome: 'SKU A', qtde: 1000, precoUnitario: 150, impostosPct: 12, descontoPct: 0, cpvPct: 50, comissaoFretePct: 23, addPct: 1 },
+  { id: 'sku-b', nome: 'SKU B', qtde: 2200, precoUnitario: 114, impostosPct: 12, descontoPct: 0, cpvPct: 45, comissaoFretePct: 23, addPct: 1.5 },
+  { id: 'sku-c', nome: 'SKU C', qtde: 3000, precoUnitario: 67, impostosPct: 12, descontoPct: 0, cpvPct: 60, comissaoFretePct: 23, addPct: 3 },
 ]
 
 function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
@@ -87,7 +87,7 @@ export default function StepDre({ className, back }) {
       const impostos = rob * (impostosPct / 100)
       const desconto = rob * (descontoPct / 100)
       const rol = rob - impostos - desconto
-      const cmv = -rol * (cpvPct / 100)
+      const cmv = -rob * (cpvPct / 100)
       const mb = rol + cmv
       const comissaoFrete = rol * (comissaoFretePct / 100)
       const add = rol * (addPct / 100)

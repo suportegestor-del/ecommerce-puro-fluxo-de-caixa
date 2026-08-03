@@ -129,8 +129,7 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
   const remove = (id)        => updateData('fornecedores', lista.filter(f => f.id !== id))
   const change = (id, field, value) => updateData('fornecedores', lista.map(f => f.id === id ? { ...f, [field]: value } : f))
 
-  const jaAdicionado = (nome) => lista.some(f => f.nome === nome)
-  const totalGeral   = lista.reduce((s, f) => s + (Number(f.total) || 0), 0)
+  const totalGeral = lista.reduce((s, f) => s + (Number(f.total) || 0), 0)
 
   return (
     <div className={`w-full max-w-[98vw] px-2 ${className}`}>
@@ -143,13 +142,9 @@ export default function StepFornecedores({ data, updateData, next, back, classNa
       {/* Quick add */}
       <div className="flex flex-wrap gap-2 mb-4 justify-center">
         {SUGESTOES.map(s => (
-          <button key={s} onClick={() => !jaAdicionado(s) && add(s)} disabled={jaAdicionado(s)}
-            className={`text-xs px-3 py-1.5 rounded-full border transition font-medium ${
-              jaAdicionado(s)
-                ? 'bg-orange-100 border-orange-300 text-blue-700 cursor-default'
-                : 'bg-slate-100 border-slate-200 text-slate-700 hover:border-blue-500 hover:text-slate-900'
-            }`}>
-            {s} {jaAdicionado(s) ? '✓' : '+'}
+          <button key={s} onClick={() => add(s)}
+            className="text-xs px-3 py-1.5 rounded-full border border-slate-200 bg-slate-100 text-slate-700 hover:border-blue-500 hover:text-slate-900 transition font-medium">
+            {s} +
           </button>
         ))}
         <button onClick={() => add()} className="text-xs px-3 py-1.5 rounded-full border border-dashed border-slate-300 text-slate-400 hover:border-blue-500 hover:text-slate-900 transition font-medium">
