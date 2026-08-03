@@ -82,162 +82,16 @@ function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
   )
 }
 
-function SimpleLineChart({ data, valueKey, labelKey, color = '#fbbf24' }) {
-  const max = Math.max(...data.map((d) => d[valueKey] || 0), 1)
-  const min = Math.min(...data.map((d) => d[valueKey] || 0), 0)
-  const range = max - min || 1
-  const points = data.map((d, idx) => {
-    const x = data.length === 1 ? 50 : (idx / (data.length - 1)) * 100
-    const y = 100 - ((d[valueKey] - min) / range) * 100
-    return `${x},${y}`
-  }).join(' ')
-
-  return (
-    <div className="h-full w-full relative">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-        <polyline
-          fill="none"
-          stroke={color}
-          strokeWidth="1.5"
-          points={points}
-          vectorEffect="non-scaling-stroke"
-        />
-        {data.map((d, idx) => {
-          const x = data.length === 1 ? 50 : (idx / (data.length - 1)) * 100
-          const y = 100 - ((d[valueKey] - min) / range) * 100
-          return <circle key={idx} cx={x} cy={y} r="1.2" fill={color} />
-        })}
-      </svg>
-      <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2">
-        {data.map((d, idx) => (
-          <div key={idx} className="text-[10px] text-slate-500 truncate max-w-[80px] text-center">{d[labelKey]}</div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function AnalisePmv({ resultadoPeriodos, periodoAtivo, periodos, removePeriodo }) {
-  const idxAtual = resultadoPeriodos.findIndex((r) => r.periodo.id === periodoAtivo)
-  const idxAnterior = idxAtual > 0 ? idxAtual - 1 : null
-  const resultadoAtual = resultadoPeriodos[idxAtual]
-  const resultadoAnterior = idxAnterior !== null ? resultadoPeriodos[idxAnterior] : null
-
-  const analise = useMemo(() => {
-    if (!resultadoAnterior || !resultadoAtual) return []
-    return resultadoAtual.skuLinhas.map((linhaAtual) => {
-      const linhaAnterior = resultadoAnterior.skuLinhas.find((l) => l.sku.id === linhaAtual.sku.id)
-      if (!linhaAnterior) return null
-
-      const qtdAnt = linhaAnterior.qtde
-      const qtdAtu = linhaAtual.qtde
-      const unitAnt = linhaAnterior.unit
-      const unitAtu = linhaAtual.unit
-      const robAnt = linhaAnterior.rob
-      const robAtu = linhaAtual.rob
-
-      const deltaQtd = qtdAtu - qtdAnt
-      const deltaRob = robAtu - robAnt
-      const impactoVolume = deltaQtd * unitAnt
-      const impactoPreco = (unitAtu - unitAnt) * qtdAtu
-      const impactoMix = deltaRob - impactoVolume - impactoPreco
-
-      return {
-        sku: linhaAtual.sku,
-        anterior: { qtd: qtdAnt, rob: robAnt, unit: unitAnt, mcPct: linhaAnterior.rol > 0 ? (linhaAnterior.mc / linhaAnterior.rol) * 100 : 0 },
-        atual: { qtd: qtdAtu, rob: robAtu, unit: unitAtu, mcPct: linhaAtual.rol > 0 ? (linhaAtual.mc / linhaAtual.rol) * 100 : 0 },
-        deltaQtd,
-        deltaRob,
-        impactoVolume,
-        impactoPreco,
-        impactoMix,
-      }
-    }).filter(Boolean)
-  }, [resultadoAnterior, resultadoAtual])
-
-  if (!resultadoAnterior) {
-    return (
-      <div className="mt-6 rounded-[28px] border border-amber-200 bg-white p-6 shadow-lg shadow-amber-500/5">
-        <h3 className="text-lg font-bold text-amber-700 mb-2">Análise PMV</h3>
-        <p className="text-sm text-slate-500">Adicione pelo menos mais um período para comparar SKU a SKU.</p>
-      </div>
-    )
-  }
-
-  const nomeAnterior = resultadoAnterior.periodo.nome
-  const nomeAtual = resultadoAtual.periodo.nome
-
-  const deltaClass = (v) => (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-slate-500')
-  const deltaSignal = (v) => (v > 0 ? '+' : '')
-
-  return (
-    <div className="mt-6 rounded-[28px] border border-amber-200 bg-white p-6 overflow-x-auto shadow-lg shadow-amber-500/5">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <h3 className="text-lg font-bold text-amber-700">Análise PMV</h3>
-        <p className="text-sm text-slate-500">Comparando {nomeAtual} com {nomeAnterior}</p>
-      </div>
-      <table className="w-full text-sm min-w-[1100px]">
-        <thead>
-          <tr className="border-b border-amber-200 text-left">
-            <th className="py-3 px-2 text-slate-700 font-semibold sticky left-0 bg-white z-10">SKU</th>
-            <th className="py-3 px-2 text-slate-700 font-semibold">Nome</th>
-            <th colSpan="4" className="py-3 px-2 text-center text-cyan-700 font-semibold border-b border-slate-200">{nomeAnterior}</th>
-            <th colSpan="4" className="py-3 px-2 text-center text-emerald-700 font-semibold border-b border-slate-200">{nomeAtual}</th>
-            <th colSpan="2" className="py-3 px-2 text-center text-slate-700 font-semibold border-b border-slate-200">Variação</th>
-            <th colSpan="3" className="py-3 px-2 text-center text-amber-700 font-semibold border-b border-slate-200">Decomposição Δ R$</th>
-          </tr>
-          <tr className="border-b border-slate-200 text-left">
-            <th className="py-2 px-2"></th>
-            <th className="py-2 px-2"></th>
-            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Qtd</th>
-            <th className="py-2 px-2 text-cyan-700 font-semibold text-center">R$</th>
-            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Unit</th>
-            <th className="py-2 px-2 text-violet-700 font-semibold text-center">Marg%</th>
-            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Qtd</th>
-            <th className="py-2 px-2 text-cyan-700 font-semibold text-center">R$</th>
-            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Unit</th>
-            <th className="py-2 px-2 text-violet-700 font-semibold text-center">Marg%</th>
-            <th className="py-2 px-2 text-slate-500 font-semibold text-center">Δ Qtd</th>
-            <th className="py-2 px-2 text-cyan-700 font-semibold text-center">Δ R$</th>
-            <th className="py-2 px-2 text-amber-700 font-semibold text-center">Volume</th>
-            <th className="py-2 px-2 text-amber-700 font-semibold text-center">Preço</th>
-            <th className="py-2 px-2 text-amber-700 font-semibold text-center">Mix</th>
-          </tr>
-        </thead>
-        <tbody>
-          {analise.map((a) => (
-            <tr key={a.sku.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-              <td className="py-3 px-2 text-slate-800 font-semibold sticky left-0 bg-white z-10">{a.sku.nome}</td>
-              <td className="py-3 px-2 text-slate-500 text-xs max-w-[160px] truncate">{a.sku.nome}</td>
-              <td className="py-3 px-2 text-center text-slate-500">{formatNumber(a.anterior.qtd)}</td>
-              <td className="py-3 px-2 text-center text-cyan-700">{formatBRL(a.anterior.rob)}</td>
-              <td className="py-3 px-2 text-center text-slate-500">{formatBRL(a.anterior.unit)}</td>
-              <td className="py-3 px-2 text-center text-violet-700">{formatPercent(a.anterior.mcPct)}</td>
-              <td className="py-3 px-2 text-center text-slate-700">{formatNumber(a.atual.qtd)}</td>
-              <td className="py-3 px-2 text-center text-cyan-700 font-semibold">{formatBRL(a.atual.rob)}</td>
-              <td className="py-3 px-2 text-center text-slate-700">{formatBRL(a.atual.unit)}</td>
-              <td className="py-3 px-2 text-center text-violet-700 font-semibold">{formatPercent(a.atual.mcPct)}</td>
-              <td className={`py-3 px-2 text-center font-semibold ${deltaClass(a.deltaQtd)}`}>
-                {deltaSignal(a.deltaQtd)}{formatNumber(a.deltaQtd)}
-              </td>
-              <td className={`py-3 px-2 text-center font-semibold ${deltaClass(a.deltaRob)}`}>
-                {deltaSignal(a.deltaRob)}{formatBRL(a.deltaRob)}
-              </td>
-              <td className={`py-3 px-2 text-center ${deltaClass(a.impactoVolume)}`}>{deltaSignal(a.impactoVolume)}{formatBRL(a.impactoVolume)}</td>
-              <td className={`py-3 px-2 text-center ${deltaClass(a.impactoPreco)}`}>{deltaSignal(a.impactoPreco)}{formatBRL(a.impactoPreco)}</td>
-              <td className={`py-3 px-2 text-center ${deltaClass(a.impactoMix)}`}>{deltaSignal(a.impactoMix)}{formatBRL(a.impactoMix)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
 export default function StepPmv({ className, back }) {
   const [skus, setSkus] = useState(() => loadStorage('epfc_pmv_skus', initialSkus))
-  const [periodos, setPeriodos] = useState(() => loadStorage('epfc_pmv_periodos', initialPeriodos))
-  const [periodoAtivo, setPeriodoAtivo] = useState(() => loadStorage('epfc_pmv_periodoAtivo', initialPeriodos[0].id))
+  const [periodos, setPeriodos] = useState(() => {
+    const saved = loadStorage('epfc_pmv_periodos', initialPeriodos)
+    return Array.isArray(saved) && saved.length > 0 ? [saved[0]] : initialPeriodos
+  })
+  const [periodoAtivo, setPeriodoAtivo] = useState(() => {
+    const saved = loadStorage('epfc_pmv_periodos', initialPeriodos)
+    return Array.isArray(saved) && saved.length > 0 ? saved[0].id : initialPeriodos[0].id
+  })
 
   useEffect(() => {
     saveStorage('epfc_pmv_skus', skus)
@@ -256,9 +110,10 @@ export default function StepPmv({ className, back }) {
       const importedSkus = loadStorage('epfc_pmv_skus', null)
       const importedPeriodos = loadStorage('epfc_pmv_periodos', null)
       if (importedSkus) setSkus(importedSkus)
-      if (importedPeriodos) {
-        setPeriodos(importedPeriodos)
-        setPeriodoAtivo(importedPeriodos[0]?.id || 'p1')
+      if (Array.isArray(importedPeriodos) && importedPeriodos.length > 0) {
+        const primeiro = importedPeriodos[0]
+        setPeriodos([primeiro])
+        setPeriodoAtivo(primeiro.id)
       }
       saveStorage('epfc_pmv_imported', false)
     }
@@ -306,64 +161,49 @@ export default function StepPmv({ className, back }) {
     [resultadoPeriodos, periodoAtivo]
   )
 
-  const addPeriodo = () => {
-    const ultimo = periodos[periodos.length - 1]
-    const novoValores = {}
-    skus.forEach((sku) => {
-      novoValores[sku.id] = ultimo ? { ...ultimo.valores[sku.id] } : { qtde: 1000, unit: 150 }
-    })
-    const novo = { id: newId(), nome: `Período ${periodos.length + 1}`, valores: novoValores }
-    setPeriodos((prev) => [...prev, novo])
-    setPeriodoAtivo(novo.id)
-  }
-
-  const removePeriodo = (id) => {
-    if (periodos.length <= 1) return
-    setPeriodos((prev) => {
-      const filtrados = prev.filter((p) => p.id !== id)
-      if (periodoAtivo === id) setPeriodoAtivo(filtrados[filtrados.length - 1].id)
-      return filtrados
-    })
-  }
-
-  const updatePeriodoNome = (id, nome) => {
-    setPeriodos((prev) => prev.map((p) => (p.id === id ? { ...p, nome } : p)))
-  }
-
   const addSku = () => {
     const novo = emptySku()
     setSkus((prev) => [...prev, novo])
-    setPeriodos((prev) =>
-      prev.map((p) => ({
-        ...p,
-        valores: { ...p.valores, [novo.id]: { qtde: 1000, unit: 150 } },
-      }))
-    )
+    setPeriodos((prev) => {
+      if (prev.length === 0) return prev
+      const primeiro = prev[0]
+      return [
+        {
+          ...primeiro,
+          valores: { ...primeiro.valores, [novo.id]: { qtde: 1000, unit: 150 } },
+        },
+        ...prev.slice(1),
+      ]
+    })
   }
 
   const removeSku = (id) => {
     setSkus((prev) => prev.filter((s) => s.id !== id))
-    setPeriodos((prev) =>
-      prev.map((p) => {
-        const valores = { ...p.valores }
-        delete valores[id]
-        return { ...p, valores }
-      })
-    )
+    setPeriodos((prev) => {
+      if (prev.length === 0) return prev
+      const primeiro = prev[0]
+      const valores = { ...primeiro.valores }
+      delete valores[id]
+      return [{ ...primeiro, valores }, ...prev.slice(1)]
+    })
   }
 
   const updateSku = (id, field, value) => {
     setSkus((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
   }
 
-  const updateValores = (periodoId, skuId, field, value) => {
-    setPeriodos((prev) =>
-      prev.map((p) =>
-        p.id === periodoId
-          ? { ...p, valores: { ...p.valores, [skuId]: { ...p.valores[skuId], [field]: value } } }
-          : p
-      )
-    )
+  const updateValores = (skuId, field, value) => {
+    setPeriodos((prev) => {
+      if (prev.length === 0) return prev
+      const primeiro = prev[0]
+      return [
+        {
+          ...primeiro,
+          valores: { ...primeiro.valores, [skuId]: { ...primeiro.valores[skuId], [field]: value } },
+        },
+        ...prev.slice(1),
+      ]
+    })
   }
 
   const reset = () => {
@@ -377,7 +217,13 @@ export default function StepPmv({ className, back }) {
   const inputPctClass =
     'w-full bg-transparent border-b border-slate-300 text-center text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
 
-  const chartData = resultadoPeriodos.map((r) => ({ nome: r.periodo.nome, mc: r.total.mc, pmv: r.total.pmv }))
+  const skuChartData = useMemo(() => {
+    return (periodoSelecionado?.skuLinhas || []).map((l) => ({
+      nome: l.sku.nome,
+      mc: l.mc,
+      pmv: l.unit,
+    }))
+  }, [periodoSelecionado])
 
   return (
     <div className={`w-full max-w-[99vw] px-2 ${className}`}>
@@ -386,14 +232,14 @@ export default function StepPmv({ className, back }) {
           <div>
             <p className="text-xs uppercase tracking-[0.32em] text-amber-700 font-semibold">Simulador PMV</p>
             <h2 className="mt-3 text-4xl sm:text-5xl font-extrabold text-amber-700 tracking-tight">
-              Mix por Período
+              PMV
             </h2>
             <p className="mt-3 max-w-2xl text-sm sm:text-base text-slate-700">
-              Compare períodos com os mesmos SKUs, ajuste quantidade e preço unitário, e veja a evolução do PMV e da margem de contribuição.
+              Ajuste quantidade e preço unitário por SKU e veja o preço médio de venda e a margem de contribuição.
             </p>
           </div>
           <div className="rounded-3xl bg-amber-600 p-5 text-center shadow-lg shadow-amber-900/10 text-white">
-            <p className="text-xs uppercase tracking-[0.28em] text-amber-100 font-semibold">PMV {periodoSelecionado.periodo.nome}</p>
+            <p className="text-xs uppercase tracking-[0.28em] text-amber-100 font-semibold">PMV</p>
             <p className="mt-3 text-4xl font-bold">{formatBRL(periodoSelecionado.total.pmv)}</p>
             <p className="text-sm text-amber-100">preço médio de venda</p>
           </div>
@@ -423,48 +269,9 @@ export default function StepPmv({ className, back }) {
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        {periodos.map((p) => {
-          const ativo = p.id === periodoAtivo
-          return (
-            <button
-              key={p.id}
-              onClick={() => setPeriodoAtivo(p.id)}
-              className={`rounded-2xl px-4 py-2 text-sm font-medium transition ${
-                ativo
-                  ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
-                  : 'bg-slate-100 text-slate-600 hover:bg-amber-100 hover:text-amber-700'
-              }`}
-            >
-              {p.nome}
-            </button>
-          )
-        })}
-        <button
-          onClick={addPeriodo}
-          className="rounded-2xl px-4 py-2 text-sm font-medium bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700 transition"
-        >
-          + Período
-        </button>
-        {periodos.length > 1 && (
-          <button
-            onClick={() => removePeriodo(periodoAtivo)}
-            className="rounded-2xl px-4 py-2 text-sm font-medium bg-slate-100 text-rose-600 hover:bg-rose-100 transition"
-          >
-            × Remover {periodoSelecionado.periodo.nome}
-          </button>
-        )}
-      </div>
-
       <div className="mt-4 rounded-[28px] border border-slate-200 bg-white p-6 overflow-x-auto shadow-lg">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <h3 className="text-lg font-bold text-slate-800">DRE por SKU — {periodoSelecionado.periodo.nome}</h3>
-          <input
-            type="text"
-            value={periodoSelecionado.periodo.nome}
-            onChange={(e) => updatePeriodoNome(periodoSelecionado.periodo.id, e.target.value)}
-            className="bg-transparent border-b border-slate-300 text-slate-800 text-sm outline-none focus:border-amber-400 px-1"
-          />
+          <h3 className="text-lg font-bold text-slate-800">DRE por SKU</h3>
         </div>
         <table className="w-full text-sm min-w-[1200px]">
           <thead>
@@ -504,7 +311,7 @@ export default function StepPmv({ className, back }) {
                     min="0"
                     step="1"
                     value={periodoSelecionado.periodo.valores[l.sku.id].qtde}
-                    onChange={(e) => updateValores(periodoSelecionado.periodo.id, l.sku.id, 'qtde', e.target.value)}
+                    onChange={(e) => updateValores(l.sku.id, 'qtde', e.target.value)}
                     className={inputClass}
                   />
                 </td>
@@ -514,7 +321,7 @@ export default function StepPmv({ className, back }) {
                     min="0"
                     step="0.01"
                     value={periodoSelecionado.periodo.valores[l.sku.id].unit}
-                    onChange={(e) => updateValores(periodoSelecionado.periodo.id, l.sku.id, 'unit', e.target.value)}
+                    onChange={(e) => updateValores(l.sku.id, 'unit', e.target.value)}
                     className={inputClass}
                   />
                 </td>
@@ -613,25 +420,18 @@ export default function StepPmv({ className, back }) {
         </table>
       </div>
 
-      <AnalisePmv
-        resultadoPeriodos={resultadoPeriodos}
-        periodoAtivo={periodoAtivo}
-        periodos={periodos}
-        removePeriodo={removePeriodo}
-      />
-
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
-          <h3 className="text-lg font-bold text-violet-700 mb-4">Evolução da Margem de Contribuição</h3>
+          <h3 className="text-lg font-bold text-violet-700 mb-4">Participação na MC</h3>
           <div className="h-64">
-            <SimpleBarChart data={chartData} valueKey="mc" labelKey="nome" />
+            <SimpleBarChart data={skuChartData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
         <div className="rounded-[28px] border border-amber-200 bg-white p-6 shadow-lg shadow-amber-500/5">
-          <h3 className="text-lg font-bold text-amber-700 mb-4">Evolução do PMV</h3>
+          <h3 className="text-lg font-bold text-amber-700 mb-4">PMV por SKU</h3>
           <div className="h-64">
-            <SimpleLineChart data={chartData} valueKey="pmv" labelKey="nome" />
+            <SimpleBarChart data={skuChartData} valueKey="pmv" labelKey="nome" color="#fbbf24" />
           </div>
         </div>
       </div>
