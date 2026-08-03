@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { loadStorage, saveStorage } from '../utils/storage'
 
 function parseNumber(value) {
@@ -184,24 +185,64 @@ function ResumoDre({ totais1, totais2 }) {
   )
 }
 
-function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
-  const max = Math.max(...data.map((d) => Math.abs(d[valueKey]) || 0), 1)
+const PIE_COLORS = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c', '#60a5fa']
+
+function DonutChart({ data }) {
+  const total = data.reduce((sum, d) => sum + (d.mc || 0), 0)
+  const chartData = data
+    .filter((d) => d.mc > 0)
+    .map((d) => ({
+      name: d.nome,
+      value: d.mc,
+      pct: total > 0 ? (d.mc / total) * 100 : 0,
+    }))
+
+  if (chartData.length === 0) {
+    return <div className="h-full flex items-center justify-center text-slate-400 text-sm">Sem dados positivos</div>
+  }
+
   return (
-    <div className="flex items-end gap-3 h-full px-2">
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={chartData}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          innerRadius={60}
+          outerRadius={90}
+          paddingAngle={3}
+          cornerRadius={6}
+        >
+          {chartData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} stroke="none" />
+          ))}
+        </Pie>
+        <Tooltip
+          formatter={(value, name, props) => [formatBRL(value), props.payload.name]}
+          labelFormatter={() => ''}
+          contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
+        />
+      </PieChart>
+    </ResponsiveContainer>
+  )
+}
+
+function Legend({ data }) {
+  const total = data.reduce((sum, d) => sum + (d.mc || 0), 0)
+  return (
+    <div className="flex flex-wrap justify-center gap-3 mt-4">
       {data.map((d, idx) => {
-        const val = d[valueKey] || 0
-        const height = `${(Math.abs(val) / max) * 100}%`
-        const colors = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6']
+        const pct = total > 0 ? (d.mc / total) * 100 : 0
         return (
-          <div key={idx} className="flex-1 flex flex-col items-center justify-end group relative">
-            <div className="opacity-0 group-hover:opacity-100 transition absolute -top-8 text-[10px] text-slate-100 bg-slate-800 px-2 py-1 rounded-lg whitespace-nowrap">
-              {formatBRL(val)}
-            </div>
-            <div
-              style={{ height, backgroundColor: colors[idx % colors.length] || color }}
-              className="w-full rounded-t-lg min-h-[4px] transition-all"
+          <div key={d.nome} className="flex items-center gap-1.5 text-xs text-slate-600">
+            <span
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: PIE_COLORS[idx % PIE_COLORS.length] }}
             />
-            <div className="text-[10px] text-slate-500 mt-2 truncate max-w-full">{d[labelKey]}</div>
+            <span className="font-medium">{d.nome}</span>
+            <span className="text-slate-400">{formatPercent(pct)}</span>
           </div>
         )
       })}
@@ -479,11 +520,12 @@ export default function StepDre({ className, back }) {
         <ResumoDre totais1={totais} totais2={totais2} />
 
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
-          <h3 className="text-lg font-bold text-violet-700 mb-4">Participação na MC</h3>
+          <h3 className="text-lg font-bold text-violet-700 mb-2">Participação na MC</h3>
           <p className="text-sm text-slate-500 mb-4">Quanto cada SKU contribui para a margem total.</p>
-          <div className="h-64">
-            <SimpleBarChart data={impactoData} valueKey="mc" labelKey="nome" />
+          <div className="h-56">
+            <DonutChart data={impactoData} />
           </div>
+          <Legend data={impactoData} />
         </div>
       </div>
 
