@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
+import { loadStorage, saveStorage } from '../utils/storage'
 
 function parseNumber(value) {
   if (value === undefined || value === null || value === '') return 0
@@ -19,13 +20,23 @@ function formatPercent(value) {
 }
 
 export default function StepMargem({ className, back }) {
-  const [itemName, setItemName] = useState('Item X')
-  const [price, setPrice] = useState(120)
-  const [margin, setMargin] = useState(30)
-  const [quantity, setQuantity] = useState(20)
-  const [discount, setDiscount] = useState(5)
-  const [increase, setIncrease] = useState(5)
-  const [showTable, setShowTable] = useState(false)
+  const [state, setState] = useState(() => loadStorage('epfc_margem_state', {
+    itemName: 'Item X',
+    price: 120,
+    margin: 30,
+    quantity: 20,
+    discount: 5,
+    increase: 5,
+    showTable: false,
+  }))
+
+  const { itemName, price, margin, quantity, discount, increase, showTable } = state
+
+  useEffect(() => {
+    saveStorage('epfc_margem_state', state)
+  }, [state])
+
+  const setField = (field, value) => setState(prev => ({ ...prev, [field]: value }))
 
   const results = useMemo(() => {
     const preco = parseNumber(price)
@@ -178,10 +189,10 @@ export default function StepMargem({ className, back }) {
 
       <div className="grid gap-4 mt-6 lg:grid-cols-2 xl:grid-cols-3">
         {[
-          { label: 'Nome do produto', value: itemName, setter: setItemName, type: 'text', placeholder: 'Item X' },
-          { label: 'Preço unitário', value: price, setter: setPrice, type: 'number', step: '0.01', placeholder: '120' },
-          { label: 'Margem (%)', value: margin, setter: setMargin, type: 'number', step: '0.1', placeholder: '30' },
-        ].map(({ label, value, setter, type, step, placeholder }) => (
+          { label: 'Nome do produto', value: itemName, field: 'itemName', type: 'text', placeholder: 'Item X' },
+          { label: 'Preço unitário', value: price, field: 'price', type: 'number', step: '0.01', placeholder: '120' },
+          { label: 'Margem (%)', value: margin, field: 'margin', type: 'number', step: '0.1', placeholder: '30' },
+        ].map(({ label, value, field, type, step, placeholder }) => (
           <label key={label} className="rounded-[28px] border border-slate-200 bg-white p-5 transition hover:border-cyan-300 hover:bg-slate-50 hover:shadow-lg hover:shadow-cyan-500/5">
             <span className="text-xs uppercase tracking-[0.32em] text-slate-700 font-semibold">{label}</span>
             <input
@@ -190,7 +201,7 @@ export default function StepMargem({ className, back }) {
               min="0"
               value={value}
               placeholder={placeholder}
-              onChange={(e) => setter(e.target.value)}
+              onChange={(e) => setField(field, e.target.value)}
               className="mt-4 w-full bg-white border border-slate-300 rounded-3xl px-4 py-4 text-slate-900 text-lg outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 focus:bg-white"
             />
           </label>
@@ -199,10 +210,10 @@ export default function StepMargem({ className, back }) {
 
       <div className="grid gap-4 mt-4 lg:grid-cols-2 xl:grid-cols-3">
         {[
-          { label: 'Quantidade atual', value: quantity, setter: setQuantity, type: 'number', step: '1', placeholder: '20' },
-          { label: 'Desconto (%)', value: discount, setter: setDiscount, type: 'number', step: '0.1', placeholder: '5' },
-          { label: 'Aumento (%)', value: increase, setter: setIncrease, type: 'number', step: '0.1', placeholder: '5' },
-        ].map(({ label, value, setter, type, step, placeholder }) => (
+          { label: 'Quantidade atual', value: quantity, field: 'quantity', type: 'number', step: '1', placeholder: '20' },
+          { label: 'Desconto (%)', value: discount, field: 'discount', type: 'number', step: '0.1', placeholder: '5' },
+          { label: 'Aumento (%)', value: increase, field: 'increase', type: 'number', step: '0.1', placeholder: '5' },
+        ].map(({ label, value, field, type, step, placeholder }) => (
           <label key={label} className="rounded-[28px] border border-slate-200 bg-white p-5 transition hover:border-cyan-300 hover:bg-slate-50 hover:shadow-lg hover:shadow-cyan-500/5">
             <span className="text-xs uppercase tracking-[0.32em] text-slate-700 font-semibold">{label}</span>
             <input
@@ -211,7 +222,7 @@ export default function StepMargem({ className, back }) {
               min="0"
               value={value}
               placeholder={placeholder}
-              onChange={(e) => setter(e.target.value)}
+              onChange={(e) => setField(field, e.target.value)}
               className="mt-4 w-full bg-white border border-slate-300 rounded-3xl px-4 py-4 text-slate-900 text-lg outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/30 focus:bg-white"
             />
           </label>
@@ -305,19 +316,22 @@ export default function StepMargem({ className, back }) {
           ← Voltar
         </button>
         <button
-          onClick={() => setShowTable(true)}
+          onClick={() => setField('showTable', true)}
           className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-violet-500 to-purple-500 text-white font-semibold shadow-lg shadow-violet-500/20 hover:brightness-110 transition"
         >
           📊 Ver Simulações
         </button>
         <button
           onClick={() => {
-            setItemName('Item X')
-            setPrice(120)
-            setMargin(30)
-            setQuantity(20)
-            setDiscount(5)
-            setIncrease(5)
+            setState({
+              itemName: 'Item X',
+              price: 120,
+              margin: 30,
+              quantity: 20,
+              discount: 5,
+              increase: 5,
+              showTable: false,
+            })
           }}
           className="w-full sm:w-auto px-6 py-3 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold shadow-lg shadow-cyan-500/20 hover:brightness-110 transition"
         >
@@ -411,7 +425,7 @@ export default function StepMargem({ className, back }) {
 
           <div className="flex flex-col gap-3 mt-6 sm:flex-row">
             <button
-              onClick={() => setShowTable(false)}
+              onClick={() => setField('showTable', false)}
               className="w-full sm:w-auto px-6 py-3 rounded-3xl border border-slate-300 text-slate-700 hover:bg-slate-100 transition"
             >
               ← Voltar ao simulador

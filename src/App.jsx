@@ -11,6 +11,7 @@ import StepMargem from './steps/StepMargem'
 import StepDre from './steps/StepDre'
 import StepPmv from './steps/StepPmv'
 import ProgressBar from './components/ProgressBar'
+import { loadStorage, saveStorage } from './utils/storage'
 
 const STEPS = [
   'Boas-vindas',
@@ -34,11 +35,23 @@ const initialData = {
 }
 
 export default function App() {
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(() => loadStorage('epfc_step', 0))
   const [direction, setDirection] = useState('right')
-  const [data, setData] = useState(initialData)
+  const [data, setData] = useState(() => loadStorage('epfc_data', initialData))
   const [animKey, setAnimKey] = useState(0)
-  const [mode, setMode] = useState('fluxo')
+  const [mode, setMode] = useState(() => loadStorage('epfc_mode', 'fluxo'))
+
+  useEffect(() => {
+    saveStorage('epfc_data', data)
+  }, [data])
+
+  useEffect(() => {
+    saveStorage('epfc_step', step)
+  }, [step])
+
+  useEffect(() => {
+    saveStorage('epfc_mode', mode)
+  }, [mode])
 
   const switchMode = (newMode) => {
     setMode(newMode)

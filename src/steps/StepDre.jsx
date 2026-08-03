@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
+import { loadStorage, saveStorage } from '../utils/storage'
 
 function parseNumber(value) {
   if (value === undefined || value === null || value === '') return 0
@@ -71,7 +72,11 @@ function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
 }
 
 export default function StepDre({ className, back }) {
-  const [skus, setSkus] = useState(initialSkus)
+  const [skus, setSkus] = useState(() => loadStorage('epfc_dre_skus', initialSkus))
+
+  useEffect(() => {
+    saveStorage('epfc_dre_skus', skus)
+  }, [skus])
 
   const linhas = useMemo(() => {
     return skus.map((sku) => {

@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
+import { loadStorage, saveStorage } from '../utils/storage'
 
 function parseNumber(value) {
   if (value === undefined || value === null || value === '') return 0
@@ -234,9 +235,21 @@ function AnalisePmv({ resultadoPeriodos, periodoAtivo, periodos, removePeriodo }
 }
 
 export default function StepPmv({ className, back }) {
-  const [skus, setSkus] = useState(initialSkus)
-  const [periodos, setPeriodos] = useState(initialPeriodos)
-  const [periodoAtivo, setPeriodoAtivo] = useState(initialPeriodos[0].id)
+  const [skus, setSkus] = useState(() => loadStorage('epfc_pmv_skus', initialSkus))
+  const [periodos, setPeriodos] = useState(() => loadStorage('epfc_pmv_periodos', initialPeriodos))
+  const [periodoAtivo, setPeriodoAtivo] = useState(() => loadStorage('epfc_pmv_periodoAtivo', initialPeriodos[0].id))
+
+  useEffect(() => {
+    saveStorage('epfc_pmv_skus', skus)
+  }, [skus])
+
+  useEffect(() => {
+    saveStorage('epfc_pmv_periodos', periodos)
+  }, [periodos])
+
+  useEffect(() => {
+    saveStorage('epfc_pmv_periodoAtivo', periodoAtivo)
+  }, [periodoAtivo])
 
   const calculaLinhaSku = (sku, valores) => {
     const qtde = parseNumber(valores?.qtde ?? 0)
