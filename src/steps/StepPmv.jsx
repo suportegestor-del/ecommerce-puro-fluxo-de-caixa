@@ -406,47 +406,49 @@ export default function StepPmv({ className, back }) {
         </div>
       </div>
 
-      <div className="grid gap-4 mt-6 lg:grid-cols-4">
-        <div className="rounded-[28px] border-2 border-rose-300 bg-white p-5 shadow-md shadow-rose-900/5 hover:shadow-lg hover:shadow-rose-900/10 transition">
-          <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Capital de Giro Travado</p>
-          <p className="text-3xl font-bold text-rose-700">{formatBRL(r2.total.capitalGiro)}</p>
-          <p className="mt-2 text-sm font-medium text-rose-600/80">NCG estimada no {r2.periodo.nome}</p>
-        </div>
-        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-md lg:col-span-3">
-          <p className="text-xs uppercase tracking-[0.28em] text-slate-500 mb-4 font-bold">Prazos operacionais (dias)</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs text-slate-500 mb-1">Prazo médio de recebimento</label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={prazos.pmr}
-                onChange={(e) => updatePrazo('pmr', e.target.value)}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-slate-500 mb-1">Prazo médio de pagamento</label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={prazos.pmp}
-                onChange={(e) => updatePrazo('pmp', e.target.value)}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-slate-500 mb-1">Cobertura de estoque</label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={prazos.coberturaEstoque}
-                onChange={(e) => updatePrazo('coberturaEstoque', e.target.value)}
-                className={inputClass}
-              />
+      <div className="mt-6 rounded-[28px] border-2 border-rose-300 bg-white p-5 shadow-md shadow-rose-900/5 hover:shadow-lg hover:shadow-rose-900/10 transition">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center">
+          <div>
+            <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Capital de Giro Travado</p>
+            <p className="text-3xl font-bold text-rose-700">{formatBRL(r2.total.capitalGiro)}</p>
+            <p className="mt-2 text-sm font-medium text-rose-600/80">NCG estimada no {r2.periodo.nome}</p>
+          </div>
+          <div className="lg:col-span-3">
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-500 mb-4 font-bold">Prazos operacionais (dias)</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Prazo médio de recebimento</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={prazos.pmr}
+                  onChange={(e) => updatePrazo('pmr', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Prazo médio de pagamento</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={prazos.pmp}
+                  onChange={(e) => updatePrazo('pmp', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Cobertura de estoque</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={prazos.coberturaEstoque}
+                  onChange={(e) => updatePrazo('coberturaEstoque', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
             </div>
           </div>
         </div>
