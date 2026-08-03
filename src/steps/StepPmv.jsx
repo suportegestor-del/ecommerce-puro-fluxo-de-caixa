@@ -130,6 +130,12 @@ export default function StepPmv({ className, back }) {
     return normalizarPeriodos(savedSkus, [saved[0], saved[1]])
   })
 
+  const [prazos, setPrazos] = useState(() => loadStorage('epfc_pmv_prazos', { pmr: 30, pmp: 30, coberturaEstoque: 30 }))
+
+  useEffect(() => {
+    saveStorage('epfc_pmv_prazos', prazos)
+  }, [prazos])
+
   useEffect(() => {
     saveStorage('epfc_pmv_skus', skus)
   }, [skus])
@@ -200,7 +206,15 @@ export default function StepPmv({ className, back }) {
       )
       const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
       const mcPct = total.rob > 0 ? (total.mc / total.rob) * 100 : 0
-      return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct } }
+      const cmvAbs = Math.abs(total.cmv)
+      const diasPmr = parseNumber(prazos.pmr) || 0
+      const diasPmp = parseNumber(prazos.pmp) || 0
+      const diasCobertura = parseNumber(prazos.coberturaEstoque) || 0
+      const estoque = cmvAbs * (diasCobertura / 30)
+      const contasReceber = total.rob * (diasPmr / 30)
+      const contasPagar = cmvAbs * (diasPmp / 30)
+      const capitalGiro = estoque + contasReceber - contasPagar
+      return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct, capitalGiro, estoque, contasReceber, contasPagar } }
     })()
 
     const custoUnitBasePorSku = r1 ? Object.fromEntries(r1.skuLinhas.map((l) => [l.sku.id, l.qtde > 0 ? Math.abs(l.cmv) / l.qtde : 0])) : {}
@@ -224,11 +238,19 @@ export default function StepPmv({ className, back }) {
       )
       const pmv = total.qtde > 0 ? total.rob / total.qtde : 0
       const mcPct = total.rob > 0 ? (total.mc / total.rob) * 100 : 0
-      return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct } }
+      const cmvAbs = Math.abs(total.cmv)
+      const diasPmr = parseNumber(prazos.pmr) || 0
+      const diasPmp = parseNumber(prazos.pmp) || 0
+      const diasCobertura = parseNumber(prazos.coberturaEstoque) || 0
+      const estoque = cmvAbs * (diasCobertura / 30)
+      const contasReceber = total.rob * (diasPmr / 30)
+      const contasPagar = cmvAbs * (diasPmp / 30)
+      const capitalGiro = estoque + contasReceber - contasPagar
+      return { periodo: p, skuLinhas, total: { ...total, pmv, mcPct, capitalGiro, estoque, contasReceber, contasPagar } }
     })()
 
     return [r1, r2].filter(Boolean)
-  }, [periodos, skus])
+  }, [periodos, skus, prazos])
 
   const r1 = resultadoPeriodos[0]
   const r2 = resultadoPeriodos[1] || r1
@@ -315,6 +337,10 @@ export default function StepPmv({ className, back }) {
     setPeriodos((prev) => prev.map((p) => (p.id === id ? { ...p, nome } : p)))
   }
 
+  const updatePrazo = (field, value) => {
+    setPrazos((prev) => ({ ...prev, [field]: value }))
+  }
+
   const reset = () => {
     setSkus(initialSkus)
     setPeriodos(initialPeriodos)
@@ -327,7 +353,11 @@ export default function StepPmv({ className, back }) {
   const inputNomeClass =
     'w-full bg-transparent border-b border-slate-300 text-left text-slate-900 py-1 outline-none transition focus:border-cyan-500 focus:bg-blue-50/50'
 
-  const chartData = resultadoPeriodos.map((r) => ({ nome: r.periodo.nome, mc: r.total.mc, pmv: r.total.qtde > 0 ? r.total.rob / r.total.qtde : 0 }))
+  const chartData = resultadoPeriodos.map((r) => ({
+    nome: r.periodo.nome,
+    mc: r.total.mc,
+    capitalGiro: r.total.capitalGiro,
+  }))
 
   const deltaClass = (v) => (v > 0 ? 'text-emerald-600' : v < 0 ? 'text-rose-600' : 'text-slate-500')
   const deltaSignal = (v) => (v > 0 ? '+' : '')
@@ -373,6 +403,52 @@ export default function StepPmv({ className, back }) {
           <p className="text-xs uppercase tracking-[0.28em] text-amber-700 mb-3 font-bold">PMV</p>
           <p className="text-3xl font-bold text-amber-700">{formatBRL(r2.total.pmv)}</p>
           <p className="mt-2 text-sm font-medium text-amber-600/80">preço médio de venda</p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 mt-6 lg:grid-cols-4">
+        <div className="rounded-[28px] border-2 border-rose-300 bg-white p-5 shadow-md shadow-rose-900/5 hover:shadow-lg hover:shadow-rose-900/10 transition">
+          <p className="text-xs uppercase tracking-[0.28em] text-rose-700 mb-3 font-bold">Capital de Giro Travado</p>
+          <p className="text-3xl font-bold text-rose-700">{formatBRL(r2.total.capitalGiro)}</p>
+          <p className="mt-2 text-sm font-medium text-rose-600/80">NCG estimada no {r2.periodo.nome}</p>
+        </div>
+        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-md lg:col-span-3">
+          <p className="text-xs uppercase tracking-[0.28em] text-slate-500 mb-4 font-bold">Prazos operacionais (dias)</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Prazo médio de recebimento</label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={prazos.pmr}
+                onChange={(e) => updatePrazo('pmr', e.target.value)}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Prazo médio de pagamento</label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={prazos.pmp}
+                onChange={(e) => updatePrazo('pmp', e.target.value)}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Cobertura de estoque</label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={prazos.coberturaEstoque}
+                onChange={(e) => updatePrazo('coberturaEstoque', e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -551,10 +627,10 @@ export default function StepPmv({ className, back }) {
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-amber-200 bg-white p-6 shadow-lg shadow-amber-500/5">
-          <h3 className="text-lg font-bold text-amber-700 mb-4">Evolução do PMV Bruto</h3>
+        <div className="rounded-[28px] border border-rose-200 bg-white p-6 shadow-lg shadow-rose-500/5">
+          <h3 className="text-lg font-bold text-rose-700 mb-4">Evolução do Capital de Giro Travado</h3>
           <div className="h-80">
-            <SimpleBarChart data={chartData} valueKey="pmv" labelKey="nome" color="#fbbf24" />
+            <SimpleBarChart data={chartData} valueKey="capitalGiro" labelKey="nome" color="#fb7185" />
           </div>
         </div>
       </div>
