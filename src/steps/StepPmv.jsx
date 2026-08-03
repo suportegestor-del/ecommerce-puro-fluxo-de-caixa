@@ -251,6 +251,19 @@ export default function StepPmv({ className, back }) {
     saveStorage('epfc_pmv_periodoAtivo', periodoAtivo)
   }, [periodoAtivo])
 
+  useEffect(() => {
+    if (loadStorage('epfc_pmv_imported', false)) {
+      const importedSkus = loadStorage('epfc_pmv_skus', null)
+      const importedPeriodos = loadStorage('epfc_pmv_periodos', null)
+      if (importedSkus) setSkus(importedSkus)
+      if (importedPeriodos) {
+        setPeriodos(importedPeriodos)
+        setPeriodoAtivo(importedPeriodos[0]?.id || 'p1')
+      }
+      saveStorage('epfc_pmv_imported', false)
+    }
+  }, [])
+
   const calculaLinhaSku = (sku, valores) => {
     const qtde = parseNumber(valores?.qtde ?? 0)
     const unit = parseNumber(valores?.unit ?? 0)
