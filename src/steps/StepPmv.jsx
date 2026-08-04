@@ -91,29 +91,38 @@ function normalizarPeriodos(skus, periodos) {
 
 const colors = ['#22d3ee', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c']
 
+function roundUpNice(value) {
+  if (value <= 0) return 1
+  const magnitude = 10 ** Math.floor(Math.log10(value))
+  const step = magnitude / 2
+  return Math.ceil(value / step) * step
+}
+
 function SimpleBarChart({ data, valueKey, labelKey, color = '#a78bfa' }) {
   const numericValues = data.map((d) => Number(d?.[valueKey]) || 0)
-  const max = Math.max(...numericValues.map(Math.abs), 1)
-  const min = Math.min(...numericValues.map(Math.abs))
-  const base = min
-  const range = max - min
+  const maxValue = Math.max(...numericValues.map(Math.abs), 1)
+  const scaleMax = roundUpNice(maxValue)
+  const scaleMin = 0
   return (
     <div className="flex items-end gap-4 h-full px-4 pb-2">
       {data.map((d, idx) => {
         const val = Number(d?.[valueKey]) || 0
-        const rawPct = range > 0 ? ((Math.abs(val) - base) / range) * 100 : 100
+        const scaleRange = scaleMax - scaleMin
+        const rawPct = scaleRange > 0 ? ((Math.abs(val) - scaleMin) / scaleRange) * 100 : 100
         const pct = Math.max(Math.min(rawPct, 100), 0)
-        const height = `${Math.max(pct, 3)}%`
+        const height = `${Math.max(pct, 5)}%`
         return (
-          <div key={idx} className="flex-1 flex flex-col items-center justify-end group relative">
-            <div className="mb-2 text-xs font-bold text-slate-700 text-center whitespace-nowrap">
-              {formatBRL(val)}
+          <div key={idx} className="flex-1 flex flex-col h-full min-h-0">
+            <div className="flex-1 w-full flex flex-col justify-end min-h-0">
+              <div className="mb-2 text-xs font-bold text-slate-700 text-center whitespace-nowrap">
+                {formatBRL(val)}
+              </div>
+              <div
+                style={{ height, backgroundColor: colors[idx % colors.length] || color }}
+                className="w-full rounded-t-xl min-h-[28px] transition-all"
+              />
             </div>
-            <div
-              style={{ height, backgroundColor: colors[idx % colors.length] || color }}
-              className="w-full rounded-t-xl min-h-[28px] transition-all"
-            />
-            <div className="text-xs text-slate-600 mt-2 truncate max-w-full font-medium">{d[labelKey]}</div>
+            <div className="text-xs text-slate-600 mt-2 text-center truncate max-w-full font-medium">{d[labelKey]}</div>
           </div>
         )
       })}
@@ -134,7 +143,7 @@ export default function StepPmv({ className, back }) {
     return normalizarPeriodos(savedSkus, [saved[0], saved[1]])
   })
 
-  const [prazos, setPrazos] = useState(() => loadStorage('epfc_pmv_prazos', { pmr: 30, pmp: 30, coberturaEstoque: 30 }))
+  const [prazos, setPrazos] = useState(() => loadStorage('epfc_pmv_prazos', { pmr: 21, pmp: 30, coberturaEstoque: 40 }))
 
   useEffect(() => {
     saveStorage('epfc_pmv_prazos', prazos)
@@ -212,8 +221,8 @@ export default function StepPmv({ className, back }) {
     const diasCobertura = parseNumber(prazos.coberturaEstoque) || 0
     const estoque = cmvAbs * (diasCobertura / 30)
     const contasReceber = total.rob * (diasPmr / 30)
-    const contasPagar = cmvAbs * (diasPmp / 30)
-    const capitalGiro = estoque + contasReceber - contasPagar
+    const contasPagar = -(cmvAbs * (diasPmp / 30))
+    const capitalGiro = estoque + contasReceber + contasPagar
     return { ...total, pmv, mcPct, capitalGiro, estoque, contasReceber, contasPagar }
   }
 
@@ -583,14 +592,14 @@ export default function StepPmv({ className, back }) {
       <div className="grid gap-4 mt-6 lg:grid-cols-2">
         <div className="rounded-[28px] border border-violet-200 bg-white p-6 shadow-lg shadow-violet-500/5">
           <h3 className="text-lg font-bold text-violet-700 mb-4">Evolução da Margem de Contribuição</h3>
-          <div className="h-[28rem]">
+          <div className="h-[14rem]">
             <SimpleBarChart data={chartData} valueKey="mc" labelKey="nome" />
           </div>
         </div>
 
         <div className="rounded-[28px] border border-rose-200 bg-white p-6 shadow-lg shadow-rose-500/5">
           <h3 className="text-lg font-bold text-rose-700 mb-4">Evolução do Capital de Giro Travado</h3>
-          <div className="h-[28rem]">
+          <div className="h-[14rem]">
             <SimpleBarChart data={chartData} valueKey="capitalGiro" labelKey="nome" color="#fb7185" />
           </div>
         </div>
@@ -678,7 +687,7 @@ export default function StepPmv({ className, back }) {
               </tr>
               <tr className="bg-rose-100/50 font-semibold">
                 <td className="py-2 px-2 text-rose-800">NCG</td>
-                <td className="py-2 px-2 text-rose-700">Estoque + Receber - Pagar</td>
+                <td className="py-2 px-2 text-rose-700">Estoque + Receber + Pagar</td>
                 <td className={`py-2 px-2 text-right ${r1.total.capitalGiro >= 0 ? 'text-rose-700' : 'text-emerald-600'}`}>{formatBRL(r1.total.capitalGiro)}</td>
                 <td className={`py-2 px-2 text-right ${r2.total.capitalGiro >= 0 ? 'text-rose-700' : 'text-emerald-600'}`}>{formatBRL(r2.total.capitalGiro)}</td>
                 <td className={`py-2 px-2 text-right ${deltaClass(r2.total.capitalGiro - r1.total.capitalGiro)}`}>{deltaSignal(r2.total.capitalGiro - r1.total.capitalGiro)}{formatBRL(r2.total.capitalGiro - r1.total.capitalGiro)}</td>
