@@ -156,21 +156,19 @@ export default function App() {
             </svg>
           </button>
           {showQR && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/40 backdrop-blur-sm p-4" onClick={() => setShowQR(false)}>
-              <div className="my-auto flex flex-col items-center gap-6 p-6 sm:p-10 rounded-3xl bg-white border border-slate-200 shadow-2xl max-w-full" onClick={e => e.stopPropagation()}>
-                <p className="text-2xl font-bold text-slate-800 tracking-wide text-center">Acesse o Fluxo de Caixa</p>
-                <p className="text-slate-500 text-base -mt-3 text-center">Aponte a câmera do celular para o QR Code</p>
-                <div className="bg-white rounded-2xl p-4 shadow-xl border border-slate-100 max-w-full">
+            <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/40 backdrop-blur-sm p-2 sm:p-4" onClick={() => setShowQR(false)}>
+              <div className="my-auto flex flex-col items-center gap-4 sm:gap-6 p-4 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-2xl max-w-full max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                <p className="text-xl sm:text-2xl font-bold text-slate-800 tracking-wide text-center">Acesse o Fluxo de Caixa</p>
+                <p className="text-slate-500 text-sm sm:text-base -mt-2 text-center">Aponte a câmera do celular para o QR Code</p>
+                <div className="bg-white rounded-2xl p-2 sm:p-4 shadow-xl border border-slate-100 max-w-full">
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(SITE_URL)}&bgcolor=ffffff&color=000000&margin=8`}
                     alt="QR Code"
-                    width={400}
-                    height={400}
-                    className="rounded-xl max-w-full h-auto max-h-[50vh] sm:max-h-[60vh]"
+                    className="rounded-xl max-w-full h-auto max-h-[35vh] sm:max-h-[50vh]"
                   />
                 </div>
-                <p className="text-slate-400 text-sm text-center break-all">{SITE_URL}</p>
-                <button onClick={() => setShowQR(false)} className="mt-2 px-8 py-2.5 rounded-xl border border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-400 transition text-sm">
+                <p className="text-slate-400 text-xs sm:text-sm text-center break-all">{SITE_URL}</p>
+                <button onClick={() => setShowQR(false)} className="px-6 sm:px-8 py-2 rounded-xl border border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-400 transition text-sm">
                   Fechar
                 </button>
               </div>
