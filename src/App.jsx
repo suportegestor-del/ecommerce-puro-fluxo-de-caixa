@@ -155,28 +155,28 @@ export default function App() {
               <path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/>
             </svg>
           </button>
-          {showQR && (
-            <>
-              <div className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowQR(false)} />
-              <div className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-2 sm:m-4 flex flex-col items-center gap-4 sm:gap-6 p-4 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-2xl max-w-[90vw] max-h-[90vh] overflow-auto" onClick={e => e.stopPropagation()}>
-                <p className="text-xl sm:text-2xl font-bold text-slate-800 tracking-wide text-center">Acesse o Fluxo de Caixa</p>
-                <p className="text-slate-500 text-sm sm:text-base -mt-2 text-center">Aponte a câmera do celular para o QR Code</p>
-                <div className="bg-white rounded-2xl p-2 sm:p-4 shadow-xl border border-slate-100 max-w-full">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(SITE_URL)}&bgcolor=ffffff&color=000000&margin=8`}
-                    alt="QR Code"
-                    className="rounded-xl w-full h-auto max-h-[35vh] sm:max-h-[50vh]"
-                  />
-                </div>
-                <p className="text-slate-400 text-xs sm:text-sm text-center break-all">{SITE_URL}</p>
-                <button onClick={() => setShowQR(false)} className="px-6 sm:px-8 py-2 rounded-xl border border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-400 transition text-sm">
-                  Fechar
-                </button>
-              </div>
-            </>
-          )}
         </div>
       </header>
+      {showQR && (
+        <>
+          <div className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowQR(false)} />
+          <div className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3 sm:gap-5 p-3 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-2xl max-w-[92vw] max-h-[85vh] overflow-auto" onClick={e => e.stopPropagation()}>
+            <p className="text-lg sm:text-2xl font-bold text-slate-800 tracking-wide text-center">Acesse o Fluxo de Caixa</p>
+            <p className="text-slate-500 text-sm sm:text-base -mt-1 text-center">Aponte a câmera do celular</p>
+            <div className="bg-white rounded-2xl p-2 sm:p-3 shadow-xl border border-slate-100 max-w-full">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(SITE_URL)}&bgcolor=ffffff&color=000000&margin=8`}
+                alt="QR Code"
+                className="rounded-xl w-full h-auto max-h-[30vh] sm:max-h-[45vh]"
+              />
+            </div>
+            <p className="text-slate-400 text-xs sm:text-sm text-center break-all">{SITE_URL}</p>
+            <button onClick={() => setShowQR(false)} className="px-6 sm:px-8 py-2 rounded-xl border border-slate-300 text-slate-600 hover:text-slate-900 hover:border-slate-400 transition text-sm">
+              Fechar
+            </button>
+          </div>
+        </>
+      )}
       {mode === 'fluxo' && step > 0 && step < STEPS.length - 1 && (
         <ProgressBar current={step} total={STEPS.length - 2} labels={STEPS.slice(1, -1)} />
       )}
